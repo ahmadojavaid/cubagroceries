@@ -52,7 +52,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     } catch (_) {}
 
     if (!mounted) return;
-    context.go(isLoggedIn ? '/home' : '/login');
+    if (isLoggedIn) {
+      final isRider = ref.read(authProvider).isRider;
+      context.go(isRider ? '/rider-home' : '/home');
+    } else {
+      context.go('/login');
+    }
   }
 
   @override

@@ -25,6 +25,7 @@ class AuthController extends Controller
             'date_of_birth' => 'nullable|date',
         ]);
 
+        $validated['role'] = 'customer';
         $user = User::create($validated);
 
         $token = $user->createToken('mobile-app')->plainTextToken;

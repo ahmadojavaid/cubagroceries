@@ -12,6 +12,7 @@ class DeliveryBoy extends Model
         'name',
         'phone',
         'payment',
+        'user_id',
     ];
 
     protected function casts(): array
@@ -22,6 +23,11 @@ class DeliveryBoy extends Model
     }
 
     // Relationships
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function orders()
     {

@@ -35,7 +35,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
 
     if (success && mounted) {
-      context.go('/home');
+      final isRider = ref.read(authProvider).isRider;
+      context.go(isRider ? '/rider-home' : '/home');
     }
   }
 

@@ -11,25 +11,32 @@ class AuthState {
   final bool isLoading;
   final Map<String, dynamic>? user;
   final String? error;
+  final String role; // 'customer' or 'rider'
 
   const AuthState({
     this.isAuthenticated = false,
     this.isLoading = false,
     this.user,
     this.error,
+    this.role = 'customer',
   });
+
+  bool get isRider => role == 'rider';
+  bool get isCustomer => role == 'customer';
 
   AuthState copyWith({
     bool? isAuthenticated,
     bool? isLoading,
     Map<String, dynamic>? user,
     String? error,
+    String? role,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       isLoading: isLoading ?? this.isLoading,
       user: user ?? this.user,
       error: error,
+      role: role ?? this.role,
     );
   }
 }
@@ -49,9 +56,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
         final response = await _api.get('/auth/user');
         final data = response.data;
         if (data['success'] == true) {
+          final userData = Map<String, dynamic>.from(data['data']);
           state = AuthState(
             isAuthenticated: true,
-            user: Map<String, dynamic>.from(data['data']),
+            user: userData,
+            role: userData['role'] as String? ?? 'customer',
           );
           // Send FCM token after auth verification
           _fcm.initialize();
@@ -89,9 +98,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final data = response.data;
       if (data['success'] == true) {
         await _api.saveToken(data['data']['token']);
+        final userData = Map<String, dynamic>.from(data['data']['user']);
         state = AuthState(
           isAuthenticated: true,
-          user: Map<String, dynamic>.from(data['data']['user']),
+          user: userData,
+          role: userData['role'] as String? ?? 'customer',
         );
         _fcm.initialize();
         return true;
@@ -121,9 +132,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final data = response.data;
       if (data['success'] == true) {
         await _api.saveToken(data['data']['token']);
+        final userData = Map<String, dynamic>.from(data['data']['user']);
         state = AuthState(
           isAuthenticated: true,
-          user: Map<String, dynamic>.from(data['data']['user']),
+          user: userData,
+          role: userData['role'] as String? ?? 'customer',
         );
         _fcm.initialize();
         return true;
@@ -170,4 +183,14 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final api = ref.watch(apiClientProvider);
   final fcm = ref.watch(fcmServiceProvider);
   return AuthNotifier(api, fcm);
+});
+
+/// Derived provider: current user role
+final userRoleProvider = Provider<String>((ref) {
+  return ref.watch(authProvider).role;
+});
+
+/// Derived provider: is the user a rider?
+final isRiderProvider = Provider<bool>((ref) {
+  return ref.watch(authProvider).isRider;
 });

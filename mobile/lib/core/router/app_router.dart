@@ -9,6 +9,7 @@ import '../../features/categories/screens/category_listing_screen.dart';
 import '../../features/home/screens/navigation_shell.dart';
 import '../../features/products/screens/product_detail_screen.dart';
 import '../../features/products/screens/product_listing_screen.dart';
+import '../../features/products/screens/product_reviews_screen.dart';
 import '../../features/products/screens/search_screen.dart';
 import '../../features/orders/screens/checkout_screen.dart';
 import '../../features/orders/screens/order_detail_screen.dart';
@@ -16,14 +17,18 @@ import '../../features/profile/data/address_model.dart';
 import '../../features/profile/screens/address_form_screen.dart';
 import '../../features/profile/screens/address_list_screen.dart';
 import '../../features/profile/screens/settings_screen.dart';
+import '../../features/cart/screens/cart_screen.dart';
 import '../../features/complaints/screens/complaint_detail_screen.dart';
 import '../../features/complaints/screens/complaint_form_screen.dart';
 import '../../features/complaints/screens/complaints_history_screen.dart';
 import '../../features/complaints/data/complaint_model.dart';
 import '../../features/notifications/screens/notification_inbox_screen.dart';
+import '../../features/surveys/screens/survey_screen.dart';
 import '../../features/settings/screens/faq_screen.dart';
 import '../../features/settings/screens/store_hours_screen.dart';
 import '../../features/settings/screens/legal_page_screen.dart';
+import '../../features/rider/screens/rider_navigation_shell.dart';
+import '../../features/rider/screens/rider_order_detail_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -49,6 +54,21 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => const NavigationShell(),
+      ),
+
+      // Rider shell
+      GoRoute(
+        path: '/rider-home',
+        builder: (context, state) => const RiderNavigationShell(),
+      ),
+
+      // Rider order detail
+      GoRoute(
+        path: '/rider/orders/:orderNumber',
+        builder: (context, state) {
+          final orderNumber = state.pathParameters['orderNumber']!;
+          return RiderOrderDetailScreen(orderNumber: orderNumber);
+        },
       ),
 
       // Category listing (sub-categories)
@@ -81,6 +101,20 @@ final routerProvider = Provider<GoRouter>((ref) {
           final id = int.parse(state.pathParameters['id']!);
           return ProductDetailScreen(productId: id);
         },
+        routes: [
+          GoRoute(
+            path: 'reviews',
+            builder: (context, state) {
+              final id = int.parse(state.pathParameters['id']!);
+              final extra = state.extra as Map<String, dynamic>?;
+              final name = extra?['product_name'] as String? ?? 'Reviews';
+              return ProductReviewsScreen(
+                productId: id,
+                productName: name,
+              );
+            },
+          ),
+        ],
       ),
 
       // Search
@@ -106,6 +140,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
+      // Cart (standalone, accessible from product detail etc.)
+      GoRoute(
+        path: '/cart',
+        builder: (context, state) => const CartScreen(),
+      ),
+
       // Checkout
       GoRoute(
         path: '/checkout',
@@ -125,6 +165,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+
+      // Surveys
+      GoRoute(
+        path: '/surveys/:id',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return SurveyScreen(surveyId: id);
+        },
       ),
 
       // Notifications

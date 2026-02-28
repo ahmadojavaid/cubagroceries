@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\V1\AppSettingController;
 use App\Http\Controllers\Api\V1\CouponController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\SurveyController;
+use App\Http\Controllers\Api\V1\RiderController;
+use App\Http\Middleware\EnsureUserIsRider;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -50,6 +52,12 @@ Route::prefix('v1')->group(function () {
         Route::get('/products', [ProductsController::class, 'index']);
         Route::get('/products/search', [ProductsController::class, 'search']);
         Route::get('/products/{id}', [ProductsController::class, 'show']);
+        Route::get('/products/{id}/related', [ProductsController::class, 'related']);
+
+        // Search history
+        Route::get('/search-history', [ProductsController::class, 'searchHistory']);
+        Route::delete('/search-history', [ProductsController::class, 'clearSearchHistory']);
+        Route::delete('/search-history/{id}', [ProductsController::class, 'deleteSearchHistoryItem']);
 
         // Profile
         Route::get('/profile', [ProfileController::class, 'show']);
@@ -109,6 +117,13 @@ Route::prefix('v1')->group(function () {
 
         // Surveys
         Route::get('/surveys', [SurveyController::class, 'index']);
-        Route::post('/surveys/{surveyId}/respond', [SurveyController::class, 'respond']);
+        Route::get('/surveys/{id}', [SurveyController::class, 'show']);
+        Route::post('/surveys/{id}/respond', [SurveyController::class, 'respond']);
+
+        // Rider endpoints
+        Route::prefix('rider')->middleware(EnsureUserIsRider::class)->group(function () {
+            Route::get('/orders', [RiderController::class, 'orders']);
+            Route::get('/orders/{orderNumber}', [RiderController::class, 'show']);
+        });
     });
 });

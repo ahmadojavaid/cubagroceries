@@ -4,11 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DeliveryBoyResource\Pages;
 use App\Models\DeliveryBoy;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Hash;
 
 class DeliveryBoyResource extends Resource
 {
@@ -53,6 +56,19 @@ class DeliveryBoyResource extends Resource
                             ->helperText('Total payment/earnings'),
                     ])
                     ->columns(2),
+
+                Forms\Components\Section::make('App Login Account')
+                    ->description('Link a user account so this rider can log into the mobile app.')
+                    ->schema([
+                        Forms\Components\Select::make('user_id')
+                            ->label('Linked User Account')
+                            ->relationship('user', 'email')
+                            ->searchable(['email', 'firstname', 'lastname'])
+                            ->preload()
+                            ->placeholder('No account linked')
+                            ->helperText('Only rider-role accounts are shown. Use the "Create Login" action to create one.'),
+                    ])
+                    ->collapsible(),
             ]);
     }
 
@@ -76,6 +92,12 @@ class DeliveryBoyResource extends Resource
                     ->money('PKR')
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('user.email')
+                    ->label('App Login')
+                    ->placeholder('No account')
+                    ->icon('heroicon-o-device-phone-mobile')
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime('M d, Y')
                     ->sortable()
@@ -85,6 +107,47 @@ class DeliveryBoyResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('createLogin')
+                    ->label('Create Login')
+                    ->icon('heroicon-o-user-plus')
+                    ->color('success')
+                    ->visible(fn (DeliveryBoy $record): bool => $record->user_id === null)
+                    ->form([
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->unique('users', 'email')
+                            ->placeholder('rider@cubagroceries.com'),
+
+                        Forms\Components\TextInput::make('password')
+                            ->password()
+                            ->required()
+                            ->minLength(6)
+                            ->placeholder('Min 6 characters'),
+                    ])
+                    ->action(function (DeliveryBoy $record, array $data): void {
+                        $names = explode(' ', $record->name, 2);
+
+                        $user = User::create([
+                            'identity' => $record->phone,
+                            'email' => $data['email'],
+                            'firstname' => $names[0],
+                            'lastname' => $names[1] ?? '',
+                            'password' => Hash::make($data['password']),
+                            'role' => 'rider',
+                        ]);
+
+                        $record->update(['user_id' => $user->id]);
+
+                        Notification::make()
+                            ->success()
+                            ->title('Login Created')
+                            ->body("Account {$data['email']} created for {$record->name}.")
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (DeliveryBoy $record) => "Create Login for {$record->name}"),
+
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

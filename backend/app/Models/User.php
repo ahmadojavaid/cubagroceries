@@ -19,6 +19,7 @@ class User extends Authenticatable
         'password',
         'date_of_birth',
         'wallet_amount',
+        'role',
         'fcm_token',
     ];
 
@@ -36,6 +37,18 @@ class User extends Authenticatable
         ];
     }
 
+    // Role helpers
+
+    public function isRider(): bool
+    {
+        return $this->role === 'rider';
+    }
+
+    public function isCustomer(): bool
+    {
+        return $this->role === 'customer';
+    }
+
     // Relationships
 
     public function orders()
@@ -51,6 +64,11 @@ class User extends Authenticatable
     public function complaints()
     {
         return $this->hasMany(Complaint::class);
+    }
+
+    public function deliveryBoy()
+    {
+        return $this->hasOne(DeliveryBoy::class);
     }
 
     // Accessors
