@@ -34,18 +34,22 @@
 - ⚠️ Run `php artisan storage:link` if not already done
 - **Verify**: Upload image, see it in table thumbnail
 
-### MP-B4: Filament ProductResource (CRUD — Basic)
-- Create `app/Filament/Resources/ProductResource.php`
-- Form: name, description (textarea), category_id (select), sub_category_id (dependent select filtered by category), stock (number)
-- Table: id, name, category, sub-category, stock, created_at
-- Eager load category and subCategory
+### MP-B4: Filament ProductResource (CRUD — Basic) ✅
+- ✅ Create `app/Filament/Resources/ProductResource.php`
+- ✅ Form: name, stock, category_id (top-level select), sub_category_id (dependent select filtered by category, live), description
+- ✅ Table: id, name, category, sub-category, stock (color-coded badge), prices count, price range, created_at
+- ✅ Eager load category, subCategory, prices via `getEloquentQuery()`
+- ✅ Filters: category, out of stock
+- ✅ Pages: ListProducts, CreateProduct, EditProduct
+- ✅ Navigation group: Catalog, sorted third
 - **Verify**: Products manageable at `/admin/products`
 
-### MP-B5: Filament ProductResource — Multi-Price Repeater
-- Add Filament Repeater field to ProductResource form for prices
-- Each row: unit_id (select from units), price (decimal input)
-- Save/update/delete prices via Repeater
-- Show price count in table column
+### MP-B5: Filament ProductResource — Multi-Price Repeater ✅
+- ✅ Repeater field on `prices` relationship in product form
+- ✅ Each row: unit_id (select from units), price (decimal with Rs prefix)
+- ✅ Save/update/delete prices via Repeater relationship binding
+- ✅ Min 1 price row, add action label "Add price variant"
+- ✅ Table shows prices_count and price range summary
 - **Verify**: Add product with 2+ price-unit combos, verify saved in `price` table
 
 ### MP-B6: API — Categories Endpoints
@@ -135,6 +139,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 8 | 3 | 5 |
+| Backend | 8 | 5 | 3 |
 | Mobile | 9 | 0 | 9 |
-| **Total** | **17** | **3** | **14** |
+| **Total** | **17** | **5** | **12** |
