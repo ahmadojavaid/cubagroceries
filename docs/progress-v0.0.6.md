@@ -73,16 +73,17 @@
 
 ## Mobile Micro-Phases
 
-### MP-M1: Notification data model
-- Create `NotificationModel` (id, type, data map, readAt, createdAt)
-- fromJson matching Laravel notification format
-- Computed: isRead, title, body (extracted from data map)
+### MP-M1: Notification data model ✅
+- ✅ Create `NotificationModel` (id, type, data map, readAt, createdAt)
+- ✅ fromJson matching Laravel database notification format
+- ✅ Computed: isRead, title, message, orderNumber, newStatus, isOrderStatusChange
+- ✅ `markAsRead()` returns copy with readAt set (for optimistic UI)
 
-### MP-M2: Notification provider
-- Create `NotificationListNotifier` (Riverpod StateNotifier)
-- fetchNotifications (paginated), loadMore
-- markAsRead (single), markAllAsRead
-- Unread count provider (derived)
+### MP-M2: Notification provider ✅
+- ✅ Create `NotificationListNotifier` (Riverpod StateNotifier)
+- ✅ fetchNotifications (paginated), loadMore
+- ✅ markAsRead (single, optimistic), markAllAsRead (optimistic)
+- ✅ `unreadNotificationCountProvider` (derived provider)
 
 ### MP-M3: Notification inbox screen
 - Build NotificationInboxScreen with paginated list
@@ -147,5 +148,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 10 | 10 | 0 |
-| Mobile | 11 | 0 | 11 |
-| **Total** | **21** | **10** | **11** |
+| Mobile | 11 | 2 | 9 |
+| **Total** | **21** | **12** | **9** |
