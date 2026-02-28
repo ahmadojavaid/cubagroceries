@@ -107,11 +107,11 @@
 - ✅ Complete `flutter-prokit-mapping.md` with all file paths and phase assignments
 - ✅ Identified key dependencies: nb_utils, appStore, AppWidget
 
-### MP-M2: Project Structure Setup
-- Create feature-first folder structure under `mobile/lib/`
-- Folders: `core/api`, `core/theme`, `core/widgets`, `core/router`
-- Feature folders: `features/auth`, `features/home`, `features/products`, `features/cart`, `features/orders`, `features/profile`, `features/notifications`
-- Each feature: `data/`, `providers/`, `screens/`, `widgets/`
+### MP-M2: Project Structure Setup ✅
+- ✅ Scaffolder created feature-first structure (core/api, core/theme, core/widgets, core/router, core/constants)
+- ✅ Scaffolder created 7 feature folders (auth, home, products, cart, orders, profile, notifications) each with data/providers/screens/widgets
+- ✅ Added missing `features/categories` folder with data/providers/screens/widgets subfolders
+- ✅ All 8 feature folders ready
 
 ### MP-M3: Core Dependencies
 - Add to pubspec.yaml: `flutter_riverpod`, `hive`, `hive_flutter`, `cached_network_image`, `shimmer`, `intl`
@@ -175,5 +175,5 @@
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
 | Backend | 10 | 10 | 0 |
-| Mobile | 12 | 0 | 12 |
-| **Total** | **28** | **10** | **18** |
+| Mobile | 12 | 1 | 11 |
+| **Total** | **28** | **11** | **17** |
