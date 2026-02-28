@@ -65,23 +65,24 @@
 
 ## Mobile Micro-Phases
 
-### MP-M1: Complaint data model
-- Create `ComplaintModel` (id, subject, message, status, orderId, orderNumber, createdAt)
-- fromJson matching API response
-- Computed: displayStatus
+### MP-M1: Complaint data model ✅
+- ✅ Create `ComplaintModel` (id, subject, message, status, orderId, orderNumber, orderStatus, createdAt)
+- ✅ fromJson matching API response (handles nested order object)
+- ✅ Computed: displayStatus, isPending, isInProgress, isResolved, isClosed
 
-### MP-M2: Complaint provider
-- Create `ComplaintNotifier` (Riverpod StateNotifier)
-- Methods: submitComplaint, fetchComplaints (paginated)
-- submitComplaint calls `POST /api/v1/complaints`
-- fetchComplaints calls `GET /api/v1/complaints`
+### MP-M2: Complaint provider ✅
+- ✅ Create `ComplaintListNotifier` + `SubmitComplaintNotifier` (Riverpod StateNotifier)
+- ✅ fetchComplaints (paginated) + loadMore + addComplaint
+- ✅ submitComplaint calls `POST /api/v1/complaints`
+- ✅ fetchComplaints calls `GET /api/v1/complaints`
+- ✅ Providers: complaintListProvider, submitComplaintProvider
 
-### MP-M3: Order status timeline widget
-- Create `OrderStatusTimeline` reusable widget
-- Show all statuses as steps: pending → confirmed → dispatched → delivered
-- Highlight current status, dim future steps
-- Handle cancelled as special case (red X)
-- Use AppColors.status* colors
+### MP-M3: Order status timeline widget ✅
+- ✅ Create `OrderStatusTimeline` reusable widget
+- ✅ Show all statuses as steps: pending → confirmed → dispatched → delivered
+- ✅ Highlight current status with shadow, dim future steps
+- ✅ Handle cancelled as special case (red X, centered)
+- ✅ Uses AppColors.status* colors per step
 
 ### MP-M4: Integrate timeline into OrderDetailScreen
 - Add OrderStatusTimeline to the top of OrderDetailScreen
@@ -115,5 +116,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 7 | 0 | 7 |
-| **Total** | **15** | **8** | **7** |
+| Mobile | 7 | 3 | 4 |
+| **Total** | **15** | **11** | **4** |
