@@ -42,11 +42,11 @@
 - ✅ Create `price` migration (id, product_id FK, unit_id FK, price decimal, timestamps)
 - **Terminal**: `php artisan migrate:fresh` (run after MP-B5)
 
-### MP-B4: Migrations — Orders Domain
-- Create `orderdetails` migration (id, order_id string unique, user_id FK, status, total_amount, timestamps)
-- Create `orderaddress` migration (id, order_id FK, address, city, phone, latitude, longitude, timestamps)
-- Create `orderproduct` migration (id, order_id FK, product_id FK, unit_id FK, quantity, price, timestamps)
-- **Terminal**: `php artisan migrate:fresh`
+### MP-B4: Migrations — Orders Domain ✅
+- ✅ Create `orderdetails` migration (id, order_id string unique, user_id FK, status, total_amount, timestamps)
+- ✅ Create `orderaddress` migration (id, order_id FK → orderdetails, address, city, phone, lat/lng, timestamps)
+- ✅ Create `orderproduct` migration (id, order_id FK → orderdetails, product_id FK, unit_id FK, quantity, price, timestamps)
+- **Terminal**: `php artisan migrate:fresh` (run after MP-B5)
 
 ### MP-B5: Migrations — Operations & System Domain
 - Create `shippingcharge` migration (id, title, amount, timestamps)
@@ -173,6 +173,6 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
-| Backend | 10 | 3 | 7 |
+| Backend | 10 | 4 | 6 |
 | Mobile | 12 | 0 | 12 |
-| **Total** | **28** | **3** | **25** |
+| **Total** | **28** | **4** | **24** |
