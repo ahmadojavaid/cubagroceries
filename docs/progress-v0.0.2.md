@@ -82,10 +82,12 @@
 
 ## Mobile Micro-Phases
 
-### MP-M1: Category Data Layer
-- Create `features/categories/data/category_model.dart` (id, title, image, children)
-- Create `features/categories/providers/category_provider.dart` (fetch & cache categories)
-- Wire to `GET /api/v1/categories`
+### MP-M1: Category Data Layer ✅
+- ✅ Create `features/categories/data/category_model.dart` (id, title, image, children)
+- ✅ Create `features/categories/providers/category_provider.dart` (fetch & cache, findById, getChildren)
+- ✅ Wired to `GET /api/v1/categories`
+- ✅ Skip re-fetch if already loaded (unless forceRefresh)
+- ✅ Follows existing auth provider pattern
 
 ### MP-M2: Product Data Layer
 - Create `features/products/data/product_model.dart` (id, name, description, category, prices, stock)
@@ -142,5 +144,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 9 | 0 | 9 |
-| **Total** | **17** | **8** | **9** |
+| Mobile | 9 | 1 | 8 |
+| **Total** | **17** | **9** | **8** |
