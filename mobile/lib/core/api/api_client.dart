@@ -78,6 +78,7 @@ class ApiClient {
   }
 
   String _statusMessage(int? code) {
+    if (code == null) return 'Something went wrong.';
     return switch (code) {
       401 => 'Session expired. Please log in again.',
       403 => 'You do not have permission to perform this action.',
