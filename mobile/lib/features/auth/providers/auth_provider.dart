@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/api/api_client.dart';
-import '../../core/api/api_exception.dart';
-import '../../core/providers/api_provider.dart';
+import '../../../core/api/api_client.dart';
+import '../../../core/api/api_exception.dart';
+import '../../../core/providers/api_provider.dart';
 
 /// Represents the current auth state
 class AuthState {
