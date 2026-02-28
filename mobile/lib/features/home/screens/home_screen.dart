@@ -5,7 +5,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../categories/providers/category_provider.dart';
-import '../../categories/widgets/category_card.dart';
+import '../providers/home_provider.dart';
+import '../widgets/banner_slider.dart';
+import '../widgets/category_slider.dart';
+import '../widgets/featured_section_widget.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -18,13 +21,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => ref.read(categoriesProvider.notifier).fetchCategories(),
-    );
+    Future.microtask(() {
+      ref.read(homeProvider.notifier).fetchHome();
+      ref.read(categoriesProvider.notifier).fetchCategories();
+    });
+  }
+
+  Future<void> _refresh() async {
+    await Future.wait([
+      ref.read(homeProvider.notifier).fetchHome(forceRefresh: true),
+      ref.read(categoriesProvider.notifier).fetchCategories(forceRefresh: true),
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
+    final homeState = ref.watch(homeProvider);
     final catState = ref.watch(categoriesProvider);
 
     return Scaffold(
@@ -39,105 +51,99 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: RefreshIndicator(
         color: AppColors.primary,
-        onRefresh: () => ref
-            .read(categoriesProvider.notifier)
-            .fetchCategories(forceRefresh: true),
-        child: _buildBody(catState),
+        onRefresh: _refresh,
+        child: _buildBody(homeState, catState),
       ),
     );
   }
 
-  Widget _buildBody(CategoriesState state) {
-    if (state.isLoading) {
+  Widget _buildBody(HomeState homeState, CategoriesState catState) {
+    // Loading
+    if (homeState.isLoading && !homeState.hasData) {
       return ListView(
         padding: const EdgeInsets.all(AppDimens.pagePadding),
-        children: [
-          const SizedBox(height: AppDimens.lg),
-          const ShimmerBox(width: 240, height: 28),
-          const SizedBox(height: AppDimens.xs),
-          const ShimmerBox(width: 160, height: 16),
-          const SizedBox(height: AppDimens.xl),
-          const ShimmerBox(width: 100, height: 18),
-          const SizedBox(height: AppDimens.md),
-          const CategoryGridShimmer(),
+        children: const [
+          SizedBox(height: AppDimens.sm),
+          ShimmerBox(width: double.infinity, height: 170, borderRadius: AppDimens.radiusMd),
+          SizedBox(height: AppDimens.lg),
+          ShimmerBox(width: 100, height: 18),
+          SizedBox(height: AppDimens.sm),
+          ShimmerBox(width: double.infinity, height: 100),
+          SizedBox(height: AppDimens.lg),
+          ShimmerBox(width: 140, height: 18),
+          SizedBox(height: AppDimens.sm),
+          ShimmerBox(width: double.infinity, height: 195),
         ],
       );
     }
 
-    if (state.error != null) {
+    // Error
+    if (homeState.error != null && !homeState.hasData) {
       return ErrorStateWidget(
-        message: state.error!,
-        onRetry: () => ref
-            .read(categoriesProvider.notifier)
-            .fetchCategories(forceRefresh: true),
+        message: homeState.error!,
+        onRetry: _refresh,
       );
     }
 
-    if (state.categories.isEmpty) {
-      return const EmptyStateWidget(
-        icon: Icons.storefront_outlined,
-        message: 'No categories available yet',
-      );
-    }
-
+    // Content
     return ListView(
-      padding: const EdgeInsets.all(AppDimens.pagePadding),
       children: [
         const SizedBox(height: AppDimens.sm),
 
-        // Welcome
-        Text(
-          'What would you\nlike to buy?',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                height: 1.15,
-              ),
-        ),
-        const SizedBox(height: AppDimens.xs),
-        Text(
-          'Fresh groceries delivered to your door',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
-              ),
-        ),
-        const SizedBox(height: AppDimens.xl),
-
-        // Section heading
-        Text(
-          'Categories',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: AppDimens.md),
-
-        // Categories grid
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: AppDimens.md,
-            mainAxisSpacing: AppDimens.md,
-            childAspectRatio: 1.05,
+        // 1. Banner slider
+        if (homeState.banners.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.pagePadding),
+            child: BannerSlider(banners: homeState.banners),
           ),
-          itemCount: state.categories.length,
-          itemBuilder: (context, index) {
-            final category = state.categories[index];
-            return CategoryCard(
-              category: category,
-              onTap: () => _onCategoryTap(category.id, category.hasChildren),
-            );
-          },
-        ),
+
+        if (homeState.banners.isNotEmpty)
+          const SizedBox(height: AppDimens.lg),
+
+        // 2. Categories horizontal slider
+        if (catState.categories.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.pagePadding),
+            child: Text(
+              'Categories',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+          ),
+          const SizedBox(height: AppDimens.sm),
+          CategorySlider(
+            categories: catState.categories,
+            onTap: (cat) {
+              if (cat.hasChildren) {
+                context.push('/categories/${cat.id}');
+              } else {
+                context.push('/categories/${cat.id}/products');
+              }
+            },
+          ),
+          const SizedBox(height: AppDimens.lg),
+        ],
+
+        // 3. Featured category sections
+        ...homeState.featuredSections.map((section) => Padding(
+              padding: const EdgeInsets.only(bottom: AppDimens.lg),
+              child: FeaturedSectionWidget(section: section),
+            )),
+
+        // Empty state if nothing at all
+        if (homeState.banners.isEmpty &&
+            catState.categories.isEmpty &&
+            homeState.featuredSections.isEmpty)
+          const EmptyStateWidget(
+            icon: Icons.storefront_outlined,
+            message: 'No content available yet',
+          ),
 
         const SizedBox(height: AppDimens.xl),
       ],
     );
-  }
-
-  void _onCategoryTap(int categoryId, bool hasChildren) {
-    if (hasChildren) {
-      context.push('/categories/$categoryId');
-    } else {
-      context.push('/categories/$categoryId/products');
-    }
   }
 }

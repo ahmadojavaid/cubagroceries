@@ -42,26 +42,26 @@
 - ✅ `HomeProvider` (StateNotifier) — fetches `/home`, caches data, force refresh
 - ✅ State holds banners + featured sections
 
-### MP-M2: Banner slider widget
-- Build `BannerSlider` widget with PageView + auto-scroll + dot indicators
-- Cached network images with shimmer placeholder
-- Handles empty banners gracefully
+### MP-M2: Banner slider widget ✅
+- ✅ `BannerSlider` with PageView + auto-scroll (4s) + animated dot indicators
+- ✅ CachedNetworkImage with loading/error states
+- ✅ Handles empty banners (returns SizedBox.shrink)
 
-### MP-M3: Category horizontal slider widget
-- Build compact horizontal scrollable category chips/pills
-- Tappable, navigates to category listing/products
-- Uses existing category data from CategoriesProvider
+### MP-M3: Category horizontal slider widget ✅
+- ✅ `CategorySlider` — horizontal scrollable category chips (64x64 image + title)
+- ✅ Tappable with onTap callback for navigation
+- ✅ CachedNetworkImage with fallback icon
 
-### MP-M4: Featured category product sections
-- Build `FeaturedSection` widget — section header (category name + "See All") + horizontal product cards
-- Product card: image placeholder, name, price, "Add" button (visual only for now)
-- Scrollable horizontally per section
+### MP-M4: Featured category product sections ✅
+- ✅ `FeaturedSectionWidget` — header (category title + "See All" link) + horizontal product cards
+- ✅ `_ProductCard` — image placeholder, name, PKR price/unit, "Add" button
+- ✅ "See All" navigates to category products, card taps to product detail
 
-### MP-M5: Home screen assembly & wiring
-- Rebuild HomeScreen layout: Banner → Categories → Featured Sections
-- Wire to HomeProvider + CategoriesProvider
-- Pull-to-refresh, shimmer loading states
-- AppBar with search icon
+### MP-M5: Home screen assembly & wiring ✅
+- ✅ HomeScreen rebuilt: Banner → Categories slider → Featured Sections
+- ✅ Wired to HomeProvider + CategoriesProvider with parallel fetch
+- ✅ Pull-to-refresh (force refresh both providers)
+- ✅ Shimmer loading states, error state with retry, empty state
 
 ---
 
@@ -70,5 +70,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 4 | 4 | 0 |
-| Mobile | 5 | 1 | 4 |
-| **Total** | **9** | **5** | **4** |
+| Mobile | 5 | 5 | 0 |
+| **Total** | **9** | **9** | **0** |
