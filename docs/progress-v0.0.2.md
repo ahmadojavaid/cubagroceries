@@ -89,11 +89,15 @@
 - ✅ Skip re-fetch if already loaded (unless forceRefresh)
 - ✅ Follows existing auth provider pattern
 
-### MP-M2: Product Data Layer
-- Create `features/products/data/product_model.dart` (id, name, description, category, prices, stock)
-- Create `features/products/data/price_model.dart` (id, price, unit)
-- Create `features/products/providers/product_provider.dart` (paginated fetch, filter by category)
-- Wire to `GET /api/v1/products`
+### MP-M2: Product Data Layer ✅
+- ✅ Create `features/products/data/product_model.dart` (id, name, description, category, prices, stock)
+- ✅ Create `features/products/data/price_model.dart` (id, price, unit) with displayPrice helper
+- ✅ Create `features/products/data/unit_model.dart` (id, name, abbreviation)
+- ✅ Create `features/products/providers/product_provider.dart`:
+  - productsProvider: paginated fetch, loadMore, filter by category/sub-category
+  - searchProductsProvider: separate provider for search
+  - productDetailProvider: FutureProvider.family for single product
+- ✅ Wired to `GET /api/v1/products`, `/products/search`, `/products/{id}`
 
 ### MP-M3: Home Screen — Category Grid
 - Build Home screen replacing placeholder tab
@@ -144,5 +148,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 9 | 1 | 8 |
-| **Total** | **17** | **9** | **8** |
+| Mobile | 9 | 2 | 7 |
+| **Total** | **17** | **10** | **7** |
