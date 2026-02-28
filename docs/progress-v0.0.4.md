@@ -9,11 +9,11 @@
 
 ## Backend Micro-Phases
 
-### MP-B1: Filament ShippingChargeResource
-- Create ShippingChargeResource (CRUD)
-- Table columns: id, title, amount (PKR), created_at
-- Simple form: title (required), amount (required, numeric)
-- Navigation group: Operations, icon: truck
+### MP-B1: Filament ShippingChargeResource ✅
+- ✅ Create ShippingChargeResource (CRUD)
+- ✅ Table columns: id, title, amount (PKR), created_at
+- ✅ Simple form: title (required), amount (required, numeric)
+- ✅ Navigation group: Operations, icon: truck
 
 ### MP-B2: API — ShippingController
 - Create `Api\V1\ShippingController`
@@ -148,6 +148,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 8 | 0 | 8 |
+| Backend | 8 | 1 | 7 |
 | Mobile | 13 | 0 | 13 |
-| **Total** | **21** | **0** | **21** |
+| **Total** | **21** | **1** | **20** |
