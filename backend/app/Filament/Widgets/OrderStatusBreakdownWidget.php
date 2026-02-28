@@ -11,7 +11,7 @@ class OrderStatusBreakdownWidget extends BaseWidget
 {
     protected static ?int $sort = 2;
 
-    protected static ?string $heading = 'Order Status Breakdown';
+    protected ?string $heading = 'Order Status Breakdown';
 
     protected function getStats(): array
     {
