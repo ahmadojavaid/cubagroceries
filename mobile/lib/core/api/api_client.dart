@@ -4,7 +4,9 @@ import 'api_exception.dart';
 
 /// Dio API client with token interceptor and error handling
 class ApiClient {
-  static const String baseUrl = 'https://cubagroceries.test/api/v1';
+  // Use artisan serve for emulator: php artisan serve --host=0.0.0.0 --port=8000
+  // 10.0.2.2 maps to host machine from Android emulator
+  static const String baseUrl = 'http://10.0.2.2:8000/api/v1';
   static const String tokenKey = 'auth_token';
 
   final Dio _dio;
