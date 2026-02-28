@@ -128,19 +128,25 @@
 - ✅ Refactored notification_inbox_screen: replaced inline error/empty with shared widgets
 - ✅ Home screen already uses shared ErrorStateWidget (verified)
 
-### MP-M9: Offline handling
-- Add connectivity check (connectivity_plus package)
-- Show offline banner when no connection
-- Graceful degradation: show cached data or clear offline message
-- Retry on reconnection
+### MP-M9: Offline handling ✅
+- ✅ Added `connectivity_plus` package
+- ✅ Created `ConnectivityNotifier` + `connectivityProvider` (Riverpod)
+- ✅ Created `OfflineBanner` widget — animated red banner with wifi_off icon
+- ✅ Integrated into NavigationShell (visible across all tabs)
+- ✅ Graceful degradation: cached data stays visible, banner informs user
 
-### MP-M10: Android release build preparation
-- Configure app signing (keystore generation)
-- Set application ID, version name, version code
-- Configure ProGuard/R8 rules
-- Set app icon (flutter_launcher_icons)
-- Set native splash screen (flutter_native_splash)
-- Generate signed APK/AAB
+### MP-M10: Android release build preparation ✅
+- ✅ Set application ID to `com.cubagroceries.app`, minSdk 23
+- ✅ Configured R8/ProGuard (isMinifyEnabled + isShrinkResources)
+- ✅ Created `proguard-rules.pro` with Flutter, Firebase, Hive rules
+- ✅ Added release signingConfig placeholder (TODO: generate keystore)
+- ✅ Added `flutter_launcher_icons` config (flutter_launcher_icons.yaml)
+- ✅ Added `flutter_native_splash` config (flutter_native_splash.yaml)
+- ✅ Created `assets/icon/` and `assets/splash/` directories
+- ⚠️ Manual: add app_icon.png + splash_logo.png, generate keystore, then run:
+  - `dart run flutter_launcher_icons`
+  - `dart run flutter_native_splash:create`
+  - `flutter build appbundle --release`
 
 ### MP-M11: Play Store listing preparation
 - Take screenshots on emulator (phone + tablet if applicable)
@@ -156,5 +162,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 10 | 10 | 0 |
-| Mobile | 11 | 8 | 3 |
-| **Total** | **21** | **18** | **3** |
+| Mobile | 11 | 10 | 1 |
+| **Total** | **21** | **20** | **1** |

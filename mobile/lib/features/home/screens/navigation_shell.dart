@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/offline_banner.dart';
 import '../../cart/screens/cart_screen.dart';
 import '../../categories/screens/categories_tab_screen.dart';
 import '../../notifications/providers/notification_provider.dart';
@@ -44,9 +45,16 @@ class _NavigationShellState extends ConsumerState<NavigationShell> {
     final unreadCount = ref.watch(unreadNotificationCountProvider);
 
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
+      body: Column(
+        children: [
+          const OfflineBanner(),
+          Expanded(
+            child: IndexedStack(
+              index: _currentIndex,
+              children: _screens,
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(

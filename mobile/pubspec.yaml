@@ -3,6 +3,9 @@ description: "Cuba Groceries — Customer mobile app"
 publish_to: 'none'
 version: 1.0.0+1
 
+# Release: flutter build apk --release
+# Bundle: flutter build appbundle --release
+
 environment:
   sdk: ^3.11.0
 
@@ -43,10 +46,15 @@ dependencies:
   firebase_core: ^3.13.0
   firebase_messaging: ^15.2.4
 
+  # Connectivity
+  connectivity_plus: ^6.1.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.5
 
 flutter:
   uses-material-design: true
