@@ -35,12 +35,12 @@
 - ✅ Kept password_reset_tokens, sessions, personal_access_tokens (needed by Sanctum)
 - **Terminal**: `php artisan migrate:fresh`
 
-### MP-B3: Migrations — Catalog Domain
-- Create `category` migration (id, title, image, parent_id self-ref FK, timestamps)
-- Create `unit` migration (id, name, abbreviation, timestamps)
-- Create `product` migration (id, name, description, category_id FK, sub_category_id FK, stock, timestamps)
-- Create `price` migration (id, product_id FK, unit_id FK, price decimal, timestamps)
-- **Terminal**: `php artisan migrate:fresh`
+### MP-B3: Migrations — Catalog Domain ✅
+- ✅ Create `category` migration (id, title, image, parent_id self-ref FK, timestamps)
+- ✅ Create `unit` migration (id, name, abbreviation, timestamps)
+- ✅ Create `product` migration (id, name, description, category_id FK, sub_category_id FK, stock, timestamps)
+- ✅ Create `price` migration (id, product_id FK, unit_id FK, price decimal, timestamps)
+- **Terminal**: `php artisan migrate:fresh` (run after MP-B5)
 
 ### MP-B4: Migrations — Orders Domain
 - Create `orderdetails` migration (id, order_id string unique, user_id FK, status, total_amount, timestamps)
@@ -173,6 +173,6 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
-| Backend | 10 | 2 | 8 |
+| Backend | 10 | 3 | 7 |
 | Mobile | 12 | 0 | 12 |
-| **Total** | **28** | **2** | **26** |
+| **Total** | **28** | **3** | **25** |
