@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             CatalogSeeder::class,
             ImageSeeder::class,
             SampleDataSeeder::class,
+            SurveySeeder::class,
         ]);
     }
 }
