@@ -9,21 +9,26 @@ final connectivityProvider =
 });
 
 class ConnectivityNotifier extends StateNotifier<bool> {
-  late final StreamSubscription<List<ConnectivityResult>> _subscription;
+  StreamSubscription<List<ConnectivityResult>>? _subscription;
 
   ConnectivityNotifier() : super(true) {
     _init();
   }
 
   Future<void> _init() async {
-    // Check initial state
-    final results = await Connectivity().checkConnectivity();
-    state = _isConnected(results);
-
-    // Listen for changes
-    _subscription = Connectivity().onConnectivityChanged.listen((results) {
+    try {
+      // Check initial state
+      final results = await Connectivity().checkConnectivity();
       state = _isConnected(results);
-    });
+
+      // Listen for changes
+      _subscription = Connectivity().onConnectivityChanged.listen((results) {
+        state = _isConnected(results);
+      });
+    } catch (_) {
+      // Assume online if connectivity check fails
+      state = true;
+    }
   }
 
   bool _isConnected(List<ConnectivityResult> results) {
@@ -32,7 +37,7 @@ class ConnectivityNotifier extends StateNotifier<bool> {
 
   @override
   void dispose() {
-    _subscription.cancel();
+    _subscription?.cancel();
     super.dispose();
   }
 }

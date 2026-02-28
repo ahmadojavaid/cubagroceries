@@ -4,19 +4,37 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 
+import 'dart:async';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
+
+  try {
+    await Hive.initFlutter();
+  } catch (e) {
+    debugPrint('Hive init failed: $e');
+  }
 
   // TODO: Initialize Firebase when google-services.json is configured
   // await Firebase.initializeApp();
   // FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-  runApp(
-    const ProviderScope(
-      child: CubaGroceriesApp(),
-    ),
-  );
+  // Catch all uncaught errors
+  FlutterError.onError = (details) {
+    debugPrint('FlutterError: ${details.exception}');
+    debugPrint('${details.stack}');
+  };
+
+  runZonedGuarded(() {
+    runApp(
+      const ProviderScope(
+        child: CubaGroceriesApp(),
+      ),
+    );
+  }, (error, stack) {
+    debugPrint('Uncaught error: $error');
+    debugPrint('$stack');
+  });
 }
 
 class CubaGroceriesApp extends ConsumerWidget {
