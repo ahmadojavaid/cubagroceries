@@ -33,6 +33,14 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Green,
             ])
             ->maxContentWidth(\Filament\Support\Enums\MaxWidth::Full)
+            ->navigationGroups([
+                'Orders',
+                'Users',
+                'Catalog',
+                'Operations',
+                'Content',
+                'Support',
+            ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
