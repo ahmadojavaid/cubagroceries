@@ -29,11 +29,11 @@
 - ✅ Validation: email unique (except self), names required
 - ✅ Routes registered in api.php under Sanctum middleware
 
-### MP-B4: API — ProfileController (password change)
-- Add `password` method to ProfileController
-- `PUT /api/v1/profile/password` — change password
-- Validation: current_password required + verified, new password min 8 + confirmed
-- Register route
+### MP-B4: API — ProfileController (password change) ✅
+- ✅ Added `password` method to ProfileController
+- ✅ `PUT /api/v1/profile/password` — verifies current password, updates to new
+- ✅ Validation: current_password required + Hash::check, password min:8|confirmed
+- ✅ Route registered in api.php
 
 ### MP-B5: API — AddressController (full CRUD)
 - Create `Api\V1\AddressController`
@@ -107,6 +107,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 6 | 3 | 3 |
+| Backend | 6 | 4 | 2 |
 | Mobile | 8 | 0 | 8 |
-| **Total** | **14** | **3** | **11** |
+| **Total** | **14** | **4** | **10** |

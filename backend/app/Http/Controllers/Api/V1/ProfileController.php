@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
@@ -34,5 +36,28 @@ class ProfileController extends Controller
         $request->user()->update($validated);
 
         return $this->success($request->user()->fresh(), 'Profile updated successfully');
+    }
+
+    /**
+     * PUT /api/v1/profile/password
+     */
+    public function password(Request $request): JsonResponse
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, $request->user()->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['The current password is incorrect.'],
+            ]);
+        }
+
+        $request->user()->update([
+            'password' => $request->password,
+        ]);
+
+        return $this->success(message: 'Password changed successfully');
     }
 }
