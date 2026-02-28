@@ -128,6 +128,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         onTap: () => context.push('/addresses'),
                       ),
                       _buildMenuTile(
+                        icon: Icons.chat_bubble_outline,
+                        title: 'My Complaints',
+                        onTap: () => context.push('/complaints'),
+                      ),
+                      _buildMenuTile(
                         icon: Icons.settings_outlined,
                         title: 'Settings',
                         onTap: () => context.push('/settings'),

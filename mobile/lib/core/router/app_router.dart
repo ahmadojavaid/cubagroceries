@@ -16,6 +16,8 @@ import '../../features/profile/data/address_model.dart';
 import '../../features/profile/screens/address_form_screen.dart';
 import '../../features/profile/screens/address_list_screen.dart';
 import '../../features/profile/screens/settings_screen.dart';
+import '../../features/complaints/screens/complaint_form_screen.dart';
+import '../../features/complaints/screens/complaints_history_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -117,6 +119,21 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+
+      // Complaints
+      GoRoute(
+        path: '/complaints',
+        builder: (context, state) => const ComplaintsHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/complaints/new',
+        builder: (context, state) {
+          final orderIdStr = state.uri.queryParameters['orderId'];
+          final orderId =
+              orderIdStr != null ? int.tryParse(orderIdStr) : null;
+          return ComplaintFormScreen(orderId: orderId);
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

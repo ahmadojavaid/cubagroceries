@@ -84,30 +84,31 @@
 - ✅ Handle cancelled as special case (red X, centered)
 - ✅ Uses AppColors.status* colors per step
 
-### MP-M4: Integrate timeline into OrderDetailScreen
-- Add OrderStatusTimeline to the top of OrderDetailScreen
-- Pass current status from order data
-- Visual improvement to order detail
+### MP-M4: Integrate timeline into OrderDetailScreen ✅
+- ✅ Add OrderStatusTimeline to the top of OrderDetailScreen
+- ✅ Pass current status from order data
+- ✅ Added "File a Complaint" button at bottom of order detail
 
-### MP-M5: Complaint submission screen
-- Build ComplaintFormScreen
-- Fields: subject (required), message (required, multiline)
-- Optional: pre-fill order reference if navigated from order detail
-- Submit button with loading state
-- On success: show snackbar, pop back
-- Route: `/complaints/new` (optional query param `?orderId=X`)
+### MP-M5: Complaint submission screen ✅
+- ✅ Build ComplaintFormScreen
+- ✅ Fields: subject (required, max 255), message (required, multiline, max 5000)
+- ✅ Pre-fill order reference if navigated from order detail (info banner)
+- ✅ Submit button with loading state
+- ✅ On success: adds to list, snackbar, pop back
+- ✅ Route: `/complaints/new` (optional query param `?orderId=X`)
 
-### MP-M6: Complaints history screen
-- Build ComplaintsHistoryScreen with paginated list
-- Each card: subject, status badge, order reference, date
-- Empty state
-- Accessible from Profile screen
+### MP-M6: Complaints history screen ✅
+- ✅ Build ComplaintsHistoryScreen with paginated list + infinite scroll
+- ✅ Each card: subject, status badge, order reference, date
+- ✅ Empty state + error state + pull-to-refresh
+- ✅ New complaint button in app bar
+- ✅ Accessible from Profile screen
 
-### MP-M7: Navigation wiring
-- Add routes: `/complaints`, `/complaints/new`
-- Add "File Complaint" action button on OrderDetailScreen
-- Add "My Complaints" link on ProfileScreen or SettingsScreen
-- Wire all navigation flows
+### MP-M7: Navigation wiring ✅
+- ✅ Add routes: `/complaints`, `/complaints/new` (with orderId query param)
+- ✅ Add "File a Complaint" button on OrderDetailScreen
+- ✅ Add "My Complaints" link on ProfileScreen
+- ✅ All navigation flows wired
 
 ---
 
@@ -116,5 +117,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 7 | 3 | 4 |
-| **Total** | **15** | **11** | **4** |
+| Mobile | 7 | 7 | 0 |
+| **Total** | **15** | **15** | **0** |

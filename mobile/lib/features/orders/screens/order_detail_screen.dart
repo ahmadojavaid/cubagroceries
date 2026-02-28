@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../data/order_model.dart';
 import '../providers/order_provider.dart';
+import '../widgets/order_status_timeline.dart';
 
 class OrderDetailScreen extends ConsumerStatefulWidget {
   final String orderNumber;
@@ -74,7 +76,12 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Status + order info card
+          // Order status timeline
+          OrderStatusTimeline(currentStatus: order.status),
+
+          const SizedBox(height: AppDimens.md),
+
+          // Order info card
           _SectionCard(
             children: [
               Row(
@@ -195,6 +202,28 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                 ],
               ),
             ],
+          ),
+
+          const SizedBox(height: AppDimens.lg),
+
+          // File complaint button
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => context.push(
+                '/complaints/new?orderId=${order.id}',
+              ),
+              icon: const Icon(Icons.report_problem_outlined, size: 18),
+              label: const Text('File a Complaint'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.textSecondary,
+                side: const BorderSide(color: AppColors.border),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                ),
+              ),
+            ),
           ),
         ],
       ),
