@@ -172,22 +172,24 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/complaints',
         builder: (context, state) => const ComplaintsHistoryScreen(),
-      ),
-      GoRoute(
-        path: '/complaints/detail',
-        builder: (context, state) {
-          final complaint = state.extra as ComplaintModel;
-          return ComplaintDetailScreen(complaint: complaint);
-        },
-      ),
-      GoRoute(
-        path: '/complaints/new',
-        builder: (context, state) {
-          final orderIdStr = state.uri.queryParameters['orderId'];
-          final orderId =
-              orderIdStr != null ? int.tryParse(orderIdStr) : null;
-          return ComplaintFormScreen(orderId: orderId);
-        },
+        routes: [
+          GoRoute(
+            path: 'detail',
+            builder: (context, state) {
+              final complaint = state.extra as ComplaintModel;
+              return ComplaintDetailScreen(complaint: complaint);
+            },
+          ),
+          GoRoute(
+            path: 'new',
+            builder: (context, state) {
+              final orderIdStr = state.uri.queryParameters['orderId'];
+              final orderId =
+                  orderIdStr != null ? int.tryParse(orderIdStr) : null;
+              return ComplaintFormScreen(orderId: orderId);
+            },
+          ),
+        ],
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
