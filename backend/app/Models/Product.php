@@ -41,6 +41,11 @@ class Product extends Model
         return $this->hasMany(Price::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
     // Scopes
 
     public function scopeInStock($query)

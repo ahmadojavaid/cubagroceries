@@ -110,12 +110,14 @@ class OrderAddressModel {
 
 /// Order line item
 class OrderItemModel {
+  final int productId;
   final String productName;
   final String unitName;
   final int quantity;
   final String price;
 
   const OrderItemModel({
+    required this.productId,
     required this.productName,
     required this.unitName,
     required this.quantity,
@@ -124,6 +126,7 @@ class OrderItemModel {
 
   factory OrderItemModel.fromJson(Map<String, dynamic> json) {
     return OrderItemModel(
+      productId: json['product']?['id'] ?? json['product_id'] ?? 0,
       productName: json['product']?['name'] ?? 'Unknown',
       unitName: json['unit']?['name'] ?? '',
       quantity: json['quantity'] ?? 0,

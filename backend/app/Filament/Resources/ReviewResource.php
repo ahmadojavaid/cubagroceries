@@ -59,12 +59,12 @@ class ReviewResource extends Resource
 
                         Forms\Components\Select::make('status')
                             ->options([
-                                'pending' => 'Pending',
                                 'approved' => 'Approved',
                                 'rejected' => 'Rejected',
+                                'pending' => 'Pending',
                             ])
                             ->required()
-                            ->default('pending'),
+                            ->default('approved'),
                     ])
                     ->columns(2),
             ]);

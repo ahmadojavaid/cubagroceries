@@ -106,13 +106,13 @@ class ReviewController extends Controller
             'order_id' => $request->order_id,
             'rating' => $request->rating,
             'comment' => $request->comment,
-            'status' => 'pending',
+            'status' => 'approved',
         ]);
 
         return response()->json([
             'success' => true,
             'data' => $review,
-            'message' => 'Review submitted. It will appear after approval.',
+            'message' => 'Review submitted. Thank you!',
         ], 201);
     }
 

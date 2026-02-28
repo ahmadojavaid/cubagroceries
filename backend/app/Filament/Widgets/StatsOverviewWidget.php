@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Review;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -54,6 +55,11 @@ class StatsOverviewWidget extends BaseWidget
                 ->description('Products in catalog')
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('warning'),
+
+            Stat::make('Product Reviews', Review::where('status', 'approved')->count())
+                ->description('Approved reviews')
+                ->descriptionIcon('heroicon-m-star')
+                ->color('success'),
         ];
     }
 }
