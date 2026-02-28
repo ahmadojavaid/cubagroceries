@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 import '../../../core/providers/api_provider.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/api/api_exception.dart';
 
 /// Model for a rider's assigned order (list item)
 class RiderOrder {
@@ -206,9 +208,16 @@ class RiderOrdersNotifier extends StateNotifier<RiderOrdersState> {
         );
       }
     } catch (e) {
+      String msg = 'Could not load orders. Pull to refresh.';
+      if (e is DioException) {
+        final apiErr = e.error;
+        if (apiErr is ApiException) {
+          msg = apiErr.message;
+        }
+      }
       state = state.copyWith(
         isLoading: false,
-        error: 'Could not load orders. Pull to refresh.',
+        error: msg,
       );
     }
   }

@@ -8,6 +8,11 @@ import '../../auth/providers/auth_provider.dart';
 import '../providers/profile_provider.dart';
 import '../data/user_model.dart';
 
+/// Whether the current user is a rider (hides customer-specific UI)
+bool _isRider(WidgetRef ref) {
+  return ref.watch(isRiderProvider);
+}
+
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
@@ -141,12 +146,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildContent(ProfileState state) {
     final user = state.user!;
+    final rider = _isRider(ref);
 
     return ListView(
       padding: EdgeInsets.zero,
       children: [
         // ── Header with avatar + name + wallet ──
-        _buildProfileHeader(user),
+        _buildProfileHeader(user, showWallet: !rider),
 
         const SizedBox(height: AppDimens.lg),
 
@@ -165,7 +171,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         Padding(
           padding:
               const EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
-          child: _buildMenuSection(),
+          child: _buildMenuSection(isRider: rider),
         ),
 
         const SizedBox(height: AppDimens.xxl),
@@ -174,7 +180,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   /// Gradient header with avatar, name and wallet
-  Widget _buildProfileHeader(UserModel user) {
+  Widget _buildProfileHeader(UserModel user, {bool showWallet = true}) {
     return Container(
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + AppDimens.lg,
@@ -282,65 +288,67 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ],
           ),
 
-          const SizedBox(height: AppDimens.lg),
+          if (showWallet) ...[
+            const SizedBox(height: AppDimens.lg),
 
-          // Wallet card
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimens.md,
-              vertical: 14,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.14),
-              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.15),
+            // Wallet card
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.md,
+                vertical: 14,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.14),
+                borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.15),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.account_balance_wallet_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: AppDimens.sm + 4),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Wallet Balance',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withOpacity(0.6),
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Rs. ${user.walletAmount}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.account_balance_wallet_rounded,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: AppDimens.sm + 4),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Wallet Balance',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withOpacity(0.6),
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Rs. ${user.walletAmount}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          ],
         ],
       ),
     );
@@ -461,7 +469,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   /// Menu section — grouped card
-  Widget _buildMenuSection() {
+  Widget _buildMenuSection({bool isRider = false}) {
+    final menuItems = <Widget>[];
+
+    if (!isRider) {
+      menuItems.add(_menuItem(
+        icon: Icons.location_on_outlined,
+        title: 'My Addresses',
+        subtitle: 'Manage delivery addresses',
+        onTap: () => context.push('/addresses'),
+        isFirst: true,
+        isLast: false,
+      ));
+      menuItems.add(_menuDivider());
+      menuItems.add(_menuItem(
+        icon: Icons.chat_bubble_outline_rounded,
+        title: 'My Complaints',
+        subtitle: 'View or file complaints',
+        onTap: () => context.push('/complaints'),
+      ));
+      menuItems.add(_menuDivider());
+    }
+
+    menuItems.add(_menuItem(
+      icon: Icons.settings_outlined,
+      title: 'Settings',
+      subtitle: 'Password, FAQs & more',
+      onTap: () => context.push('/settings'),
+      isFirst: isRider, // first item when rider (no address/complaints above)
+      isLast: true,
+    ));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -487,32 +525,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             ],
           ),
-          child: Column(
-            children: [
-              _menuItem(
-                icon: Icons.location_on_outlined,
-                title: 'My Addresses',
-                subtitle: 'Manage delivery addresses',
-                onTap: () => context.push('/addresses'),
-                isFirst: true,
-              ),
-              _menuDivider(),
-              _menuItem(
-                icon: Icons.chat_bubble_outline_rounded,
-                title: 'My Complaints',
-                subtitle: 'View or file complaints',
-                onTap: () => context.push('/complaints'),
-              ),
-              _menuDivider(),
-              _menuItem(
-                icon: Icons.settings_outlined,
-                title: 'Settings',
-                subtitle: 'Password, FAQs & more',
-                onTap: () => context.push('/settings'),
-                isLast: true,
-              ),
-            ],
-          ),
+          child: Column(children: menuItems),
         ),
       ],
     );
