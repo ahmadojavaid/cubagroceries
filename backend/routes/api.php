@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoriesController;
 use App\Http\Controllers\Api\V1\ProductsController;
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\AddressController;
+use App\Http\Controllers\Api\V1\WalletController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -37,5 +39,15 @@ Route::prefix('v1')->group(function () {
         Route::get('/profile', [ProfileController::class, 'show']);
         Route::put('/profile', [ProfileController::class, 'update']);
         Route::put('/profile/password', [ProfileController::class, 'password']);
+
+        // Addresses
+        Route::get('/addresses', [AddressController::class, 'index']);
+        Route::post('/addresses', [AddressController::class, 'store']);
+        Route::put('/addresses/{id}', [AddressController::class, 'update']);
+        Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
+        Route::put('/addresses/{id}/default', [AddressController::class, 'setDefault']);
+
+        // Wallet
+        Route::get('/wallet', [WalletController::class, 'balance']);
     });
 });

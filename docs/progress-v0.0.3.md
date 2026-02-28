@@ -35,20 +35,20 @@
 - ✅ Validation: current_password required + Hash::check, password min:8|confirmed
 - ✅ Route registered in api.php
 
-### MP-B5: API — AddressController (full CRUD)
-- Create `Api\V1\AddressController`
-- `GET /api/v1/addresses` — list user's addresses (default first)
-- `POST /api/v1/addresses` — create address (auto-set default if first)
-- `PUT /api/v1/addresses/{id}` — update address (ownership check)
-- `DELETE /api/v1/addresses/{id}` — delete address (ownership check, reassign default)
-- Validation: address required, label/city/phone/lat/lng optional
-- Register routes
+### MP-B5: API — AddressController (full CRUD) ✅
+- ✅ `Api\V1\AddressController` created with ApiResponse trait
+- ✅ `GET /api/v1/addresses` — lists user's addresses (default first, then newest)
+- ✅ `POST /api/v1/addresses` — creates address (auto-sets default if first)
+- ✅ `PUT /api/v1/addresses/{id}` — updates address (ownership via relationship query)
+- ✅ `DELETE /api/v1/addresses/{id}` — deletes address (reassigns default to most recent)
+- ✅ Validation: address required, label/city/phone/lat/lng optional
+- ✅ Routes registered
 
-### MP-B6: API — Address set default + Wallet balance
-- Add `PUT /api/v1/addresses/{id}/default` — set as default (unset others)
-- Create `Api\V1\WalletController`
-- `GET /api/v1/wallet` — return wallet_amount for authenticated user
-- Register routes
+### MP-B6: API — Address set default + Wallet balance ✅
+- ✅ `PUT /api/v1/addresses/{id}/default` — unsets all defaults, sets chosen one
+- ✅ `Api\V1\WalletController` created with ApiResponse trait
+- ✅ `GET /api/v1/wallet` — returns wallet_amount for authenticated user
+- ✅ Routes registered
 
 ---
 
@@ -107,6 +107,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 6 | 4 | 2 |
+| Backend | 6 | 6 | 0 |
 | Mobile | 8 | 0 | 8 |
-| **Total** | **14** | **4** | **10** |
+| **Total** | **14** | **6** | **8** |
