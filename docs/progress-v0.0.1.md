@@ -100,11 +100,12 @@
 
 ## Mobile Micro-Phases
 
-### MP-M1: ProKit Analysis & Screen Mapping
-- Audit `prokit-flutter/lib/fullApps/grocery/` screens
-- Audit `prokit-flutter/lib/fullApps/shopHop/` for supplementary screens
-- Read key screen files to understand structure and dependencies
-- Complete `flutter-prokit-mapping.md` with file paths
+### MP-M1: ProKit Analysis & Screen Mapping ✅
+- ✅ Audit `grocery/` — 34 screens, using ~20 (splash, auth, home, catalog, checkout, profile, etc.)
+- ✅ Audit `shopHop/` — supplementary: onboarding, cart, address mgmt, order list/detail, settings
+- ✅ Audit `food/` — fallback for walkthrough and address forms
+- ✅ Complete `flutter-prokit-mapping.md` with all file paths and phase assignments
+- ✅ Identified key dependencies: nb_utils, appStore, AppWidget
 
 ### MP-M2: Project Structure Setup
 - Create feature-first folder structure under `mobile/lib/`
