@@ -64,18 +64,21 @@
 - ✅ `AddressProvider` (StateNotifier) — fetchAddresses, addAddress, updateAddress, deleteAddress, setDefault
 - ✅ Wired to all `/addresses` endpoints via ApiClient
 
-### MP-M3: Profile Screen (view & edit)
-- Build ProfileScreen showing user info (name, email, phone, DOB, wallet balance)
-- Edit mode: inline editing with save button
-- Wire to ProfileProvider
-- Wire Profile tab in NavigationShell (replace placeholder)
+### MP-M3: Profile Screen (view & edit) ✅
+- ✅ ProfileScreen with user info (name, email, phone, DOB)
+- ✅ Wallet balance card at top with styled display
+- ✅ Edit mode: toggle to inline form with save, cancel
+- ✅ Wired to ProfileProvider (fetch, update, error handling)
+- ✅ Profile tab in NavigationShell replaces placeholder
+- ✅ Menu links to Addresses and Settings screens
 
-### MP-M4: Address List Screen
-- Build AddressListScreen showing saved addresses as cards
-- Default address badge, edit/delete actions
-- Set default button
-- Navigate to add/edit form
-- Wire to AddressProvider
+### MP-M4: Address List Screen ✅
+- ✅ AddressListScreen with address cards (label, address, city, phone)
+- ✅ Default badge, highlighted border on default address
+- ✅ Actions: Set Default, Edit, Delete with confirmation dialog
+- ✅ FAB to add new address, navigates to /addresses/add
+- ✅ Edit navigates to /addresses/:id/edit with address as extra
+- ✅ Wired to AddressProvider with refresh and error handling
 
 ### MP-M5: Address Add/Edit Form
 - Build AddressFormScreen (reused for add and edit)
@@ -108,5 +111,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 6 | 6 | 0 |
-| Mobile | 8 | 2 | 6 |
-| **Total** | **14** | **8** | **6** |
+| Mobile | 8 | 4 | 4 |
+| **Total** | **14** | **10** | **4** |

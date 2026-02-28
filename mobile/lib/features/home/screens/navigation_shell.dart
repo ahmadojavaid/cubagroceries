@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../categories/screens/categories_tab_screen.dart';
+import '../../profile/screens/profile_screen.dart';
 import 'home_screen.dart';
 
 class NavigationShell extends StatefulWidget {
@@ -18,7 +19,7 @@ class _NavigationShellState extends State<NavigationShell> {
     CategoriesTabScreen(),
     _PlaceholderTab(icon: Icons.shopping_bag_outlined, label: 'Cart'),
     _PlaceholderTab(icon: Icons.receipt_long_outlined, label: 'Orders'),
-    _PlaceholderTab(icon: Icons.person_outline, label: 'Profile'),
+    ProfileScreen(),
   ];
 
   @override
