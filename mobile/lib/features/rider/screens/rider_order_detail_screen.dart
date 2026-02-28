@@ -455,6 +455,11 @@ class _BottomActions extends StatelessWidget {
     };
 
     final phone = order.customer?.identity ?? order.address?.phone;
+    final isCancelled = order.status == 'cancelled';
+    final isTerminal = order.status == 'delivered' || isCancelled;
+
+    // Nothing to show for delivered/cancelled with no actions
+    if (isTerminal && actionLabel == null) return const SizedBox.shrink();
 
     return Container(
       padding: EdgeInsets.only(
@@ -487,26 +492,27 @@ class _BottomActions extends StatelessWidget {
             ),
             const SizedBox(height: 10),
           ],
-          Row(children: [
-            if (order.address != null && order.address!.hasCoordinates)
-              Expanded(child: _SecondaryBtn(icon: Icons.map_rounded, label: 'Maps',
-                  onTap: () => LauncherUtils.openGoogleMaps(
-                    latitude: order.address?.latitude, longitude: order.address?.longitude,
-                    addressFallback: order.address != null ? '${order.address!.address}, ${order.address!.city ?? ''}' : null,
-                    context: context))),
-            if (order.address != null && order.address!.hasCoordinates && phone != null && phone.isNotEmpty)
-              const SizedBox(width: 10),
-            if (phone != null && phone.isNotEmpty)
-              Expanded(child: _SecondaryBtn(icon: Icons.chat_rounded, label: 'WhatsApp', color: const Color(0xFF25D366),
-                  onTap: () => LauncherUtils.openWhatsApp(phone: phone,
-                      message: 'Hi! I am your delivery rider from Cuba Groceries. Your order #${order.orderId} is on the way.',
+          if (!isCancelled)
+            Row(children: [
+              if (order.address != null && order.address!.hasCoordinates)
+                Expanded(child: _SecondaryBtn(icon: Icons.map_rounded, label: 'Maps',
+                    onTap: () => LauncherUtils.openGoogleMaps(
+                      latitude: order.address?.latitude, longitude: order.address?.longitude,
+                      addressFallback: order.address != null ? '${order.address!.address}, ${order.address!.city ?? ''}' : null,
                       context: context))),
-            if (phone != null && phone.isNotEmpty) ...[
-              const SizedBox(width: 10),
-              Expanded(child: _SecondaryBtn(icon: Icons.phone_rounded, label: 'Call', color: AppColors.primary,
-                  onTap: () => LauncherUtils.call(phone: phone, context: context))),
-            ],
-          ]),
+              if (order.address != null && order.address!.hasCoordinates && phone != null && phone.isNotEmpty)
+                const SizedBox(width: 10),
+              if (phone != null && phone.isNotEmpty)
+                Expanded(child: _SecondaryBtn(icon: Icons.chat_rounded, label: 'WhatsApp', color: const Color(0xFF25D366),
+                    onTap: () => LauncherUtils.openWhatsApp(phone: phone,
+                        message: 'Hi! I am your delivery rider from Cuba Groceries. Your order #${order.orderId} is on the way.',
+                        context: context))),
+              if (phone != null && phone.isNotEmpty) ...[
+                const SizedBox(width: 10),
+                Expanded(child: _SecondaryBtn(icon: Icons.phone_rounded, label: 'Call', color: AppColors.primary,
+                    onTap: () => LauncherUtils.call(phone: phone, context: context))),
+              ],
+            ]),
         ],
       ),
     );
