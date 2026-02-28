@@ -63,17 +63,18 @@
 
 ## Mobile Micro-Phases
 
-### MP-M1: Cart data model
-- Create `CartItemModel` (productId, productName, unitId, unitName, price, quantity)
-- toJson / fromJson for Hive serialization
-- Computed: lineTotal (price × quantity)
+### MP-M1: Cart data model ✅
+- ✅ Create `CartItemModel` (productId, productName, unitId, unitName, price, quantity)
+- ✅ toJson / fromJson for Hive serialization
+- ✅ Computed: lineTotal (price × quantity), cartKey, displayPrice, displayLineTotal
 
-### MP-M2: Cart provider with Hive persistence
-- Create `CartProvider` (Riverpod StateNotifier)
-- Methods: addItem, removeItem, updateQuantity, clearCart
-- Persist to Hive box on every change
-- Load from Hive on init
-- Computed: itemCount, subtotal, isEmpty
+### MP-M2: Cart provider with Hive persistence ✅
+- ✅ Create `CartNotifier` (Riverpod StateNotifier)
+- ✅ Methods: addItem, removeItem, updateQuantity, incrementQuantity, decrementQuantity, clearCart
+- ✅ Persist to Hive box on every change (JSON-encoded)
+- ✅ Load from Hive on init
+- ✅ Computed: itemCount, totalQuantity, subtotal, isEmpty
+- ✅ Helper: isInCart, getQuantity
 
 ### MP-M3: Hive initialization
 - Add hive + hive_flutter to pubspec (if not present)
@@ -149,5 +150,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 13 | 0 | 13 |
-| **Total** | **21** | **8** | **13** |
+| Mobile | 13 | 2 | 11 |
+| **Total** | **21** | **10** | **11** |
