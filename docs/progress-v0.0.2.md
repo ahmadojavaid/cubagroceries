@@ -127,17 +127,21 @@
 - ✅ Route /categories/:id/products now uses real screen
 - ✅ Added /products/:id route (placeholder)
 
-### MP-M6: Product Detail Screen
-- Build product detail screen
-- Show name, description, all price variants with unit selection
-- Stock indicator
-- Add to cart button (non-functional placeholder for now)
+### MP-M6: Product Detail Screen ✅
+- ✅ Build ProductDetailScreen with FutureProvider.family
+- ✅ Name, description, category breadcrumb, stock indicator
+- ✅ All price variants listed with unit name and abbreviation
+- ✅ Add to cart button (disabled when out of stock, non-functional placeholder)
+- ✅ Error state with retry (invalidate provider), not-found state
+- ✅ Route /products/:id now uses real screen, all placeholders removed
 
-### MP-M7: Search Screen
-- Build search screen with debounced text input
-- Wire to `GET /api/v1/products/search?q=`
-- Show results as product cards
-- Loading state while searching, empty state for no results
+### MP-M7: Search Screen ✅
+- ✅ Build SearchScreen with debounced text input (500ms)
+- ✅ Wired to searchProductsProvider (separate from browse provider)
+- ✅ Results as 2-column ProductCard grid
+- ✅ States: initial (prompt), loading, no results, error
+- ✅ Clear button in app bar, autofocus on open
+- ✅ Route /search now uses real screen
 
 ### MP-M8: Shimmer Loading & Image Caching
 - Add shimmer loading placeholders to: home screen, category listing, product listing
@@ -158,5 +162,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 9 | 5 | 4 |
-| **Total** | **17** | **13** | **4** |
+| Mobile | 9 | 7 | 2 |
+| **Total** | **17** | **15** | **2** |

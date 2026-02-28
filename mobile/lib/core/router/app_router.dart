@@ -7,7 +7,9 @@ import '../../features/auth/screens/splash_screen.dart';
 import '../../features/auth/screens/onboarding_screen.dart';
 import '../../features/categories/screens/category_listing_screen.dart';
 import '../../features/home/screens/navigation_shell.dart';
+import '../../features/products/screens/product_detail_screen.dart';
 import '../../features/products/screens/product_listing_screen.dart';
+import '../../features/products/screens/search_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -58,19 +60,19 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-      // Product detail — placeholder until MP-M6
+      // Product detail
       GoRoute(
         path: '/products/:id',
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return _ProductDetailPlaceholder(productId: id);
+          return ProductDetailScreen(productId: id);
         },
       ),
 
-      // Search — placeholder until MP-M7
+      // Search
       GoRoute(
         path: '/search',
-        builder: (context, state) => const _SearchPlaceholder(),
+        builder: (context, state) => const SearchScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
@@ -81,30 +83,4 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-/// Temporary placeholder for product detail screen
-class _ProductDetailPlaceholder extends StatelessWidget {
-  final int productId;
 
-  const _ProductDetailPlaceholder({required this.productId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Product Detail')),
-      body: Center(child: Text('Product #$productId detail coming soon')),
-    );
-  }
-}
-
-/// Temporary placeholder for search screen
-class _SearchPlaceholder extends StatelessWidget {
-  const _SearchPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Search')),
-      body: const Center(child: Text('Search coming soon')),
-    );
-  }
-}
