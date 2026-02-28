@@ -29,10 +29,10 @@
 - ✅ Green primary color, removed FilamentInfoWidget
 - **Verify**: `https://cubagroceries.test/admin` loads
 
-### MP-B2: Migrations — Auth Domain
-- Create `portal_users` migration (id, name, email, password, role, remember_token, timestamps)
-- Modify default `users` migration to match schema (identity, email, firstname, lastname, password, date_of_birth, wallet_amount, timestamps)
-- Remove default Laravel migrations we don't need (password_resets, etc. — keep personal_access_tokens for Sanctum)
+### MP-B2: Migrations — Auth Domain ✅
+- ✅ Create `portal_users` migration (id, name, email, password, role, remember_token, timestamps)
+- ✅ Modify default `users` migration to match schema (identity, email, firstname, lastname, password, date_of_birth, wallet_amount, timestamps)
+- ✅ Kept password_reset_tokens, sessions, personal_access_tokens (needed by Sanctum)
 - **Terminal**: `php artisan migrate:fresh`
 
 ### MP-B3: Migrations — Catalog Domain
@@ -173,6 +173,6 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
-| Backend | 10 | 1 | 9 |
+| Backend | 10 | 2 | 8 |
 | Mobile | 12 | 0 | 12 |
-| **Total** | **28** | **1** | **27** |
+| **Total** | **28** | **2** | **26** |
