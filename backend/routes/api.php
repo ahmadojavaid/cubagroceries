@@ -124,6 +124,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('rider')->middleware(EnsureUserIsRider::class)->group(function () {
             Route::get('/orders', [RiderController::class, 'orders']);
             Route::get('/orders/{orderNumber}', [RiderController::class, 'show']);
+            Route::put('/orders/{orderNumber}/status', [RiderController::class, 'updateStatus']);
         });
     });
 });

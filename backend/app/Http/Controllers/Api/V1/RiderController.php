@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
+use App\Notifications\OrderStatusChanged;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -10,7 +12,6 @@ class RiderController extends Controller
 {
     /**
      * GET /api/v1/rider/orders
-     * List orders assigned to the authenticated rider's delivery boy record.
      */
     public function orders(Request $request): JsonResponse
     {
@@ -48,7 +49,6 @@ class RiderController extends Controller
 
     /**
      * GET /api/v1/rider/orders/{order_number}
-     * Get a single order detail by order number.
      */
     public function show(Request $request, string $orderNumber): JsonResponse
     {
@@ -82,6 +82,84 @@ class RiderController extends Controller
         return response()->json([
             'success' => true,
             'data' => $order,
+        ]);
+    }
+
+    /**
+     * PUT /api/v1/rider/orders/{order_number}/status
+     *
+     * Rider can only:
+     *   confirmed  → dispatched  (pick up / start delivery)
+     *   dispatched → delivered   (mark delivered)
+     */
+    public function updateStatus(Request $request, string $orderNumber): JsonResponse
+    {
+        $request->validate([
+            'status' => 'required|string|in:dispatched,delivered',
+        ]);
+
+        $user = $request->user();
+        $deliveryBoy = $user->deliveryBoy;
+
+        if (! $deliveryBoy) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No delivery boy profile linked to this account.',
+            ], 404);
+        }
+
+        $order = $deliveryBoy->orders()
+            ->where('order_id', $orderNumber)
+            ->first();
+
+        if (! $order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found.',
+            ], 404);
+        }
+
+        $newStatus = OrderStatus::from($request->status);
+        $currentStatus = $order->status;
+
+        // Validate transition
+        if (! $currentStatus->canTransitionTo($newStatus)) {
+            return response()->json([
+                'success' => false,
+                'message' => "Cannot change status from {$currentStatus->label()} to {$newStatus->label()}.",
+            ], 422);
+        }
+
+        // Only allow rider-specific transitions
+        $allowed = match ($newStatus) {
+            OrderStatus::Dispatched => $currentStatus === OrderStatus::Confirmed,
+            OrderStatus::Delivered  => $currentStatus === OrderStatus::Dispatched,
+            default => false,
+        };
+
+        if (! $allowed) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not allowed to perform this status change.',
+            ], 403);
+        }
+
+        $order->update(['status' => $newStatus]);
+
+        // Notify customer
+        try {
+            $order->user->notify(new OrderStatusChanged($order));
+        } catch (\Throwable $e) {
+            // Don't fail the request if notification fails
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'order_id' => $order->order_id,
+                'status' => $order->status->value,
+            ],
+            'message' => "Order marked as {$newStatus->label()}.",
         ]);
     }
 }

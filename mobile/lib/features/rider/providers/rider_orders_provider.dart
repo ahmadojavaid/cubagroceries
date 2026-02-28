@@ -228,6 +228,72 @@ class RiderOrdersNotifier extends StateNotifier<RiderOrdersState> {
     }
   }
 
+  /// Update an order's status (dispatched or delivered)
+  Future<bool> updateStatus(String orderNumber, String newStatus) async {
+    try {
+      final response = await _api.put(
+        '/rider/orders/$orderNumber/status',
+        data: {'status': newStatus},
+      );
+      final data = response.data;
+      if (data['success'] == true) {
+        // Update local state
+        final updated = state.orders.map((o) {
+          if (o.orderId == orderNumber) {
+            return RiderOrder(
+              id: o.id,
+              orderId: o.orderId,
+              status: newStatus,
+              totalAmount: o.totalAmount,
+              createdAt: o.createdAt,
+              address: o.address,
+              customer: o.customer,
+              items: o.items,
+            );
+          }
+          return o;
+        }).toList();
+        state = state.copyWith(orders: updated);
+        return true;
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> updateStatus(String orderId, String newStatus) async {
+    try {
+      final response = await _api.put('/rider/orders/$orderId/status', data: {
+        'status': newStatus,
+      });
+      final data = response.data;
+      if (data['success'] == true) {
+        // Update local state immediately
+        final updated = state.orders.map((o) {
+          if (o.orderId == orderId) {
+            return RiderOrder(
+              id: o.id,
+              orderId: o.orderId,
+              status: newStatus,
+              totalAmount: o.totalAmount,
+              createdAt: o.createdAt,
+              address: o.address,
+              customer: o.customer,
+              items: o.items,
+            );
+          }
+          return o;
+        }).toList();
+        state = RiderOrdersState(orders: updated);
+        return true;
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> refresh() async {
     state = state.copyWith(isRefreshing: true);
     try {

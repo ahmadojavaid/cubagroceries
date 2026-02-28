@@ -79,6 +79,21 @@ class LauncherUtils {
     return false;
   }
 
+  /// Opens the phone dialer with the given number.
+  static Future<bool> call({
+    required String phone,
+    BuildContext? context,
+  }) async {
+    final cleaned = phone.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+    final uri = Uri.parse('tel:$cleaned');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+      return true;
+    }
+    _showSnackbar(context, 'Could not open phone dialer.');
+    return false;
+  }
+
   static void _showSnackbar(BuildContext? context, String message) {
     if (context != null && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
