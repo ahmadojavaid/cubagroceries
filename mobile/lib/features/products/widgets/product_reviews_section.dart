@@ -12,7 +12,8 @@ final productReviewsProvider =
   final data = response.data;
   if (data['success'] == true) {
     return {
-      'reviews': List<Map<String, dynamic>>.from(data['data']['data'] ?? data['data'] ?? []),
+      'reviews': List<Map<String, dynamic>>.from(
+          data['data'] is List ? data['data'] : data['data']['data'] ?? []),
       'total': data['meta']?['total'] ?? 0,
     };
   }
@@ -62,17 +63,17 @@ class ProductReviewsSection extends ConsumerWidget {
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
           ),
-          error: (_, __) => Text(
+          error: (_, __) => const Text(
             'Could not load reviews',
             style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
           ),
           data: (data) {
             final reviews = data['reviews'] as List;
             if (reviews.isEmpty) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
                 child: Text(
-                  'No reviews yet. Be the first to review!',
+                  'No reviews yet.',
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 13,
@@ -90,7 +91,7 @@ class ProductReviewsSection extends ConsumerWidget {
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
                       'And ${(data['total'] as int) - 5} more reviews',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 13,
                       ),
@@ -120,22 +121,20 @@ class _ReviewCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: AppColors.surfaceBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-        border: Border.all(color: AppColors.border, width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              // Stars
               Row(
                 children: List.generate(
                   5,
                   (i) => Icon(
-                    i < rating ? Icons.star : Icons.star_border,
-                    color: Colors.amber,
+                    i < rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                    color: AppColors.ratingStar,
                     size: 16,
                   ),
                 ),
@@ -143,7 +142,7 @@ class _ReviewCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 customer,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 12,
                 ),
@@ -163,16 +162,11 @@ class _ReviewCard extends StatelessWidget {
   }
 }
 
-/// Dialog for writing a review
+/// Dialog for writing a product review — requires selecting which order
 class WriteReviewDialog extends ConsumerStatefulWidget {
   final int productId;
-  final int? orderId;
 
-  const WriteReviewDialog({
-    super.key,
-    required this.productId,
-    this.orderId,
-  });
+  const WriteReviewDialog({super.key, required this.productId});
 
   @override
   ConsumerState<WriteReviewDialog> createState() => _WriteReviewDialogState();
@@ -182,6 +176,63 @@ class _WriteReviewDialogState extends ConsumerState<WriteReviewDialog> {
   int _rating = 0;
   final _commentController = TextEditingController();
   bool _isSubmitting = false;
+  bool _isLoadingOrders = true;
+  List<Map<String, dynamic>> _eligibleOrders = [];
+  int? _selectedOrderId;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEligibleOrders();
+  }
+
+  Future<void> _loadEligibleOrders() async {
+    try {
+      final api = ref.read(apiClientProvider);
+      // Fetch user's orders, find delivered ones containing this product
+      final response = await api.get('/orders', queryParameters: {
+        'per_page': 50,
+      });
+
+      final data = response.data;
+      if (data['success'] == true) {
+        final orders = (data['data'] as List).cast<Map<String, dynamic>>();
+        final delivered = orders.where((o) => o['status'] == 'delivered').toList();
+
+        // For each delivered order, check if product was in it and not yet reviewed
+        final eligible = <Map<String, dynamic>>[];
+        for (final order in delivered) {
+          final reviewableRes = await api.get('/orders/${order['id']}/reviewable-products');
+          final rData = reviewableRes.data;
+          if (rData['success'] == true && rData['can_review'] == true) {
+            final items = (rData['data'] as List).cast<Map<String, dynamic>>();
+            final match = items.where(
+              (i) => i['product_id'] == widget.productId && i['reviewed'] == false,
+            );
+            if (match.isNotEmpty) {
+              eligible.add(order);
+            }
+          }
+        }
+
+        if (mounted) {
+          setState(() {
+            _eligibleOrders = eligible;
+            _selectedOrderId = eligible.isNotEmpty ? eligible.first['id'] as int : null;
+            _isLoadingOrders = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingOrders = false;
+          _error = 'Could not load orders';
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -196,6 +247,7 @@ class _WriteReviewDialogState extends ConsumerState<WriteReviewDialog> {
       );
       return;
     }
+    if (_selectedOrderId == null) return;
 
     setState(() => _isSubmitting = true);
 
@@ -203,7 +255,7 @@ class _WriteReviewDialogState extends ConsumerState<WriteReviewDialog> {
       final api = ref.read(apiClientProvider);
       final response = await api.post('/reviews', data: {
         'product_id': widget.productId,
-        if (widget.orderId != null) 'order_id': widget.orderId,
+        'order_id': _selectedOrderId,
         'rating': _rating,
         'comment': _commentController.text.trim().isEmpty
             ? null
@@ -212,46 +264,146 @@ class _WriteReviewDialogState extends ConsumerState<WriteReviewDialog> {
 
       if (!mounted) return;
 
-      final data = response.data;
       Navigator.pop(context, true);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(data['message'] ?? 'Review submitted!')),
+        SnackBar(
+          content: Text(response.data['message'] ?? 'Review submitted!'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.success,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
       setState(() => _isSubmitting = false);
+      String msg = 'Failed to submit review';
+      try {
+        msg = (e as dynamic).response?.data?['message'] ?? msg;
+      } catch (_) {}
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to submit review'),
-          backgroundColor: AppColors.error,
-        ),
+        SnackBar(content: Text(msg), backgroundColor: AppColors.error),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Write a Review'),
-      content: Column(
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: _isLoadingOrders
+            ? const SizedBox(
+                height: 120,
+                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              )
+            : _error != null
+                ? _buildError()
+                : _eligibleOrders.isEmpty
+                    ? _buildNoEligible()
+                    : _buildForm(),
+      ),
+    );
+  }
+
+  Widget _buildError() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.error_outline, size: 40, color: AppColors.error),
+        const SizedBox(height: 12),
+        Text(_error!, style: const TextStyle(color: AppColors.textSecondary)),
+        const SizedBox(height: 16),
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+      ],
+    );
+  }
+
+  Widget _buildNoEligible() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.rate_review_outlined, size: 40, color: AppColors.textHint),
+        const SizedBox(height: 12),
+        const Text(
+          'Can\'t review this product',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          'You can only review products from orders that have been delivered.',
+          style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+      ],
+    );
+  }
+
+  Widget _buildForm() {
+    return SingleChildScrollView(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Text(
+            'Write a Review',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 16),
+
+          // Order selector (if multiple)
+          if (_eligibleOrders.length > 1) ...[
+            const Text('For order:', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.border),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int>(
+                  value: _selectedOrderId,
+                  isExpanded: true,
+                  items: _eligibleOrders.map((o) {
+                    return DropdownMenuItem<int>(
+                      value: o['id'] as int,
+                      child: Text(o['order_id'] as String? ?? '#${o['id']}',
+                          style: const TextStyle(fontSize: 14)),
+                    );
+                  }).toList(),
+                  onChanged: (v) => setState(() => _selectedOrderId = v),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
           // Star rating
+          const Text('Rating', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+          const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
               5,
-              (i) => IconButton(
-                onPressed: () => setState(() => _rating = i + 1),
-                icon: Icon(
-                  i < _rating ? Icons.star : Icons.star_border,
-                  color: Colors.amber,
-                  size: 32,
+              (i) => GestureDetector(
+                onTap: () => setState(() => _rating = i + 1),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Icon(
+                    i < _rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                    color: AppColors.ratingStar,
+                    size: 36,
+                  ),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
+
+          // Comment
           TextField(
             controller: _commentController,
             maxLines: 3,
@@ -263,24 +415,33 @@ class _WriteReviewDialogState extends ConsumerState<WriteReviewDialog> {
               ),
             ),
           ),
+          const SizedBox(height: 20),
+
+          // Actions
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _isSubmitting || _rating == 0 ? null : _submit,
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 18, height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text('Submit'),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
-      actions: [
-        TextButton(
-          onPressed: _isSubmitting ? null : () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: _isSubmitting ? null : _submit,
-          child: _isSubmitting
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Text('Submit'),
-        ),
-      ],
     );
   }
 }

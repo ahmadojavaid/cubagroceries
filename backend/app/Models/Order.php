@@ -46,4 +46,14 @@ class Order extends Model
     {
         return $this->belongsTo(DeliveryBoy::class);
     }
+
+    public function orderReview()
+    {
+        return $this->hasOne(OrderReview::class, 'order_id');
+    }
+
+    public function productReviews()
+    {
+        return $this->hasMany(Review::class, 'order_id');
+    }
 }

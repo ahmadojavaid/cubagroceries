@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../data/order_model.dart';
 import '../providers/order_provider.dart';
+import '../widgets/order_review_section.dart';
 import '../widgets/order_status_timeline.dart';
 
 class OrderDetailScreen extends ConsumerStatefulWidget {
@@ -202,6 +203,12 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                 ],
               ),
             ],
+          ),
+
+          // Reviews section (only for delivered orders)
+          OrderReviewSection(
+            orderId: order.id,
+            orderStatus: order.status,
           ),
 
           const SizedBox(height: AppDimens.lg),

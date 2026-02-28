@@ -98,9 +98,14 @@ Route::prefix('v1')->group(function () {
         // Coupons
         Route::post('/coupons/apply', [CouponController::class, 'apply']);
 
-        // Reviews
+        // Reviews — Product
         Route::get('/products/{productId}/reviews', [ReviewController::class, 'forProduct']);
         Route::post('/reviews', [ReviewController::class, 'store']);
+        Route::get('/orders/{orderId}/reviewable-products', [ReviewController::class, 'reviewableProducts']);
+
+        // Reviews — Order
+        Route::post('/order-reviews', [ReviewController::class, 'storeOrderReview']);
+        Route::get('/orders/{orderId}/review', [ReviewController::class, 'orderReview']);
 
         // Surveys
         Route::get('/surveys', [SurveyController::class, 'index']);

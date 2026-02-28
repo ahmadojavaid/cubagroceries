@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../../../core/widgets/app_network_image.dart';
+import '../../../core/widgets/fullscreen_image_viewer.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../data/price_model.dart';
 import '../data/product_model.dart';
@@ -136,17 +137,24 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   Widget _buildImageHero(BuildContext context, ProductModel product) {
     return Stack(
       children: [
-        Container(
-          height: 320,
-          width: double.infinity,
-          color: AppColors.cardBg,
-          child: Hero(
-            tag: 'product_${product.id}',
-            child: AppNetworkImage(
-              imageUrl: product.image,
-              height: 320,
-              width: double.infinity,
-              fit: BoxFit.cover,
+        GestureDetector(
+          onTap: () => FullscreenImageViewer.open(
+            context,
+            imageUrl: product.image,
+            heroTag: 'product_${product.id}',
+          ),
+          child: Container(
+            height: 320,
+            width: double.infinity,
+            color: AppColors.cardBg,
+            child: Hero(
+              tag: 'product_${product.id}',
+              child: AppNetworkImage(
+                imageUrl: product.image,
+                height: 320,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ),
