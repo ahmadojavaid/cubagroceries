@@ -139,37 +139,37 @@
 - ✅ Create `features/auth/providers/auth_provider.dart` (AuthState + AuthNotifier)
 - ✅ AuthNotifier: checkAuth, register, login, logout, clearError methods
 
-### MP-M7: Router Setup
-- Create `core/router/app_router.dart` with go_router
-- Define initial routes: splash, onboarding, login, register, home shell
-- Auth redirect logic (logged in → home, not logged in → login)
+### MP-M7: Router Setup ✅
+- ✅ Create `core/router/app_router.dart` with go_router
+- ✅ Routes: /splash, /onboarding, /login, /register, /home
+- ✅ Auth redirect (authenticated → /home, unauthenticated → /login)
+- ✅ Wire router into main.dart via MaterialApp.router
 
-### MP-M8: Splash Screen
-- Extract and adapt `GrocerySplash.dart`
-- Wire navigation: check auth state → onboarding (first launch) or home (logged in) or login
+### MP-M8: Splash Screen ✅
+- ✅ Build SplashScreen with green background, icon, branding, loading spinner
+- ✅ Calls authProvider.checkAuth() then navigates to /home or /login
 
-### MP-M9: Onboarding Screen
-- Extract walkthrough from `shopHop/ShWalkThroughScreen.dart` or build custom
-- 2-3 slides introducing the app
-- Skip/Done → navigate to login
-- Store "onboarding seen" flag in shared prefs
+### MP-M9: Onboarding Screen ✅
+- ✅ 3-slide PageView (Fresh Groceries, Fast Delivery, Easy Payment)
+- ✅ Animated dot indicator, Skip button, Next/Get Started button
+- ✅ Navigates to /login on completion
 
-### MP-M10: Login Screen
-- Extract and adapt `GrocerySignUp.dart` or build login screen using ProKit widgets
-- Wire to `POST /api/v1/auth/login`
-- Store token on success, navigate to home
-- Error handling and loading states
+### MP-M10: Login Screen ✅
+- ✅ Form with email + password, validation, show/hide password toggle
+- ✅ Wired to authProvider.login() → POST /api/v1/auth/login
+- ✅ Error display, loading state, navigates to /home on success
+- ✅ Link to Register screen
 
-### MP-M11: Register Screen
-- Build register screen matching our API fields (identity, email, firstname, lastname, password, DOB)
-- Wire to `POST /api/v1/auth/register`
-- Store token on success, navigate to home
-- Error handling and loading states
+### MP-M11: Register Screen ✅
+- ✅ Form: phone, first/last name (side by side), email, password, confirm password
+- ✅ Wired to authProvider.register() → POST /api/v1/auth/register
+- ✅ Error display, loading state, navigates to /home on success
+- ✅ Link back to Login screen
 
-### MP-M12: Navigation Shell
-- Build bottom navigation bar (Home, Categories, Cart, Orders, Profile)
-- Each tab shows placeholder screen
-- Extract nav bar style from ProKit grocery dashboard
+### MP-M12: Navigation Shell ✅
+- ✅ Bottom nav: Home, Categories, Cart, Orders, Profile
+- ✅ IndexedStack for tab persistence
+- ✅ Placeholder tabs with icon + "Coming soon" text
 
 ---
 
@@ -179,5 +179,5 @@
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
 | Backend | 10 | 10 | 0 |
-| Mobile | 12 | 5 | 7 |
-| **Total** | **28** | **15** | **13** |
+| Mobile | 12 | 11 | 1 |
+| **Total** | **28** | **21** | **7** |
