@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/shared_widgets.dart';
 import '../providers/product_provider.dart';
 import '../widgets/product_card.dart';
 
@@ -21,7 +22,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    // Reset search state on open
     Future.microtask(() => ref.read(searchProductsProvider.notifier).reset());
   }
 
@@ -56,13 +56,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           decoration: const InputDecoration(
             hintText: 'Search products...',
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            fillColor: Colors.transparent,
+            filled: true,
           ),
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         actions: [
           if (_controller.text.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.clear),
+              icon: const Icon(Icons.clear_rounded, size: 20),
               onPressed: () {
                 _controller.clear();
                 ref.read(searchProductsProvider.notifier).reset();
@@ -76,7 +80,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   Widget _buildBody(BuildContext context, ProductsState state) {
-    // Initial empty state — no query yet
     if (!state.isLoading &&
         state.products.isEmpty &&
         state.error == null &&
@@ -85,24 +88,27 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     }
 
     if (state.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const ProductGridShimmer(itemCount: 4);
     }
 
     if (state.error != null && state.products.isEmpty) {
-      return _buildError(context, state.error!);
+      return ErrorStateWidget(message: state.error!);
     }
 
     if (state.products.isEmpty) {
-      return _buildNoResults(context);
+      return EmptyStateWidget(
+        icon: Icons.search_off_rounded,
+        message: 'No products found for "${_controller.text}"',
+      );
     }
 
     return GridView.builder(
-      padding: const EdgeInsets.all(AppDimens.md),
+      padding: const EdgeInsets.all(AppDimens.pagePadding),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: AppDimens.sm,
-        mainAxisSpacing: AppDimens.sm,
-        childAspectRatio: 0.7,
+        crossAxisSpacing: AppDimens.md,
+        mainAxisSpacing: AppDimens.md,
+        childAspectRatio: 0.68,
       ),
       itemCount: state.products.length,
       itemBuilder: (context, index) {
@@ -120,8 +126,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.search, size: 48, color: AppColors.textHint),
-          const SizedBox(height: AppDimens.md),
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceBg,
+              shape: BoxShape.circle,
+            ),
+            child:
+                const Icon(Icons.search_rounded, size: 36, color: AppColors.textHint),
+          ),
+          const SizedBox(height: AppDimens.lg),
           Text(
             'Search for products',
             style: Theme.of(context)
@@ -130,49 +145,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 ?.copyWith(color: AppColors.textSecondary),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildNoResults(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.search_off, size: 48, color: AppColors.textHint),
-          const SizedBox(height: AppDimens.md),
-          Text(
-            'No products found for "${_controller.text}"',
-            textAlign: TextAlign.center,
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: AppColors.textSecondary),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildError(BuildContext context, String message) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppDimens.lg),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-            const SizedBox(height: AppDimens.md),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: AppColors.textSecondary),
-            ),
-          ],
-        ),
       ),
     );
   }

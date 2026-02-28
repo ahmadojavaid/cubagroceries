@@ -12,16 +12,16 @@ class CategoryGridShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: AppColors.border,
-      highlightColor: AppColors.surfaceBg,
+      baseColor: AppColors.divider,
+      highlightColor: AppColors.scaffoldBg,
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: AppDimens.sm,
-          mainAxisSpacing: AppDimens.sm,
-          childAspectRatio: 1.1,
+          crossAxisSpacing: AppDimens.md,
+          mainAxisSpacing: AppDimens.md,
+          childAspectRatio: 1.05,
         ),
         itemCount: itemCount,
         itemBuilder: (_, __) => Container(
@@ -44,15 +44,15 @@ class ProductGridShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: AppColors.border,
-      highlightColor: AppColors.surfaceBg,
+      baseColor: AppColors.divider,
+      highlightColor: AppColors.scaffoldBg,
       child: GridView.builder(
-        padding: const EdgeInsets.all(AppDimens.md),
+        padding: const EdgeInsets.all(AppDimens.pagePadding),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: AppDimens.sm,
-          mainAxisSpacing: AppDimens.sm,
-          childAspectRatio: 0.7,
+          crossAxisSpacing: AppDimens.md,
+          mainAxisSpacing: AppDimens.md,
+          childAspectRatio: 0.68,
         ),
         itemCount: itemCount,
         itemBuilder: (_, __) => Container(
@@ -82,8 +82,8 @@ class ShimmerBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: AppColors.border,
-      highlightColor: AppColors.surfaceBg,
+      baseColor: AppColors.divider,
+      highlightColor: AppColors.scaffoldBg,
       child: Container(
         width: width,
         height: height,
@@ -104,7 +104,7 @@ class ImageFallback extends StatelessWidget {
   const ImageFallback({
     super.key,
     this.size = 64,
-    this.icon = Icons.image_not_supported_outlined,
+    this.icon = Icons.eco_outlined,
   });
 
   @override
@@ -113,10 +113,10 @@ class ImageFallback extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.primarySurface,
+        color: AppColors.primarySurface.withOpacity(0.6),
         borderRadius: BorderRadius.circular(AppDimens.radiusSm),
       ),
-      child: Icon(icon, size: size * 0.5, color: AppColors.primary),
+      child: Icon(icon, size: size * 0.45, color: AppColors.primaryLight),
     );
   }
 }
@@ -140,23 +140,30 @@ class EmptyStateWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppDimens.lg),
+        padding: const EdgeInsets.all(AppDimens.xxl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 48, color: AppColors.textHint),
-            const SizedBox(height: AppDimens.md),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceBg,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 36, color: AppColors.textHint),
+            ),
+            const SizedBox(height: AppDimens.lg),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
             ),
             if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: AppDimens.md),
-              ElevatedButton(
+              const SizedBox(height: AppDimens.lg),
+              OutlinedButton(
                 onPressed: onAction,
                 child: Text(actionLabel!),
               ),
@@ -183,25 +190,34 @@ class ErrorStateWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppDimens.lg),
+        padding: const EdgeInsets.all(AppDimens.xxl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-            const SizedBox(height: AppDimens.md),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.error.withOpacity(0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.cloud_off_outlined,
+                  size: 36, color: AppColors.error.withOpacity(0.6)),
+            ),
+            const SizedBox(height: AppDimens.lg),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
             ),
             if (onRetry != null) ...[
-              const SizedBox(height: AppDimens.md),
-              ElevatedButton(
+              const SizedBox(height: AppDimens.lg),
+              OutlinedButton.icon(
                 onPressed: onRetry,
-                child: const Text('Retry'),
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('Try again'),
               ),
             ],
           ],

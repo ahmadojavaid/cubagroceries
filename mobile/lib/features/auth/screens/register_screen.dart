@@ -56,55 +56,69 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final auth = ref.watch(authProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.scaffoldBg,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.go('/login'),
         ),
         title: const Text('Create Account'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimens.lg),
+          padding: const EdgeInsets.all(AppDimens.pagePadding),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Error message
+                // Error
                 if (auth.error != null) ...[
                   Container(
                     padding: const EdgeInsets.all(AppDimens.md),
                     decoration: BoxDecoration(
-                      color: AppColors.error.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppDimens.radiusSm),
+                      color: AppColors.error.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                      border: Border.all(
+                          color: AppColors.error.withOpacity(0.15)),
                     ),
-                    child: Text(
-                      auth.error!,
-                      style: const TextStyle(color: AppColors.error),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline,
+                            size: 18, color: AppColors.error.withOpacity(0.7)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            auth.error!,
+                            style: TextStyle(
+                                color: AppColors.error, fontSize: 13),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                 ],
 
-                // Phone / Identity
+                // Phone
                 TextFormField(
                   controller: _identityController,
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
                     labelText: 'Phone Number',
-                    prefixIcon: Icon(Icons.phone_outlined),
+                    prefixIcon: Icon(Icons.phone_outlined, size: 20),
                     hintText: '03001234567',
                   ),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Phone number is required';
+                    if (v == null || v.trim().isEmpty)
+                      return 'Phone number is required';
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
 
-                // First & Last name row
+                // Names
                 Row(
                   children: [
                     Expanded(
@@ -145,10 +159,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: Icon(Icons.email_outlined),
+                    prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
                   ),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Email is required';
+                    if (v == null || v.trim().isEmpty)
+                      return 'Email is required';
                     if (!v.contains('@')) return 'Enter a valid email';
                     return null;
                   },
@@ -162,12 +177,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock_outlined),
+                    prefixIcon:
+                        const Icon(Icons.lock_outline_rounded, size: 20),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        size: 20,
                       ),
                       onPressed: () =>
                           setState(() => _obscurePassword = !_obscurePassword),
@@ -181,19 +198,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Confirm Password
+                // Confirm
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirm,
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
                     labelText: 'Confirm Password',
-                    prefixIcon: const Icon(Icons.lock_outlined),
+                    prefixIcon:
+                        const Icon(Icons.lock_outline_rounded, size: 20),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureConfirm
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        size: 20,
                       ),
                       onPressed: () =>
                           setState(() => _obscureConfirm = !_obscureConfirm),
@@ -201,16 +220,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Please confirm password';
-                    if (v != _passwordController.text) return 'Passwords do not match';
+                    if (v != _passwordController.text)
+                      return 'Passwords do not match';
                     return null;
                   },
                   onFieldSubmitted: (_) => _onRegister(),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
 
                 // Register button
                 SizedBox(
-                  height: 50,
+                  height: 52,
                   child: ElevatedButton(
                     onPressed: auth.isLoading ? null : _onRegister,
                     child: auth.isLoading
@@ -225,13 +245,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         : const Text('Create Account'),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // Login link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Already have an account? '),
+                    Text(
+                      'Already have an account? ',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: AppColors.textSecondary),
+                    ),
                     TextButton(
                       onPressed: () => context.go('/login'),
                       child: const Text('Sign In'),

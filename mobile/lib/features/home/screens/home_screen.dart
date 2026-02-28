@@ -18,7 +18,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch categories on first load
     Future.microtask(
       () => ref.read(categoriesProvider.notifier).fetchCategories(),
     );
@@ -33,12 +32,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: const Text('Cuba Groceries'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.search_rounded),
             onPressed: () => context.push('/search'),
           ),
         ],
       ),
       body: RefreshIndicator(
+        color: AppColors.primary,
         onRefresh: () => ref
             .read(categoriesProvider.notifier)
             .fetchCategories(forceRefresh: true),
@@ -50,13 +50,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildBody(CategoriesState state) {
     if (state.isLoading) {
       return ListView(
-        padding: const EdgeInsets.all(AppDimens.md),
+        padding: const EdgeInsets.all(AppDimens.pagePadding),
         children: [
-          const SizedBox(height: AppDimens.xl),
-          const ShimmerBox(width: 220, height: 24),
           const SizedBox(height: AppDimens.lg),
-          const ShimmerBox(width: 120, height: 20),
-          const SizedBox(height: AppDimens.sm),
+          const ShimmerBox(width: 240, height: 28),
+          const SizedBox(height: AppDimens.xs),
+          const ShimmerBox(width: 160, height: 16),
+          const SizedBox(height: AppDimens.xl),
+          const ShimmerBox(width: 100, height: 18),
+          const SizedBox(height: AppDimens.md),
           const CategoryGridShimmer(),
         ],
       );
@@ -74,40 +76,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (state.categories.isEmpty) {
       return const EmptyStateWidget(
         icon: Icons.storefront_outlined,
-        message: 'No categories available',
+        message: 'No categories available yet',
       );
     }
 
     return ListView(
-      padding: const EdgeInsets.all(AppDimens.md),
+      padding: const EdgeInsets.all(AppDimens.pagePadding),
       children: [
-        // Welcome section
+        const SizedBox(height: AppDimens.sm),
+
+        // Welcome
         Text(
-          'What would you like to buy?',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+          'What would you\nlike to buy?',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                height: 1.15,
               ),
+        ),
+        const SizedBox(height: AppDimens.xs),
+        Text(
+          'Fresh groceries delivered to your door',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+        ),
+        const SizedBox(height: AppDimens.xl),
+
+        // Section heading
+        Text(
+          'Categories',
+          style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: AppDimens.md),
 
         // Categories grid
-        Text(
-          'Categories',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-        ),
-        const SizedBox(height: AppDimens.sm),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            crossAxisSpacing: AppDimens.sm,
-            mainAxisSpacing: AppDimens.sm,
-            childAspectRatio: 1.1,
+            crossAxisSpacing: AppDimens.md,
+            mainAxisSpacing: AppDimens.md,
+            childAspectRatio: 1.05,
           ),
           itemCount: state.categories.length,
           itemBuilder: (context, index) {
@@ -118,19 +127,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             );
           },
         ),
+
+        const SizedBox(height: AppDimens.xl),
       ],
     );
   }
 
   void _onCategoryTap(int categoryId, bool hasChildren) {
     if (hasChildren) {
-      // Navigate to category listing (shows sub-categories)
       context.push('/categories/$categoryId');
     } else {
-      // Navigate directly to products for this category
       context.push('/categories/$categoryId/products');
     }
   }
-
-
 }

@@ -16,9 +16,9 @@ class _NavigationShellState extends State<NavigationShell> {
   final _screens = const [
     HomeScreen(),
     CategoriesTabScreen(),
-    _PlaceholderTab(icon: Icons.shopping_cart, label: 'Cart'),
-    _PlaceholderTab(icon: Icons.receipt_long, label: 'Orders'),
-    _PlaceholderTab(icon: Icons.person, label: 'Profile'),
+    _PlaceholderTab(icon: Icons.shopping_bag_outlined, label: 'Cart'),
+    _PlaceholderTab(icon: Icons.receipt_long_outlined, label: 'Orders'),
+    _PlaceholderTab(icon: Icons.person_outline, label: 'Profile'),
   ];
 
   @override
@@ -28,19 +28,38 @@ class _NavigationShellState extends State<NavigationShell> {
         index: _currentIndex,
         children: _screens,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (i) => setState(() => _currentIndex = i),
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textHint,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'Categories'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Orders'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(color: AppColors.divider, width: 0.5),
+          ),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (i) => setState(() => _currentIndex = i),
+          items: const [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                activeIcon: Icon(Icons.home_rounded),
+                label: 'Home'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.grid_view_outlined),
+                activeIcon: Icon(Icons.grid_view_rounded),
+                label: 'Categories'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.shopping_bag_outlined),
+                activeIcon: Icon(Icons.shopping_bag_rounded),
+                label: 'Cart'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.receipt_long_outlined),
+                activeIcon: Icon(Icons.receipt_long_rounded),
+                label: 'Orders'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline),
+                activeIcon: Icon(Icons.person_rounded),
+                label: 'Profile'),
+          ],
+        ),
       ),
     );
   }
@@ -58,13 +77,21 @@ class _PlaceholderTab extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 48, color: AppColors.textHint),
-          const SizedBox(height: 12),
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceBg,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 32, color: AppColors.textHint),
+          ),
+          const SizedBox(height: 16),
           Text(
             label,
             style: Theme.of(context)
                 .textTheme
-                .titleLarge
+                .titleMedium
                 ?.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 4),

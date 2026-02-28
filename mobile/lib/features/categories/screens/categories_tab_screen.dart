@@ -7,8 +7,6 @@ import '../../../core/theme/app_dimens.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../providers/category_provider.dart';
 
-/// Full-screen categories tab: shows all top-level categories with their
-/// sub-categories in an expandable list. Tapping navigates to products.
 class CategoriesTabScreen extends ConsumerStatefulWidget {
   const CategoriesTabScreen({super.key});
 
@@ -35,12 +33,13 @@ class _CategoriesTabScreenState extends ConsumerState<CategoriesTabScreen> {
         title: const Text('Categories'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.search_rounded),
             onPressed: () => context.push('/search'),
           ),
         ],
       ),
       body: RefreshIndicator(
+        color: AppColors.primary,
         onRefresh: () => ref
             .read(categoriesProvider.notifier)
             .fetchCategories(forceRefresh: true),
@@ -71,111 +70,109 @@ class _CategoriesTabScreenState extends ConsumerState<CategoriesTabScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(AppDimens.md),
+      padding: const EdgeInsets.all(AppDimens.pagePadding),
       itemCount: state.categories.length,
       itemBuilder: (context, index) {
         final category = state.categories[index];
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Parent category header
-            InkWell(
-              onTap: () {
-                if (category.hasChildren) {
-                  context.push('/categories/${category.id}');
-                } else {
-                  context.push('/categories/${category.id}/products');
-                }
-              },
-              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-              child: Container(
-                padding: const EdgeInsets.all(AppDimens.md),
-                decoration: BoxDecoration(
-                  color: AppColors.cardBg,
-                  borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadow,
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius:
-                          BorderRadius.circular(AppDimens.radiusSm),
-                      child: category.image != null
-                          ? CachedNetworkImage(
-                              imageUrl: category.image!,
-                              width: 48,
-                              height: 48,
-                              fit: BoxFit.cover,
-                              errorWidget: (_, __, ___) =>
-                                  const ImageFallback(size: 48),
-                            )
-                          : const ImageFallback(size: 48),
-                    ),
-                    const SizedBox(width: AppDimens.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            category.title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                          if (category.hasChildren)
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppDimens.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Parent category row
+              InkWell(
+                onTap: () {
+                  if (category.hasChildren) {
+                    context.push('/categories/${category.id}');
+                  } else {
+                    context.push('/categories/${category.id}/products');
+                  }
+                },
+                borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                child: Container(
+                  padding: const EdgeInsets.all(AppDimens.md),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardBg,
+                    borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                    border: Border.all(color: AppColors.border, width: 0.5),
+                  ),
+                  child: Row(
+                    children: [
+                      // Circular image
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: AppColors.primarySurface.withOpacity(0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: category.image != null
+                            ? CachedNetworkImage(
+                                imageUrl: category.image!,
+                                width: 52,
+                                height: 52,
+                                fit: BoxFit.cover,
+                                errorWidget: (_, __, ___) =>
+                                    const ImageFallback(size: 52),
+                              )
+                            : const ImageFallback(size: 52),
+                      ),
+                      const SizedBox(width: AppDimens.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              '${category.children.length} sub-categories',
+                              category.title,
                               style: Theme.of(context)
                                   .textTheme
-                                  .bodySmall
-                                  ?.copyWith(color: AppColors.textSecondary),
+                                  .titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.w600),
                             ),
-                        ],
+                            if (category.hasChildren)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Text(
+                                  '${category.children.length} sub-categories',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(color: AppColors.textHint),
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const Icon(Icons.chevron_right,
-                        color: AppColors.textHint),
-                  ],
+                      Icon(Icons.chevron_right_rounded,
+                          color: AppColors.textHint, size: 20),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            // Sub-categories chips
-            if (category.hasChildren) ...[
-              const SizedBox(height: AppDimens.sm),
-              Padding(
-                padding:
-                    const EdgeInsets.only(left: AppDimens.md + 48 + AppDimens.md),
-                child: Wrap(
-                  spacing: AppDimens.sm,
-                  runSpacing: AppDimens.xs,
-                  children: category.children.map((sub) {
-                    return ActionChip(
-                      label: Text(sub.title),
-                      onPressed: () => context.push(
-                        '/categories/${category.id}/products',
-                        extra: {'sub_category_id': sub.id},
-                      ),
-                      backgroundColor: AppColors.primarySurface,
-                      labelStyle: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(color: AppColors.primaryDark),
-                    );
-                  }).toList(),
+              // Sub-categories chips
+              if (category.hasChildren) ...[
+                const SizedBox(height: AppDimens.sm),
+                Padding(
+                  padding: const EdgeInsets.only(left: 52 + AppDimens.md * 2),
+                  child: Wrap(
+                    spacing: AppDimens.sm,
+                    runSpacing: AppDimens.xs,
+                    children: category.children.map((sub) {
+                      return ActionChip(
+                        label: Text(sub.title),
+                        onPressed: () => context.push(
+                          '/categories/${category.id}/products',
+                          extra: {'sub_category_id': sub.id},
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
+              ],
             ],
-
-            const SizedBox(height: AppDimens.md),
-          ],
+          ),
         );
       },
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../providers/auth_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
@@ -43,54 +44,71 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final auth = ref.watch(authProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.scaffoldBg,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimens.lg),
+          padding: const EdgeInsets.all(AppDimens.pagePadding),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 48),
+                const SizedBox(height: 56),
 
                 // Logo
-                Icon(
-                  Icons.local_grocery_store,
-                  size: 64,
-                  color: AppColors.primary,
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySurface.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(
+                    Icons.eco_rounded,
+                    size: 38,
+                    color: AppColors.primary,
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
                 Text(
-                  'Cuba Groceries',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                  textAlign: TextAlign.center,
+                  'Welcome back',
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
-                  'Sign in to continue',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  'Sign in to your Cuba Groceries account',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.textSecondary,
                       ),
-                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 36),
 
-                // Error message
+                // Error
                 if (auth.error != null) ...[
                   Container(
                     padding: const EdgeInsets.all(AppDimens.md),
                     decoration: BoxDecoration(
-                      color: AppColors.error.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppDimens.radiusSm),
+                      color: AppColors.error.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                      border: Border.all(
+                          color: AppColors.error.withOpacity(0.15)),
                     ),
-                    child: Text(
-                      auth.error!,
-                      style: const TextStyle(color: AppColors.error),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline,
+                            size: 18, color: AppColors.error.withOpacity(0.7)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            auth.error!,
+                            style: TextStyle(
+                                color: AppColors.error, fontSize: 13),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                 ],
 
                 // Email
@@ -100,7 +118,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: Icon(Icons.email_outlined),
+                    prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
                   ),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'Email is required';
@@ -117,12 +135,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock_outlined),
+                    prefixIcon:
+                        const Icon(Icons.lock_outline_rounded, size: 20),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        size: 20,
                       ),
                       onPressed: () =>
                           setState(() => _obscurePassword = !_obscurePassword),
@@ -134,11 +154,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   },
                   onFieldSubmitted: (_) => _onLogin(),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
 
                 // Login button
                 SizedBox(
-                  height: 50,
+                  height: 52,
                   child: ElevatedButton(
                     onPressed: auth.isLoading ? null : _onLogin,
                     child: auth.isLoading
@@ -153,13 +173,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         : const Text('Sign In'),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // Register link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account? "),
+                    Text(
+                      "Don't have an account? ",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: AppColors.textSecondary),
+                    ),
                     TextButton(
                       onPressed: () => context.go('/register'),
                       child: const Text('Sign Up'),

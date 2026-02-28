@@ -3,11 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/shared_widgets.dart';
 import '../providers/category_provider.dart';
 import '../widgets/category_card.dart';
 
-/// Shows sub-categories for a given parent category.
-/// If the category has no children, redirects to products.
 class CategoryListingScreen extends ConsumerWidget {
   final int categoryId;
 
@@ -38,65 +37,45 @@ class CategoryListingScreen extends ConsumerWidget {
     }
 
     if (children.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.folder_open_outlined,
-                size: 48, color: AppColors.textHint),
-            const SizedBox(height: AppDimens.md),
-            Text(
-              'No sub-categories found',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: AppDimens.md),
-            ElevatedButton(
-              onPressed: () =>
-                  context.push('/categories/$categoryId/products'),
-              child: const Text('View all products'),
-            ),
-          ],
-        ),
+      return EmptyStateWidget(
+        icon: Icons.folder_open_outlined,
+        message: 'No sub-categories found',
+        actionLabel: 'View all products',
+        onAction: () =>
+            context.push('/categories/$categoryId/products'),
       );
     }
 
     return Padding(
-      padding: const EdgeInsets.all(AppDimens.md),
+      padding: const EdgeInsets.all(AppDimens.pagePadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // "View all" button for this category
+          // View all button
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () =>
                   context.push('/categories/$categoryId/products'),
-              icon: const Icon(Icons.grid_view),
-              label: const Text('View all products in this category'),
+              icon: const Icon(Icons.grid_view_rounded, size: 18),
+              label: const Text('View all products'),
             ),
           ),
-          const SizedBox(height: AppDimens.md),
+          const SizedBox(height: AppDimens.lg),
 
           Text(
             'Sub-categories',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
+            style: Theme.of(context).textTheme.titleMedium,
           ),
-          const SizedBox(height: AppDimens.sm),
+          const SizedBox(height: AppDimens.md),
 
-          // Sub-category grid
           Expanded(
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: AppDimens.sm,
-                mainAxisSpacing: AppDimens.sm,
-                childAspectRatio: 1.1,
+                crossAxisSpacing: AppDimens.md,
+                mainAxisSpacing: AppDimens.md,
+                childAspectRatio: 1.05,
               ),
               itemCount: children.length,
               itemBuilder: (context, index) {

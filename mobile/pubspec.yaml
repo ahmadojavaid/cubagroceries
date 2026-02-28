@@ -31,6 +31,9 @@ dependencies:
   # Image Caching
   cached_network_image: ^3.4.1
 
+  # Typography
+  google_fonts: ^6.2.1
+
   # UI Utilities
   shimmer: ^3.0.0
   pull_to_refresh: ^2.0.0

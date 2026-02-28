@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_dimens.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -17,19 +16,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final _pages = const [
     _OnboardingPage(
-      icon: Icons.local_grocery_store,
+      icon: Icons.eco_rounded,
       title: 'Fresh Groceries',
-      subtitle: 'Browse a wide selection of fresh fruits, vegetables, and daily essentials.',
+      subtitle:
+          'Browse a wide selection of fresh fruits, vegetables, and daily essentials.',
     ),
     _OnboardingPage(
-      icon: Icons.delivery_dining,
+      icon: Icons.local_shipping_outlined,
       title: 'Fast Delivery',
-      subtitle: 'Get your groceries delivered right to your doorstep quickly and safely.',
+      subtitle:
+          'Get your groceries delivered right to your doorstep quickly and safely.',
     ),
     _OnboardingPage(
-      icon: Icons.payment,
+      icon: Icons.account_balance_wallet_outlined,
       title: 'Easy Payment',
-      subtitle: 'Pay with wallet, cash on delivery, or your preferred payment method.',
+      subtitle:
+          'Pay with wallet, cash on delivery, or your preferred payment method.',
     ),
   ];
 
@@ -42,7 +44,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _onNext() {
     if (_currentPage < _pages.length - 1) {
       _controller.nextPage(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
       );
     } else {
@@ -53,15 +55,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.scaffoldBg,
       body: SafeArea(
         child: Column(
           children: [
-            // Skip button
+            // Skip
             Align(
               alignment: Alignment.topRight,
-              child: TextButton(
-                onPressed: () => context.go('/login'),
-                child: const Text('Skip'),
+              child: Padding(
+                padding: const EdgeInsets.all(AppDimens.md),
+                child: TextButton(
+                  onPressed: () => context.go('/login'),
+                  child: const Text('Skip'),
+                ),
               ),
             ),
 
@@ -74,9 +80,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
 
-            // Dots indicator
+            // Dots
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppDimens.md),
+              padding: const EdgeInsets.symmetric(vertical: AppDimens.lg),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
@@ -84,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   (i) => AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: _currentPage == i ? 24 : 8,
+                    width: _currentPage == i ? 28 : 8,
                     height: 8,
                     decoration: BoxDecoration(
                       color: _currentPage == i
@@ -97,9 +103,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
 
-            // Next / Get Started button
+            // Button
             Padding(
-              padding: const EdgeInsets.all(AppDimens.lg),
+              padding: const EdgeInsets.fromLTRB(
+                  AppDimens.pagePadding, 0, AppDimens.pagePadding, AppDimens.xl),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -133,25 +140,31 @@ class _OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(AppDimens.xl),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimens.xl),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 140,
-            height: 140,
+            width: 130,
+            height: 130,
             decoration: BoxDecoration(
-              color: AppColors.primarySurface,
+              color: AppColors.primarySurface.withOpacity(0.6),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 72, color: AppColors.primary),
+            child: Icon(icon, size: 60, color: AppColors.primary),
           ),
           const SizedBox(height: 40),
-          Text(title, style: AppTextStyles.h2, textAlign: TextAlign.center),
-          const SizedBox(height: 16),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.headlineMedium,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
           Text(
             subtitle,
-            style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
             textAlign: TextAlign.center,
           ),
         ],

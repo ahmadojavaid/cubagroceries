@@ -8,7 +8,6 @@ import '../../categories/providers/category_provider.dart';
 import '../providers/product_provider.dart';
 import '../widgets/product_card.dart';
 
-/// Paginated product listing screen, filterable by category/sub-category.
 class ProductListingScreen extends ConsumerStatefulWidget {
   final int categoryId;
   final int? subCategoryId;
@@ -61,7 +60,6 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(productsProvider);
 
-    // Resolve title from categories provider
     final catNotifier = ref.read(categoriesProvider.notifier);
     final category = widget.subCategoryId != null
         ? catNotifier.findById(widget.subCategoryId!)
@@ -71,6 +69,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: RefreshIndicator(
+        color: AppColors.primary,
         onRefresh: () async => _fetchProducts(),
         child: _buildBody(context, state),
       ),
@@ -95,21 +94,20 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 
     return GridView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.all(AppDimens.md),
+      padding: const EdgeInsets.all(AppDimens.pagePadding),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: AppDimens.sm,
-        mainAxisSpacing: AppDimens.sm,
-        childAspectRatio: 0.7,
+        crossAxisSpacing: AppDimens.md,
+        mainAxisSpacing: AppDimens.md,
+        childAspectRatio: 0.68,
       ),
       itemCount: state.products.length + (state.isLoadingMore ? 2 : 0),
       itemBuilder: (context, index) {
-        // Loading indicator at bottom
         if (index >= state.products.length) {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(AppDimens.md),
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(strokeWidth: 1.5),
             ),
           );
         }
@@ -122,6 +120,4 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
       },
     );
   }
-
-
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/shared_widgets.dart';
 import '../data/price_model.dart';
 import '../providers/product_provider.dart';
 
@@ -18,9 +19,17 @@ class ProductDetailScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Product Detail')),
       body: productAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => _buildError(context, ref),
+        error: (e, _) => ErrorStateWidget(
+          message: 'Failed to load product details',
+          onRetry: () => ref.invalidate(productDetailProvider(productId)),
+        ),
         data: (product) {
-          if (product == null) return _buildNotFound(context);
+          if (product == null) {
+            return const EmptyStateWidget(
+              icon: Icons.search_off_rounded,
+              message: 'Product not found',
+            );
+          }
           return _buildContent(context, product);
         },
       ),
@@ -29,146 +38,146 @@ class ProductDetailScreen extends ConsumerWidget {
 
   Widget _buildContent(BuildContext context, product) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppDimens.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Product image placeholder
+          // Product image hero — full width, warm gradient
           Container(
-            height: 200,
+            height: 220,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppColors.primarySurface,
-              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.primarySurface.withOpacity(0.6),
+                  AppColors.accentLight.withOpacity(0.5),
+                ],
+              ),
             ),
             child: Center(
               child: Icon(
-                Icons.inventory_2_outlined,
-                size: 64,
-                color: AppColors.primary.withOpacity(0.4),
+                Icons.eco_outlined,
+                size: 72,
+                color: AppColors.primaryLight,
               ),
             ),
           ),
-          const SizedBox(height: AppDimens.md),
 
-          // Name
-          Text(
-            product.name,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-          ),
-          const SizedBox(height: AppDimens.sm),
-
-          // Category breadcrumb
-          if (product.category != null)
-            Row(
+          Padding(
+            padding: const EdgeInsets.all(AppDimens.pagePadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.folder_outlined,
-                    size: 16, color: AppColors.textSecondary),
-                const SizedBox(width: AppDimens.xs),
+                // Name
                 Text(
-                  [
-                    product.category?.title,
-                    product.subCategory?.title,
-                  ].where((t) => t != null).join(' › '),
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(color: AppColors.textSecondary),
+                  product.name,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
+                const SizedBox(height: AppDimens.sm),
+
+                // Category breadcrumb
+                if (product.category != null)
+                  Text(
+                    [
+                      product.category?.title,
+                      product.subCategory?.title,
+                    ].where((t) => t != null).join(' › '),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: AppColors.textHint),
+                  ),
+                const SizedBox(height: AppDimens.md),
+
+                // Stock badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: product.inStock
+                        ? AppColors.success.withOpacity(0.08)
+                        : AppColors.error.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                  ),
+                  child: Text(
+                    product.inStock
+                        ? 'In Stock (${product.stock})'
+                        : 'Out of Stock',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: product.inStock
+                              ? AppColors.success
+                              : AppColors.error,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ),
+                const SizedBox(height: AppDimens.lg),
+
+                // Description
+                if (product.description != null &&
+                    product.description!.isNotEmpty) ...[
+                  Text(
+                    'Description',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  const SizedBox(height: AppDimens.sm),
+                  Text(
+                    product.description!,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                          height: 1.6,
+                        ),
+                  ),
+                  const SizedBox(height: AppDimens.lg),
+                ],
+
+                // Prices
+                Text(
+                  'Available Prices',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: AppDimens.md),
+
+                if (product.prices.isEmpty)
+                  Text(
+                    'No prices available',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: AppColors.textHint),
+                  )
+                else
+                  ...product.prices.map<Widget>(
+                    (PriceModel price) => _buildPriceRow(context, price),
+                  ),
+
+                const SizedBox(height: AppDimens.xl),
+
+                // Add to cart
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: product.inStock ? () {} : null,
+                    icon: const Icon(Icons.shopping_bag_outlined, size: 20),
+                    label: const Text('Add to Cart'),
+                    style: ElevatedButton.styleFrom(
+                      padding:
+                          const EdgeInsets.symmetric(vertical: AppDimens.md),
+                      disabledBackgroundColor: AppColors.border,
+                      disabledForegroundColor: AppColors.textHint,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: AppDimens.lg),
               ],
-            ),
-          const SizedBox(height: AppDimens.sm),
-
-          // Stock indicator
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimens.sm,
-              vertical: AppDimens.xs,
-            ),
-            decoration: BoxDecoration(
-              color: product.inStock
-                  ? AppColors.success.withOpacity(0.1)
-                  : AppColors.error.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-            ),
-            child: Text(
-              product.inStock
-                  ? 'In Stock (${product.stock})'
-                  : 'Out of Stock',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color:
-                        product.inStock ? AppColors.success : AppColors.error,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-          ),
-          const SizedBox(height: AppDimens.lg),
-
-          // Description
-          if (product.description != null &&
-              product.description!.isNotEmpty) ...[
-            Text(
-              'Description',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-            ),
-            const SizedBox(height: AppDimens.sm),
-            Text(
-              product.description!,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: AppColors.textSecondary, height: 1.5),
-            ),
-            const SizedBox(height: AppDimens.lg),
-          ],
-
-          // Prices
-          Text(
-            'Available Prices',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-          ),
-          const SizedBox(height: AppDimens.sm),
-
-          if (product.prices.isEmpty)
-            Text(
-              'No prices available',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: AppColors.textHint),
-            )
-          else
-            ...product.prices.map<Widget>(
-              (PriceModel price) => _buildPriceRow(context, price),
-            ),
-
-          const SizedBox(height: AppDimens.lg),
-
-          // Add to cart button (non-functional placeholder)
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: product.inStock ? () {} : null,
-              icon: const Icon(Icons.add_shopping_cart),
-              label: const Text('Add to Cart'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: AppDimens.md),
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.textOnPrimary,
-                disabledBackgroundColor: AppColors.border,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-                ),
-              ),
             ),
           ),
         ],
@@ -179,11 +188,12 @@ class ProductDetailScreen extends ConsumerWidget {
   Widget _buildPriceRow(BuildContext context, PriceModel price) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.sm),
-      padding: const EdgeInsets.all(AppDimens.md),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.md, vertical: AppDimens.md),
       decoration: BoxDecoration(
         color: AppColors.surfaceBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border, width: 0.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -198,66 +208,23 @@ class ProductDetailScreen extends ConsumerWidget {
                     ),
               ),
               if (price.unit.abbreviation != null)
-                Text(
-                  price.unit.abbreviation!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textHint,
-                      ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    price.unit.abbreviation!,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textHint,
+                        ),
+                  ),
                 ),
             ],
           ),
           Text(
             'Rs ${price.price}',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.primary,
                 ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildError(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppDimens.lg),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-            const SizedBox(height: AppDimens.md),
-            Text(
-              'Failed to load product details',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: AppDimens.md),
-            ElevatedButton(
-              onPressed: () => ref.invalidate(productDetailProvider(productId)),
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNotFound(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.search_off, size: 48, color: AppColors.textHint),
-          const SizedBox(height: AppDimens.md),
-          Text(
-            'Product not found',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: AppColors.textSecondary),
           ),
         ],
       ),

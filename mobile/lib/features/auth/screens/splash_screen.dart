@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../providers/auth_provider.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -11,81 +12,103 @@ class SplashScreen extends ConsumerStatefulWidget {
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+
   @override
   void initState() {
     super.initState();
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOut,
+    );
+    _fadeController.forward();
     _initialize();
   }
 
-  Future<void> _initialize() async {
-    // Branding delay
-    await Future.delayed(const Duration(seconds: 2));
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
+  }
 
+  Future<void> _initialize() async {
+    await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    // Try checking auth, but always navigate
     bool isLoggedIn = false;
     try {
-      await ref.read(authProvider.notifier).checkAuth()
+      await ref
+          .read(authProvider.notifier)
+          .checkAuth()
           .timeout(const Duration(seconds: 5));
       isLoggedIn = ref.read(authProvider).isAuthenticated;
-    } catch (_) {
-      // API error or timeout — just go to login
-    }
+    } catch (_) {}
 
     if (!mounted) return;
-
-    if (isLoggedIn) {
-      context.go('/home');
-    } else {
-      context.go('/login');
-    }
+    context.go(isLoggedIn ? '/home' : '/login');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.primaryDark,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo container
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                child: const Icon(
+                  Icons.eco_rounded,
+                  size: 52,
+                  color: Colors.white,
+                ),
               ),
-              child: const Icon(
-                Icons.local_grocery_store,
-                size: 64,
-                color: AppColors.primary,
+              const SizedBox(height: 28),
+              Text(
+                'Cuba Groceries',
+                style: GoogleFonts.dmSans(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  letterSpacing: -0.5,
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Cuba Groceries',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+              const SizedBox(height: 6),
+              Text(
+                'Fresh groceries delivered',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: Colors.white60,
+                  letterSpacing: 0.2,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Fresh groceries delivered',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white70,
+              const SizedBox(height: 48),
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white38,
+                  strokeWidth: 2,
+                ),
               ),
-            ),
-            const SizedBox(height: 48),
-            const CircularProgressIndicator(
-              color: Colors.white,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
