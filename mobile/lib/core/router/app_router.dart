@@ -10,6 +10,9 @@ import '../../features/home/screens/navigation_shell.dart';
 import '../../features/products/screens/product_detail_screen.dart';
 import '../../features/products/screens/product_listing_screen.dart';
 import '../../features/products/screens/search_screen.dart';
+import '../../features/profile/data/address_model.dart';
+import '../../features/profile/screens/address_form_screen.dart';
+import '../../features/profile/screens/address_list_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -73,6 +76,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/search',
         builder: (context, state) => const SearchScreen(),
+      ),
+
+      // Addresses
+      GoRoute(
+        path: '/addresses',
+        builder: (context, state) => const AddressListScreen(),
+      ),
+      GoRoute(
+        path: '/addresses/add',
+        builder: (context, state) => const AddressFormScreen(),
+      ),
+      GoRoute(
+        path: '/addresses/:id/edit',
+        builder: (context, state) {
+          final address = state.extra as AddressModel?;
+          return AddressFormScreen(address: address);
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

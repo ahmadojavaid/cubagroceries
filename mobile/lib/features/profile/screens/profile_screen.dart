@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../providers/profile_provider.dart';
+import '../widgets/wallet_balance_card.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -109,7 +110,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     padding: const EdgeInsets.all(AppDimens.pagePadding),
                     children: [
                       // Wallet card
-                      _buildWalletCard(state.user!.walletAmount),
+                      WalletBalanceCard(amount: state.user!.walletAmount),
                       const SizedBox(height: AppDimens.lg),
 
                       // Profile info
@@ -134,46 +135,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ],
                   ),
                 ),
-    );
-  }
-
-  Widget _buildWalletCard(String amount) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimens.md),
-      decoration: BoxDecoration(
-        color: AppColors.primarySurface,
-        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-            ),
-            child: const Icon(Icons.account_balance_wallet_rounded,
-                color: AppColors.primary),
-          ),
-          const SizedBox(width: AppDimens.md),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Wallet Balance',
-                  style: TextStyle(
-                      fontSize: 13, color: AppColors.primary.withOpacity(0.7))),
-              const SizedBox(height: 2),
-              Text('Rs. $amount',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryDark,
-                  )),
-            ],
-          ),
-        ],
-      ),
     );
   }
 

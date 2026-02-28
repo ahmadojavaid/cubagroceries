@@ -80,16 +80,18 @@
 - ✅ Edit navigates to /addresses/:id/edit with address as extra
 - ✅ Wired to AddressProvider with refresh and error handling
 
-### MP-M5: Address Add/Edit Form
-- Build AddressFormScreen (reused for add and edit)
-- Fields: label, address, city, phone
-- Validation, loading/success/error states
-- Route: `/addresses/add`, `/addresses/:id/edit`
+### MP-M5: Address Add/Edit Form ✅
+- ✅ AddressFormScreen reused for add (null address) and edit (address passed via extra)
+- ✅ Fields: label, address (required), city, phone with icons and hints
+- ✅ Form validation, loading spinner on save, error snackbar
+- ✅ Routes registered: `/addresses/add`, `/addresses/:id/edit`
+- ✅ Pops with `true` on success to trigger list refresh
 
-### MP-M6: Wallet Display Widget
-- Build wallet balance card widget for profile screen
-- Shows formatted balance with currency
-- Wire to wallet_amount from ProfileProvider (already in UserModel)
+### MP-M6: Wallet Display Widget ✅
+- ✅ Extracted `WalletBalanceCard` widget to `profile/widgets/`
+- ✅ Shows formatted Rs. balance with wallet icon
+- ✅ ProfileScreen refactored to use extracted widget
+- ✅ Reusable across checkout and other screens
 
 ### MP-M7: Settings Screen (password change + logout)
 - Build SettingsScreen with change password form (current, new, confirm)
@@ -111,5 +113,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 6 | 6 | 0 |
-| Mobile | 8 | 4 | 4 |
-| **Total** | **14** | **10** | **4** |
+| Mobile | 8 | 6 | 2 |
+| **Total** | **14** | **12** | **2** |
