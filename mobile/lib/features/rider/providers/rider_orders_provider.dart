@@ -28,19 +28,19 @@ class RiderOrder {
 
   factory RiderOrder.fromJson(Map<String, dynamic> json) {
     return RiderOrder(
-      id: json['id'] as int,
+      id: json['id'] is int ? json['id'] : int.parse(json['id'].toString()),
       orderId: json['order_id'] as String,
-      status: json['status'] as String? ?? 'pending',
+      status: json['status']?.toString() ?? 'pending',
       totalAmount: json['total_amount']?.toString() ?? '0.00',
       createdAt: json['created_at'] as String? ?? '',
       address: json['address'] != null
-          ? RiderOrderAddress.fromJson(json['address'])
+          ? RiderOrderAddress.fromJson(Map<String, dynamic>.from(json['address']))
           : null,
       customer: json['user'] != null
-          ? RiderOrderCustomer.fromJson(json['user'])
+          ? RiderOrderCustomer.fromJson(Map<String, dynamic>.from(json['user']))
           : null,
       items: (json['products'] as List<dynamic>?)
-              ?.map((e) => RiderOrderItem.fromJson(e))
+              ?.map((e) => RiderOrderItem.fromJson(Map<String, dynamic>.from(e)))
               .toList() ??
           [],
     );
@@ -84,8 +84,8 @@ class RiderOrderAddress {
       address: json['address'] as String? ?? '',
       city: json['city'] as String?,
       phone: json['phone'] as String?,
-      latitude: (json['latitude'] as num?)?.toDouble(),
-      longitude: (json['longitude'] as num?)?.toDouble(),
+      latitude: json['latitude'] != null ? double.tryParse(json['latitude'].toString()) : null,
+      longitude: json['longitude'] != null ? double.tryParse(json['longitude'].toString()) : null,
     );
   }
 
@@ -117,7 +117,7 @@ class RiderOrderCustomer {
 
   factory RiderOrderCustomer.fromJson(Map<String, dynamic> json) {
     return RiderOrderCustomer(
-      id: json['id'] as int,
+      id: json['id'] is int ? json['id'] : int.parse(json['id'].toString()),
       firstname: json['firstname'] as String? ?? '',
       lastname: json['lastname'] as String? ?? '',
       identity: json['identity'] as String?,
@@ -141,12 +141,12 @@ class RiderOrderItem {
   });
 
   factory RiderOrderItem.fromJson(Map<String, dynamic> json) {
+    final product = json['product'] != null ? Map<String, dynamic>.from(json['product']) : null;
+    final unit = json['unit'] != null ? Map<String, dynamic>.from(json['unit']) : null;
     return RiderOrderItem(
-      productName:
-          (json['product'] as Map<String, dynamic>?)?['name'] as String? ?? '',
-      unitName:
-          (json['unit'] as Map<String, dynamic>?)?['name'] as String? ?? '',
-      quantity: json['quantity'] as int? ?? 0,
+      productName: product?['name'] as String? ?? '',
+      unitName: unit?['name'] as String? ?? '',
+      quantity: json['quantity'] is int ? json['quantity'] : int.tryParse(json['quantity'].toString()) ?? 0,
       price: json['price']?.toString() ?? '0.00',
     );
   }
@@ -209,12 +209,18 @@ class RiderOrdersNotifier extends StateNotifier<RiderOrdersState> {
       }
     } catch (e) {
       String msg = 'Could not load orders. Pull to refresh.';
-      if (e is DioException) {
-        final apiErr = e.error;
-        if (apiErr is ApiException) {
-          msg = apiErr.message;
+      try {
+        if (e is DioException) {
+          final apiErr = e.error;
+          if (apiErr is ApiException) {
+            msg = apiErr.message;
+          } else {
+            msg = 'Dio: ${e.type.name} — ${e.message ?? e.error}';
+          }
+        } else {
+          msg = 'Error: ${e.runtimeType}: $e';
         }
-      }
+      } catch (_) {}
       state = state.copyWith(
         isLoading: false,
         error: msg,
