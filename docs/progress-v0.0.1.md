@@ -113,10 +113,11 @@
 - ✅ Added missing `features/categories` folder with data/providers/screens/widgets subfolders
 - ✅ All 8 feature folders ready
 
-### MP-M3: Core Dependencies
-- Add to pubspec.yaml: `flutter_riverpod`, `hive`, `hive_flutter`, `cached_network_image`, `shimmer`, `intl`
-- Verify `dio`, `go_router`, `flutter_secure_storage` already added by scaffolder
-- **Terminal**: `flutter pub get`
+### MP-M3: Core Dependencies ✅
+- ✅ Verified scaffolder added: `dio`, `go_router`, `flutter_secure_storage`
+- ✅ Added: `flutter_riverpod`, `hive`, `hive_flutter`, `cached_network_image`, `shimmer`, `pull_to_refresh`, `intl`
+- ✅ Added dev deps: `hive_generator`, `build_runner`
+- **Terminal**: `cd mobile && flutter pub get`
 
 ### MP-M4: Theme Extraction from ProKit
 - Extract `GroceryColors.dart` → adapt to `core/theme/app_colors.dart`
@@ -175,5 +176,5 @@
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
 | Backend | 10 | 10 | 0 |
-| Mobile | 12 | 1 | 11 |
-| **Total** | **28** | **11** | **17** |
+| Mobile | 12 | 2 | 10 |
+| **Total** | **28** | **12** | **16** |
