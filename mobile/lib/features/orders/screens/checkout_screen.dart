@@ -60,9 +60,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius:
-                            BorderRadius.circular(AppDimens.radiusSm),
+                            BorderRadius.circular(AppDimens.radiusMd),
                       ),
                       elevation: 0,
+                      minimumSize: const Size(64, 52),
                       padding:
                           const EdgeInsets.symmetric(vertical: 14),
                     ),

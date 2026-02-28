@@ -172,18 +172,15 @@ class _CouponInputWidgetState extends ConsumerState<CouponInputWidget> {
               ),
             ),
             const SizedBox(width: 8),
-            SizedBox(
-              height: 46,
-              child: ElevatedButton(
-                onPressed: _isApplying ? null : _applyCoupon,
-                child: _isApplying
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Apply'),
-              ),
+            ElevatedButton(
+              onPressed: _isApplying ? null : _applyCoupon,
+              child: _isApplying
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Apply'),
             ),
           ],
         ),

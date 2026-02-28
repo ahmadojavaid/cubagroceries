@@ -107,7 +107,6 @@ class CartScreen extends ConsumerWidget {
             // Checkout button
             SizedBox(
               width: double.infinity,
-              height: 50,
               child: ElevatedButton(
                 onPressed: () => context.push('/checkout'),
                 style: ElevatedButton.styleFrom(

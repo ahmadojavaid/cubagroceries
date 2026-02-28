@@ -162,18 +162,15 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
               const SizedBox(height: AppDimens.xl),
 
               // Save button
-              SizedBox(
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isSaving ? null : _save,
-                  child: _isSaving
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(widget.isEditing ? 'Update Address' : 'Save Address'),
-                ),
+              ElevatedButton(
+                onPressed: _isSaving ? null : _save,
+                child: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(widget.isEditing ? 'Update Address' : 'Save Address'),
               ),
             ],
           ),

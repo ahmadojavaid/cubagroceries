@@ -640,7 +640,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const SizedBox(height: AppDimens.lg),
               SizedBox(
                 width: double.infinity,
-                height: 50,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : _saveProfile,
                   child: isLoading

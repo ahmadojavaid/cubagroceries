@@ -221,7 +221,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                   SizedBox(
                     width: double.infinity,
-                    height: 48,
                     child: ElevatedButton(
                       onPressed:
                           _isChangingPassword ? null : _changePassword,
@@ -297,7 +296,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           // Logout
           SizedBox(
             width: double.infinity,
-            height: 48,
             child: OutlinedButton.icon(
               onPressed: _confirmLogout,
               icon: const Icon(Icons.logout, size: 20),
