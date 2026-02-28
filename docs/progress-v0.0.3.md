@@ -15,19 +15,19 @@
 - ✅ `User` model has `addresses()` hasMany relationship
 - ✅ Migration already ran in Phase 1 (all 14 tables created together)
 
-### MP-B2: Filament CustomerResource
-- Create CustomerResource (list only — no create/edit from admin)
-- Table columns: id, full name (firstname + lastname), email, identity (phone), wallet_amount, created_at
-- Searchable by name, email, phone
-- Infolist/view page showing: profile details, wallet balance, addresses count, orders count
-- Navigation group: Customers, icon: users
+### MP-B2: Filament CustomerResource ✅
+- ✅ CustomerResource with list-only (canCreate: false, no edit)
+- ✅ Table columns: id, full_name, email, identity (phone), wallet_amount (PKR), created_at
+- ✅ Searchable by firstname, lastname, email, identity
+- ✅ Infolist/view page: profile details, wallet balance, addresses count, orders count
+- ✅ Navigation group: Customers, icon: heroicon-o-users
 
-### MP-B3: API — ProfileController (show & update)
-- Create `Api\V1\ProfileController`
-- `GET /api/v1/profile` — return authenticated user profile
-- `PUT /api/v1/profile` — update firstname, lastname, email, date_of_birth
-- Validation: email unique (except self), names required
-- Register routes in api.php under Sanctum middleware
+### MP-B3: API — ProfileController (show & update) ✅
+- ✅ `Api\V1\ProfileController` created with ApiResponse trait
+- ✅ `GET /api/v1/profile` — returns authenticated user
+- ✅ `PUT /api/v1/profile` — updates firstname, lastname, email, date_of_birth
+- ✅ Validation: email unique (except self), names required
+- ✅ Routes registered in api.php under Sanctum middleware
 
 ### MP-B4: API — ProfileController (password change)
 - Add `password` method to ProfileController
@@ -107,6 +107,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 6 | 1 | 5 |
+| Backend | 6 | 3 | 3 |
 | Mobile | 8 | 0 | 8 |
-| **Total** | **14** | **1** | **13** |
+| **Total** | **14** | **3** | **11** |
