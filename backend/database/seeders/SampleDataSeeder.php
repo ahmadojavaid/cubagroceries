@@ -14,7 +14,12 @@ use App\Models\Price;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\ShippingCharge;
+use App\Models\AppSetting;
+use App\Models\Faq;
+use App\Models\SearchHistory;
 use App\Models\StoreSchedule;
+use App\Models\Survey;
+use App\Models\SurveyResponse;
 use App\Models\User;
 use App\Notifications\OrderStatusChanged;
 use Illuminate\Database\Seeder;
@@ -54,6 +59,18 @@ class SampleDataSeeder extends Seeder
 
         $this->seedReviews($customers);
         $this->command->info('  ✓ Reviews');
+
+        $this->seedFaqs();
+        $this->command->info('  ✓ FAQs');
+
+        $this->seedSurveys($customers);
+        $this->command->info('  ✓ Surveys');
+
+        $this->seedSearchHistory($customers);
+        $this->command->info('  ✓ Search history');
+
+        $this->seedAppSettings();
+        $this->command->info('  ✓ App settings');
 
         $this->command->info('Sample data seeding complete!');
     }
@@ -479,6 +496,127 @@ class SampleDataSeeder extends Seeder
         // Mark some as read for realism
         foreach ($customers as $customer) {
             $customer->notifications()->limit(2)->update(['read_at' => now()]);
+        }
+    }
+
+    private function seedFaqs(): void
+    {
+        $faqs = [
+            [
+                'question' => 'How do I place an order?',
+                'answer' => 'Browse products, add items to your cart, proceed to checkout, select your delivery address and shipping method, then confirm your order.',
+                'sort_order' => 1,
+            ],
+            [
+                'question' => 'What are the delivery hours?',
+                'answer' => 'We deliver Monday to Saturday from 9 AM to 9 PM. Friday deliveries start at 2 PM. We are closed on Sundays.',
+                'sort_order' => 2,
+            ],
+            [
+                'question' => 'How can I track my order?',
+                'answer' => 'Go to My Orders in the app to see the current status of your order. You will also receive push notifications when your order status changes.',
+                'sort_order' => 3,
+            ],
+            [
+                'question' => 'What is your return/refund policy?',
+                'answer' => 'If you receive damaged or incorrect items, please file a complaint within 24 hours through the app. We will arrange a replacement or refund to your wallet.',
+                'sort_order' => 4,
+            ],
+            [
+                'question' => 'How does the wallet work?',
+                'answer' => 'Your wallet balance can be used during checkout. Refunds are credited to your wallet. You can choose to pay with wallet balance at the time of placing an order.',
+                'sort_order' => 5,
+            ],
+            [
+                'question' => 'Is there a minimum order amount?',
+                'answer' => 'There is no minimum order amount, but free delivery is available on orders above Rs 2,000.',
+                'sort_order' => 6,
+            ],
+        ];
+
+        foreach ($faqs as $faq) {
+            Faq::firstOrCreate(['question' => $faq['question']], array_merge($faq, ['is_active' => true]));
+        }
+    }
+
+    private function seedSurveys(array $customers): void
+    {
+        $surveys = [
+            [
+                'question' => 'How did you hear about Cuba Groceries?',
+                'options' => ['Social Media', 'Friend/Family', 'Google Search', 'Flyer/Banner', 'Other'],
+            ],
+            [
+                'question' => 'How would you rate our delivery speed?',
+                'options' => ['Excellent', 'Good', 'Average', 'Poor'],
+            ],
+            [
+                'question' => 'Which product category do you shop most?',
+                'options' => ['Fruits', 'Vegetables', 'Dairy', 'Beverages', 'Bakery'],
+            ],
+        ];
+
+        foreach ($surveys as $i => $data) {
+            $survey = Survey::firstOrCreate(
+                ['question' => $data['question']],
+                array_merge($data, ['is_active' => true, 'sort_order' => $i + 1])
+            );
+
+            // Add some responses
+            foreach (array_slice($customers, 0, 3) as $customer) {
+                SurveyResponse::firstOrCreate(
+                    ['survey_id' => $survey->id, 'user_id' => $customer->id],
+                    ['answer' => $data['options'][array_rand($data['options'])]]
+                );
+            }
+        }
+    }
+
+    private function seedSearchHistory(array $customers): void
+    {
+        $searches = [
+            ['query' => 'tomatoes', 'results_count' => 3],
+            ['query' => 'milk', 'results_count' => 2],
+            ['query' => 'mango', 'results_count' => 1],
+            ['query' => 'orange juice', 'results_count' => 2],
+            ['query' => 'onion', 'results_count' => 1],
+            ['query' => 'cheese', 'results_count' => 1],
+            ['query' => 'banana', 'results_count' => 1],
+            ['query' => 'fresh vegetables', 'results_count' => 4],
+            ['query' => 'cola', 'results_count' => 1],
+            ['query' => 'yogurt', 'results_count' => 1],
+            ['query' => 'potato', 'results_count' => 1],
+            ['query' => 'lemon', 'results_count' => 1],
+        ];
+
+        foreach ($searches as $i => $search) {
+            $customer = $customers[$i % count($customers)];
+            SearchHistory::create([
+                'user_id' => $customer->id,
+                'query' => $search['query'],
+                'results_count' => $search['results_count'],
+                'created_at' => now()->subHours(rand(1, 200)),
+            ]);
+        }
+    }
+
+    private function seedAppSettings(): void
+    {
+        $settings = [
+            'app_name' => 'Cuba Groceries',
+            'contact_email' => 'support@cubagroceries.pk',
+            'contact_phone' => '03001234567',
+            'whatsapp_number' => '03001234567',
+            'min_order_amount' => '0',
+            'currency_symbol' => 'Rs',
+            'delivery_time_text' => '30-60 minutes',
+            'about_us' => '<p>Cuba Groceries is your trusted online grocery store in Lahore, delivering fresh produce and daily essentials to your doorstep.</p>',
+            'terms_and_conditions' => '<p>By using Cuba Groceries, you agree to our terms of service. All orders are subject to availability.</p>',
+            'privacy_policy' => '<p>We respect your privacy. Your personal data is used only for order processing and delivery.</p>',
+        ];
+
+        foreach ($settings as $key => $value) {
+            AppSetting::firstOrCreate(['key' => $key], ['value' => $value]);
         }
     }
 }
