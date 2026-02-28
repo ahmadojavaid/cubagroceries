@@ -8,11 +8,13 @@
 
 ## Backend Micro-Phases
 
-### MP-B1: Filament UnitResource (CRUD)
-- Create `app/Filament/Resources/UnitResource.php`
-- Form: name (required), abbreviation (optional)
-- Table: id, name, abbreviation, created_at
-- Full-width table layout
+### MP-B1: Filament UnitResource (CRUD) ✅
+- ✅ Create `app/Filament/Resources/UnitResource.php`
+- ✅ Form: name (required, unique), abbreviation (optional)
+- ✅ Table: id, name, abbreviation, created_at
+- ✅ Full-width table layout (via panel provider maxContentWidth)
+- ✅ Pages: ListUnits, CreateUnit, EditUnit
+- ✅ Navigation group: Catalog, icon: scale
 - **Verify**: Units manageable at `/admin/units`
 
 ### MP-B2: Filament CategoryResource (CRUD — Basic)
@@ -129,6 +131,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 8 | 0 | 8 |
+| Backend | 8 | 1 | 7 |
 | Mobile | 9 | 0 | 9 |
-| **Total** | **17** | **0** | **17** |
+| **Total** | **17** | **1** | **16** |
