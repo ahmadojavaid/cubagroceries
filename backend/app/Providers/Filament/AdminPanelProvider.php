@@ -38,6 +38,7 @@ class AdminPanelProvider extends PanelProvider
                 'Users',
                 'Catalog',
                 'Operations',
+                'Marketing',
                 'Content',
                 'Support',
             ])

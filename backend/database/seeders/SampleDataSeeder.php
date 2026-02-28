@@ -5,13 +5,16 @@ namespace Database\Seeders;
 use App\Enums\OrderStatus;
 use App\Models\Address;
 use App\Models\Complaint;
+use App\Models\Coupon;
 use App\Models\DeliveryBoy;
 use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\Orderproduct;
 use App\Models\Price;
 use App\Models\Product;
+use App\Models\Review;
 use App\Models\ShippingCharge;
+use App\Models\StoreSchedule;
 use App\Models\User;
 use App\Notifications\OrderStatusChanged;
 use Illuminate\Database\Seeder;
@@ -42,6 +45,15 @@ class SampleDataSeeder extends Seeder
 
         $this->seedNotifications($customers);
         $this->command->info('  ✓ Notifications');
+
+        $this->seedStoreSchedules();
+        $this->command->info('  ✓ Store schedules');
+
+        $this->seedCoupons();
+        $this->command->info('  ✓ Coupons');
+
+        $this->seedReviews($customers);
+        $this->command->info('  ✓ Reviews');
 
         $this->command->info('Sample data seeding complete!');
     }
@@ -315,6 +327,125 @@ class SampleDataSeeder extends Seeder
                     'subject' => $data['subject'],
                     'message' => $data['message'],
                     'status' => $data['status'],
+                ]
+            );
+        }
+    }
+
+    private function seedStoreSchedules(): void
+    {
+        $schedules = [
+            ['day' => 'monday',    'open_time' => '09:00', 'close_time' => '21:00', 'is_closed' => false],
+            ['day' => 'tuesday',   'open_time' => '09:00', 'close_time' => '21:00', 'is_closed' => false],
+            ['day' => 'wednesday', 'open_time' => '09:00', 'close_time' => '21:00', 'is_closed' => false],
+            ['day' => 'thursday',  'open_time' => '09:00', 'close_time' => '21:00', 'is_closed' => false],
+            ['day' => 'friday',    'open_time' => '14:00', 'close_time' => '21:00', 'is_closed' => false],
+            ['day' => 'saturday',  'open_time' => '10:00', 'close_time' => '22:00', 'is_closed' => false],
+            ['day' => 'sunday',    'open_time' => '00:00', 'close_time' => '00:00', 'is_closed' => true],
+        ];
+
+        foreach ($schedules as $schedule) {
+            StoreSchedule::firstOrCreate(['day' => $schedule['day']], $schedule);
+        }
+    }
+
+    private function seedCoupons(): void
+    {
+        $coupons = [
+            [
+                'code' => 'WELCOME10',
+                'description' => '10% off your first order',
+                'type' => 'percentage',
+                'value' => 10,
+                'min_order_amount' => 500,
+                'max_discount' => 200,
+                'usage_limit' => 100,
+                'used_count' => 12,
+                'start_date' => now()->subDays(30),
+                'end_date' => now()->addDays(60),
+                'is_active' => true,
+            ],
+            [
+                'code' => 'FLAT50',
+                'description' => 'Rs 50 off on orders above Rs 1000',
+                'type' => 'fixed',
+                'value' => 50,
+                'min_order_amount' => 1000,
+                'max_discount' => null,
+                'usage_limit' => null,
+                'used_count' => 35,
+                'start_date' => now()->subDays(15),
+                'end_date' => now()->addDays(15),
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SUMMER25',
+                'description' => '25% off summer beverages',
+                'type' => 'percentage',
+                'value' => 25,
+                'min_order_amount' => 300,
+                'max_discount' => 500,
+                'usage_limit' => 50,
+                'used_count' => 50,
+                'start_date' => now()->subDays(60),
+                'end_date' => now()->subDays(5),
+                'is_active' => false,
+            ],
+            [
+                'code' => 'FREEDEL',
+                'description' => 'Free delivery on any order',
+                'type' => 'fixed',
+                'value' => 200,
+                'min_order_amount' => null,
+                'max_discount' => null,
+                'usage_limit' => 200,
+                'used_count' => 78,
+                'start_date' => now()->subDays(10),
+                'end_date' => now()->addDays(90),
+                'is_active' => true,
+            ],
+        ];
+
+        foreach ($coupons as $coupon) {
+            Coupon::firstOrCreate(['code' => $coupon['code']], $coupon);
+        }
+    }
+
+    private function seedReviews(array $customers): void
+    {
+        $products = Product::all();
+        if ($products->isEmpty()) return;
+
+        $reviews = [
+            ['customer' => 0, 'rating' => 5, 'comment' => 'Best oranges I\'ve ever had. Super fresh and juicy!', 'status' => 'approved'],
+            ['customer' => 0, 'rating' => 4, 'comment' => 'Good quality tomatoes, but a couple were slightly soft.', 'status' => 'approved'],
+            ['customer' => 1, 'rating' => 5, 'comment' => 'The mangoes are absolutely amazing. Will order again!', 'status' => 'approved'],
+            ['customer' => 1, 'rating' => 3, 'comment' => 'Milk was close to expiry date. Expected better.', 'status' => 'approved'],
+            ['customer' => 2, 'rating' => 2, 'comment' => 'Bananas arrived too green, not ripe at all.', 'status' => 'approved'],
+            ['customer' => 2, 'rating' => 4, 'comment' => null, 'status' => 'approved'],
+            ['customer' => 3, 'rating' => 5, 'comment' => 'Fresh vegetables, excellent packaging!', 'status' => 'pending'],
+            ['customer' => 3, 'rating' => 1, 'comment' => 'Received wrong product. Very disappointed.', 'status' => 'pending'],
+            ['customer' => 4, 'rating' => 4, 'comment' => 'Good cheddar cheese, nice taste.', 'status' => 'approved'],
+            ['customer' => 4, 'rating' => 5, 'comment' => 'Orange juice is top quality. My kids love it.', 'status' => 'approved'],
+            ['customer' => 0, 'rating' => 3, 'comment' => 'Cola was a bit flat, packaging could be better.', 'status' => 'rejected'],
+            ['customer' => 2, 'rating' => 4, 'comment' => 'Carrots were very fresh and crunchy.', 'status' => 'pending'],
+        ];
+
+        foreach ($reviews as $i => $data) {
+            $customer = $customers[$data['customer']];
+            $product = $products[$i % $products->count()];
+            $order = $customer->orders()->first();
+
+            Review::firstOrCreate(
+                ['user_id' => $customer->id, 'product_id' => $product->id],
+                [
+                    'user_id' => $customer->id,
+                    'product_id' => $product->id,
+                    'order_id' => $order?->id,
+                    'rating' => $data['rating'],
+                    'comment' => $data['comment'],
+                    'status' => $data['status'],
+                    'created_at' => now()->subDays(rand(1, 30)),
                 ]
             );
         }
