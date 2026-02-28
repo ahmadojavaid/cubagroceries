@@ -17,6 +17,8 @@
 | PF-5 | Update Claude Desktop MCP config (filesystem + postgres) | ✅ |
 | PF-6 | Initial git commit | ✅ |
 
+> **Pre-Flight: COMPLETE** ✅
+
 ---
 
 ## Backend Micro-Phases
@@ -177,7 +179,9 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Pre-Flight | 6 | 0 | 6 |
+| Pre-Flight | 6 | 6 | 0 |
 | Backend | 10 | 10 | 0 |
-| Mobile | 12 | 11 | 1 |
-| **Total** | **28** | **21** | **7** |
+| Mobile | 12 | 12 | 0 |
+| **Total** | **28** | **28** | **0** |
+
+> **🎉 PHASE 1 COMPLETE — Foundation & Auth delivered**
