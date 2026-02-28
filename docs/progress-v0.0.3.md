@@ -59,10 +59,10 @@
 - ✅ `ProfileProvider` (StateNotifier) — fetchProfile, updateProfile, clearError
 - ✅ Wired to `GET /profile` and `PUT /profile` via ApiClient
 
-### MP-M2: Address Data Layer
-- Create `AddressModel` (id, label, address, city, phone, latitude, longitude, is_default)
-- Create `AddressProvider` (Riverpod) — fetchAddresses, addAddress, updateAddress, deleteAddress, setDefault
-- Wire to all `/api/v1/addresses` endpoints
+### MP-M2: Address Data Layer ✅
+- ✅ `AddressModel` with fromJson, toJson, displayName getter
+- ✅ `AddressProvider` (StateNotifier) — fetchAddresses, addAddress, updateAddress, deleteAddress, setDefault
+- ✅ Wired to all `/addresses` endpoints via ApiClient
 
 ### MP-M3: Profile Screen (view & edit)
 - Build ProfileScreen showing user info (name, email, phone, DOB, wallet balance)
@@ -108,5 +108,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 6 | 6 | 0 |
-| Mobile | 8 | 1 | 7 |
-| **Total** | **14** | **7** | **7** |
+| Mobile | 8 | 2 | 6 |
+| **Total** | **14** | **8** | **6** |
