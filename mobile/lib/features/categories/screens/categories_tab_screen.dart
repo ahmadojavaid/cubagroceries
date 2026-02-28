@@ -27,25 +27,25 @@ class _CategoriesTabScreenState extends ConsumerState<CategoriesTabScreen> {
 
   /// Soft background tints per category index for visual variety
   static const List<Color> _categoryTints = [
-    Color(0xFFE8F5E9), // green tint
+    Color(0xFFFFF3E0), // warm orange tint
+    Color(0xFFE0F5F2), // teal tint
     Color(0xFFFFF8E1), // amber tint
     Color(0xFFE3F2FD), // blue tint
     Color(0xFFFCE4EC), // pink tint
     Color(0xFFF3E5F5), // purple tint
-    Color(0xFFE0F7FA), // cyan tint
-    Color(0xFFFFF3E0), // orange tint
+    Color(0xFFE8F5E9), // green tint
     Color(0xFFE8EAF6), // indigo tint
   ];
 
   /// Accent colors that complement the tints
   static const List<Color> _categoryAccents = [
-    Color(0xFF2E7D32), // green
+    Color(0xFFE8742A), // warm orange
+    Color(0xFF1A8A7D), // teal
     Color(0xFFF9A825), // amber
     Color(0xFF1565C0), // blue
     Color(0xFFC62828), // red/pink
     Color(0xFF6A1B9A), // purple
-    Color(0xFF00838F), // cyan
-    Color(0xFFE65100), // orange
+    Color(0xFF2E7D32), // green
     Color(0xFF283593), // indigo
   ];
 

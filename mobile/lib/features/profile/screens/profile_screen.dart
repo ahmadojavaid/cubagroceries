@@ -182,13 +182,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         left: AppDimens.pagePadding,
         right: AppDimens.pagePadding,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [
             AppColors.primaryDark,
             AppColors.primary,
+            AppColors.primary.withOpacity(0.9),
           ],
         ),
       ),
