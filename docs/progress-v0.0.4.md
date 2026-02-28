@@ -76,23 +76,23 @@
 - ✅ Computed: itemCount, totalQuantity, subtotal, isEmpty
 - ✅ Helper: isInCart, getQuantity
 
-### MP-M3: Hive initialization
-- Add hive + hive_flutter to pubspec (if not present)
-- Initialize Hive in main.dart before runApp
-- Open cart box on startup
-- Reminder to run `flutter pub get`
+### MP-M3: Hive initialization ✅
+- ✅ hive + hive_flutter already in pubspec
+- ✅ Initialize Hive in main.dart before runApp
+- ✅ Cart box opened lazily by CartNotifier on first access
 
-### MP-M4: Cart screen
-- Build CartScreen showing list of cart items
-- Each item: product name, unit, price, quantity +/- buttons, line total
-- Subtotal display at bottom
-- "Proceed to Checkout" button (disabled if empty)
-- Empty cart state
-- Wire Cart tab in NavigationShell (replace placeholder)
+### MP-M4: Cart screen ✅
+- ✅ Build CartScreen showing list of cart items
+- ✅ Each item: product name, unit, price, quantity +/- buttons, line total
+- ✅ Subtotal display at bottom with item count
+- ✅ "Proceed to Checkout" button (hidden if empty)
+- ✅ Empty cart state with icon and message
+- ✅ Clear cart action with confirmation dialog
+- ✅ Wire Cart tab in NavigationShell (replaced placeholder)
 
-### MP-M5: Shipping data layer
-- Create `ShippingChargeModel` (id, title, amount)
-- Create `ShippingProvider` — fetches `GET /api/v1/shipping-charges`
+### MP-M5: Shipping data layer ✅
+- ✅ Create `ShippingChargeModel` (id, title, amount, displayAmount, amountValue)
+- ✅ Create `ShippingNotifier` — fetches `GET /api/v1/shipping-charges`
 
 ### MP-M6: Order data models
 - Create `OrderModel` (id, orderId, status, totalAmount, itemsCount, createdAt)
@@ -150,5 +150,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 13 | 2 | 11 |
-| **Total** | **21** | **10** | **11** |
+| Mobile | 13 | 5 | 8 |
+| **Total** | **21** | **13** | **8** |
