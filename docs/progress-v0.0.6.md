@@ -85,22 +85,24 @@
 - ✅ markAsRead (single, optimistic), markAllAsRead (optimistic)
 - ✅ `unreadNotificationCountProvider` (derived provider)
 
-### MP-M3: Notification inbox screen
-- Build NotificationInboxScreen with paginated list
-- Each item: icon, title, body, time ago, read/unread styling
-- Swipe to mark as read (or tap)
-- "Mark all as read" action in app bar
-- Empty state
+### MP-M3: Notification inbox screen ✅
+- ✅ Build NotificationInboxScreen with paginated list + pull-to-refresh
+- ✅ Each item: status-colored icon, title, body, time ago, read/unread styling
+- ✅ Tap to mark as read + navigate to order detail
+- ✅ "Mark all read" button in app bar (visible when unread > 0)
+- ✅ Empty state + error state with retry
 
-### MP-M4: Notification badge on bottom nav
-- Add unread count badge to notifications tab in NavigationShell
-- Fetch unread count on app start
-- Update badge when notifications are read
+### MP-M4: Notification badge on bottom nav ✅
+- ✅ Added "Alerts" tab with Badge widget showing unread count
+- ✅ Fetch unread count on app start (initState in NavigationShell)
+- ✅ Badge updates reactively via Riverpod unreadNotificationCountProvider
+- ✅ NavigationShell converted to ConsumerStatefulWidget
 
-### MP-M5: Navigation wiring for notifications
-- Add route: `/notifications`
-- Wire notification tab in bottom nav to NotificationInboxScreen
-- Tap notification → navigate to relevant order detail
+### MP-M5: Navigation wiring for notifications ✅
+- ✅ Added route: `/notifications` in app_router.dart
+- ✅ Notifications tab wired in bottom nav (index 4, between Orders and Profile)
+- ✅ Tap notification → navigates to order detail via `/orders/{orderNumber}`
+- ✅ BottomNavigationBar set to `fixed` type for 6 items
 
 ### MP-M6: Firebase FCM setup in Flutter
 - Add `firebase_messaging` and `firebase_core` packages
@@ -148,5 +150,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 10 | 10 | 0 |
-| Mobile | 11 | 2 | 9 |
-| **Total** | **21** | **12** | **9** |
+| Mobile | 11 | 5 | 6 |
+| **Total** | **21** | **15** | **6** |

@@ -18,6 +18,7 @@ import '../../features/profile/screens/address_list_screen.dart';
 import '../../features/profile/screens/settings_screen.dart';
 import '../../features/complaints/screens/complaint_form_screen.dart';
 import '../../features/complaints/screens/complaints_history_screen.dart';
+import '../../features/notifications/screens/notification_inbox_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -119,6 +120,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+
+      // Notifications
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationInboxScreen(),
       ),
 
       // Complaints
