@@ -15,29 +15,30 @@
 - ✅ Form: name (required), phone (required), payment (numeric, default 0)
 - ✅ Navigation group: Operations, icon: user-group
 
-### MP-B2: Add delivery_boy_id to orderdetails
-- Create migration to add `delivery_boy_id` (nullable FK → deliveryboy.id) to `orderdetails`
-- Update Order model: add `deliveryBoy()` belongsTo relationship
-- Update DeliveryBoy model: add `orders()` hasMany relationship
-- Run migration reminder
+### MP-B2: Add delivery_boy_id to orderdetails ✅
+- ✅ Create migration to add `delivery_boy_id` (nullable FK → deliveryboy.id) to `orderdetails`
+- ✅ Update Order model: add `deliveryBoy()` belongsTo relationship
+- ✅ Update DeliveryBoy model: add `orders()` hasMany relationship
+- ⚠️ Run migration: `php artisan migrate`
 
-### MP-B3: Order status workflow enforcement
-- Create `App\Enums\OrderStatus` enum (pending, confirmed, dispatched, delivered, cancelled)
-- Define valid transitions map (e.g., pending → confirmed/cancelled, confirmed → dispatched/cancelled, etc.)
-- Add `canTransitionTo()` method
-- Update Order model to cast status to enum
+### MP-B3: Order status workflow enforcement ✅
+- ✅ Create `App\Enums\OrderStatus` enum (pending, confirmed, dispatched, delivered, cancelled)
+- ✅ Define valid transitions map (pending → confirmed/cancelled, confirmed → dispatched/cancelled, etc.)
+- ✅ Add `canTransitionTo()`, `allowedTransitions()`, `allowedTransitionOptions()`, `isFinal()` methods
+- ✅ Update Order model to cast status to enum
 
-### MP-B4: Delivery boy assignment on OrderResource
-- Add delivery_boy_id select to the existing OrderResource status change action
-- Only allow assignment when status is confirmed or dispatched
-- Show assigned delivery boy in OrderResource table and view page
-- Validate delivery boy exists
+### MP-B4: Delivery boy assignment on OrderResource ✅
+- ✅ Add "Assign Rider" action with delivery boy select (searchable)
+- ✅ Only visible when status is confirmed or dispatched
+- ✅ Show assigned delivery boy in table column + view page (Delivery section)
+- ✅ Filter by delivery boy on table
 
-### MP-B5: Apply status workflow to OrderResource
-- Update OrderResource status change action to use OrderStatus enum
-- Validate transitions (only allow valid next statuses)
-- Show only valid next statuses in the dropdown
-- Display error if invalid transition attempted
+### MP-B5: Apply status workflow to OrderResource ✅
+- ✅ Update OrderResource status change action to use OrderStatus enum
+- ✅ Validate transitions (only allow valid next statuses)
+- ✅ Show only valid next statuses in dropdown via `allowedTransitionOptions()`
+- ✅ Display error notification if invalid transition attempted
+- ✅ Hide status action on final states (delivered/cancelled)
 
 ### MP-B6: Filament ComplaintResource (list + status management)
 - Create ComplaintResource (list + view, no create)
@@ -113,6 +114,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 8 | 1 | 7 |
+| Backend | 8 | 5 | 3 |
 | Mobile | 7 | 0 | 7 |
-| **Total** | **15** | **1** | **14** |
+| **Total** | **15** | **5** | **10** |

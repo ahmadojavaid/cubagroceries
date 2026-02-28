@@ -20,4 +20,11 @@ class DeliveryBoy extends Model
             'payment' => 'decimal:2',
         ];
     }
+
+    // Relationships
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

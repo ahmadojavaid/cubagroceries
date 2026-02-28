@@ -2,10 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages;
+use App\Models\DeliveryBoy;
 use App\Models\Order;
+use Filament\Forms;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -48,19 +52,17 @@ class OrderResource extends Resource
 
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'confirmed' => 'info',
-                        'dispatched' => 'primary',
-                        'delivered' => 'success',
-                        'cancelled' => 'danger',
-                        default => 'gray',
-                    }),
+                    ->color(fn (OrderStatus $state): string => $state->color()),
 
                 Tables\Columns\TextColumn::make('total_amount')
                     ->label('Total')
                     ->money('PKR')
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('deliveryBoy.name')
+                    ->label('Delivery Boy')
+                    ->placeholder('—')
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('products_count')
                     ->label('Items')
@@ -74,32 +76,77 @@ class OrderResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'confirmed' => 'Confirmed',
-                        'dispatched' => 'Dispatched',
-                        'delivered' => 'Delivered',
-                        'cancelled' => 'Cancelled',
-                    ]),
+                    ->options(OrderStatus::options()),
+
+                Tables\Filters\SelectFilter::make('delivery_boy_id')
+                    ->label('Delivery Boy')
+                    ->relationship('deliveryBoy', 'name')
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+
                 Tables\Actions\Action::make('changeStatus')
                     ->label('Status')
                     ->icon('heroicon-o-arrow-path')
-                    ->form([
-                        \Filament\Forms\Components\Select::make('status')
-                            ->options([
-                                'pending' => 'Pending',
-                                'confirmed' => 'Confirmed',
-                                'dispatched' => 'Dispatched',
-                                'delivered' => 'Delivered',
-                                'cancelled' => 'Cancelled',
-                            ])
+                    ->hidden(fn (Order $record): bool => $record->status->isFinal())
+                    ->form(fn (Order $record) => [
+                        Forms\Components\Select::make('status')
+                            ->label('New Status')
+                            ->options($record->status->allowedTransitionOptions())
                             ->required(),
                     ])
-                    ->fillForm(fn (Order $record) => ['status' => $record->status])
-                    ->action(fn (Order $record, array $data) => $record->update(['status' => $data['status']]))
+                    ->action(function (Order $record, array $data): void {
+                        $newStatus = OrderStatus::from($data['status']);
+
+                        if (! $record->status->canTransitionTo($newStatus)) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Invalid Transition')
+                                ->body("Cannot change from {$record->status->label()} to {$newStatus->label()}.")
+                                ->send();
+                            return;
+                        }
+
+                        $record->update(['status' => $newStatus]);
+
+                        Notification::make()
+                            ->success()
+                            ->title('Status Updated')
+                            ->body("Order {$record->order_id} is now {$newStatus->label()}.")
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (Order $record) => "Change Status: {$record->order_id}"),
+
+                Tables\Actions\Action::make('assignDeliveryBoy')
+                    ->label('Assign Rider')
+                    ->icon('heroicon-o-user-plus')
+                    ->visible(fn (Order $record): bool => in_array($record->status, [
+                        OrderStatus::Confirmed,
+                        OrderStatus::Dispatched,
+                    ]))
+                    ->form([
+                        Forms\Components\Select::make('delivery_boy_id')
+                            ->label('Delivery Boy')
+                            ->options(DeliveryBoy::pluck('name', 'id'))
+                            ->searchable()
+                            ->required(),
+                    ])
+                    ->fillForm(fn (Order $record) => [
+                        'delivery_boy_id' => $record->delivery_boy_id,
+                    ])
+                    ->action(function (Order $record, array $data): void {
+                        $record->update(['delivery_boy_id' => $data['delivery_boy_id']]);
+
+                        $deliveryBoy = DeliveryBoy::find($data['delivery_boy_id']);
+
+                        Notification::make()
+                            ->success()
+                            ->title('Delivery Boy Assigned')
+                            ->body("{$deliveryBoy->name} assigned to order {$record->order_id}.")
+                            ->send();
+                    })
                     ->requiresConfirmation(),
             ])
             ->bulkActions([])
@@ -118,14 +165,7 @@ class OrderResource extends Resource
 
                         Infolists\Components\TextEntry::make('status')
                             ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'pending' => 'warning',
-                                'confirmed' => 'info',
-                                'dispatched' => 'primary',
-                                'delivered' => 'success',
-                                'cancelled' => 'danger',
-                                default => 'gray',
-                            }),
+                            ->color(fn (OrderStatus $state): string => $state->color()),
 
                         Infolists\Components\TextEntry::make('total_amount')
                             ->label('Total')
@@ -151,8 +191,16 @@ class OrderResource extends Resource
                     ])
                     ->columns(3),
 
-                Infolists\Components\Section::make('Delivery Address')
+                Infolists\Components\Section::make('Delivery')
                     ->schema([
+                        Infolists\Components\TextEntry::make('deliveryBoy.name')
+                            ->label('Delivery Boy')
+                            ->placeholder('Not assigned'),
+
+                        Infolists\Components\TextEntry::make('deliveryBoy.phone')
+                            ->label('Rider Phone')
+                            ->placeholder('—'),
+
                         Infolists\Components\TextEntry::make('address.address')
                             ->label('Address'),
 
@@ -161,7 +209,7 @@ class OrderResource extends Resource
                             ->placeholder('—'),
 
                         Infolists\Components\TextEntry::make('address.phone')
-                            ->label('Phone')
+                            ->label('Contact Phone')
                             ->placeholder('—'),
                     ])
                     ->columns(3),

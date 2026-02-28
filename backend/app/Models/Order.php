@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
@@ -13,12 +14,14 @@ class Order extends Model
         'user_id',
         'status',
         'total_amount',
+        'delivery_boy_id',
     ];
 
     protected function casts(): array
     {
         return [
             'total_amount' => 'decimal:2',
+            'status' => OrderStatus::class,
         ];
     }
 
@@ -37,5 +40,10 @@ class Order extends Model
     public function products()
     {
         return $this->hasMany(Orderproduct::class, 'order_id');
+    }
+
+    public function deliveryBoy()
+    {
+        return $this->belongsTo(DeliveryBoy::class);
     }
 }
