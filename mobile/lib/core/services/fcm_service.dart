@@ -1,36 +1,22 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import '../api/api_client.dart';
 
 /// Handles Firebase Cloud Messaging initialization, permissions, and token management.
+/// Currently a no-op until Firebase is configured (google-services.json added).
 class FcmService {
   final ApiClient _api;
-  static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
   FcmService(this._api);
 
   /// Initialize FCM: request permission, get token, send to backend.
+  /// No-op until Firebase is configured.
   Future<void> initialize() async {
-    // Request permission (iOS + Android 13+)
-    final settings = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.denied) {
-      debugPrint('FCM: User denied notification permission');
-      return;
-    }
-
-    // Get FCM token and send to backend
-    final token = await _messaging.getToken();
-    if (token != null) {
-      await _sendTokenToBackend(token);
-    }
-
-    // Listen for token refreshes
-    _messaging.onTokenRefresh.listen(_sendTokenToBackend);
+    // TODO: Uncomment when Firebase is configured
+    // final settings = await FirebaseMessaging.instance.requestPermission(...);
+    // final token = await FirebaseMessaging.instance.getToken();
+    // if (token != null) await _sendTokenToBackend(token);
+    // FirebaseMessaging.instance.onTokenRefresh.listen(_sendTokenToBackend);
+    debugPrint('FCM: Skipped — Firebase not configured yet');
   }
 
   /// Send the FCM device token to the backend.
@@ -42,7 +28,4 @@ class FcmService {
       debugPrint('FCM: Failed to send token: $e');
     }
   }
-
-  /// Get the current FCM token (useful for debugging).
-  Future<String?> getToken() => _messaging.getToken();
 }
