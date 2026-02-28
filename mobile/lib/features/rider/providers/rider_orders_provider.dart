@@ -199,6 +199,7 @@ class RiderOrdersNotifier extends StateNotifier<RiderOrdersState> {
       if (data['success'] == true) {
         final list = (data['data'] as List<dynamic>)
             .map((e) => RiderOrder.fromJson(e as Map<String, dynamic>))
+            .where((o) => o.status != 'pending') // Riders can't act on pending orders
             .toList();
         state = RiderOrdersState(orders: list);
       } else {
@@ -270,6 +271,7 @@ class RiderOrdersNotifier extends StateNotifier<RiderOrdersState> {
       if (data['success'] == true) {
         final list = (data['data'] as List<dynamic>)
             .map((e) => RiderOrder.fromJson(e as Map<String, dynamic>))
+            .where((o) => o.status != 'pending')
             .toList();
         state = RiderOrdersState(orders: list);
       }

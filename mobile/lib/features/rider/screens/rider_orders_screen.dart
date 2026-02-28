@@ -260,12 +260,11 @@ class _DashboardGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int pending = 0, dispatched = 0, delivered = 0, total = orders.length;
+    int awaiting = 0, dispatched = 0, delivered = 0, total = orders.length;
     for (final o in orders) {
       switch (o.status) {
-        case 'pending':
         case 'confirmed':
-          pending++;
+          awaiting++;
           break;
         case 'dispatched':
           dispatched++;
@@ -284,8 +283,8 @@ class _DashboardGrid extends StatelessWidget {
           Expanded(
             child: _StatCard(
               icon: Icons.pending_actions_rounded,
-              label: 'Pending',
-              count: pending,
+              label: 'To Pick Up',
+              count: awaiting,
               color: const Color(0xFFE65100),
               bgColor: const Color(0xFFFFF3E0),
             ),
