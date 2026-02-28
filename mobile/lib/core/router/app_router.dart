@@ -7,6 +7,7 @@ import '../../features/auth/screens/splash_screen.dart';
 import '../../features/auth/screens/onboarding_screen.dart';
 import '../../features/categories/screens/category_listing_screen.dart';
 import '../../features/home/screens/navigation_shell.dart';
+import '../../features/products/screens/product_listing_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -43,17 +44,26 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-      // Category products — placeholder until MP-M5
+      // Category products
       GoRoute(
         path: '/categories/:id/products',
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
           final extra = state.extra as Map<String, dynamic>?;
           final subCategoryId = extra?['sub_category_id'] as int?;
-          return _ProductsPlaceholder(
+          return ProductListingScreen(
             categoryId: id,
             subCategoryId: subCategoryId,
           );
+        },
+      ),
+
+      // Product detail — placeholder until MP-M6
+      GoRoute(
+        path: '/products/:id',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return _ProductDetailPlaceholder(productId: id);
         },
       ),
 
@@ -71,27 +81,17 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-/// Temporary placeholder for product listing screen
-class _ProductsPlaceholder extends StatelessWidget {
-  final int categoryId;
-  final int? subCategoryId;
+/// Temporary placeholder for product detail screen
+class _ProductDetailPlaceholder extends StatelessWidget {
+  final int productId;
 
-  const _ProductsPlaceholder({
-    required this.categoryId,
-    this.subCategoryId,
-  });
+  const _ProductDetailPlaceholder({required this.productId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Products')),
-      body: Center(
-        child: Text(
-          'Product listing for category $categoryId'
-          '${subCategoryId != null ? '\nSub-category: $subCategoryId' : ''}',
-          textAlign: TextAlign.center,
-        ),
-      ),
+      appBar: AppBar(title: const Text('Product Detail')),
+      body: Center(child: Text('Product #$productId detail coming soon')),
     );
   }
 }

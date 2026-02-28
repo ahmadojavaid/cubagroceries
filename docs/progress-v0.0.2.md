@@ -116,12 +116,16 @@
 - ✅ Routes added: /categories/:id, /categories/:id/products, /search
 - ✅ Placeholder screens for products and search until MP-M5/M7
 
-### MP-M5: Product Listing Screen (Paginated)
-- Build product listing screen with card grid/list
-- Infinite scroll pagination via product provider
-- Pull-to-refresh
-- Show product name, image placeholder, first price
-- Tap product → navigate to product detail
+### MP-M5: Product Listing Screen (Paginated) ✅
+- ✅ Build ProductListingScreen with 2-column card grid
+- ✅ Infinite scroll pagination via scroll controller + loadMore
+- ✅ Pull-to-refresh via RefreshIndicator
+- ✅ ProductCard widget: name, category, first price, out-of-stock badge
+- ✅ Tap product → /products/:id (placeholder until MP-M6)
+- ✅ Title resolved from categoriesProvider
+- ✅ Error state with retry, empty state, loading indicators
+- ✅ Route /categories/:id/products now uses real screen
+- ✅ Added /products/:id route (placeholder)
 
 ### MP-M6: Product Detail Screen
 - Build product detail screen
@@ -154,5 +158,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 9 | 4 | 5 |
-| **Total** | **17** | **12** | **5** |
+| Mobile | 9 | 5 | 4 |
+| **Total** | **17** | **13** | **4** |
