@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/app_network_image.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../providers/category_provider.dart';
 
@@ -107,16 +107,13 @@ class _CategoriesTabScreenState extends ConsumerState<CategoriesTabScreen> {
                           shape: BoxShape.circle,
                         ),
                         clipBehavior: Clip.antiAlias,
-                        child: category.image != null
-                            ? CachedNetworkImage(
-                                imageUrl: category.image!,
+                        child: AppNetworkImage(
+                                imageUrl: category.image,
                                 width: 52,
                                 height: 52,
                                 fit: BoxFit.cover,
-                                errorWidget: (_, __, ___) =>
-                                    const ImageFallback(size: 52),
-                              )
-                            : const ImageFallback(size: 52),
+                                errorWidget: const ImageFallback(size: 52),
+                              ),
                       ),
                       const SizedBox(width: AppDimens.md),
                       Expanded(

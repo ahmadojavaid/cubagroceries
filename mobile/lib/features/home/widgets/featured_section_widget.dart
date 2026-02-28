@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/app_network_image.dart';
 import '../../products/data/product_model.dart';
 import '../data/featured_section_model.dart';
 
@@ -95,33 +95,11 @@ class _ProductCard extends StatelessWidget {
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(AppDimens.radiusMd),
               ),
-              child: product.image != null
-                  ? CachedNetworkImage(
-                      imageUrl: product.image!,
+              child: AppNetworkImage(
+                      imageUrl: product.image,
                       height: 90,
                       width: double.infinity,
                       fit: BoxFit.cover,
-                      placeholder: (_, __) => Container(
-                        height: 90,
-                        color: AppColors.primarySurface.withOpacity(0.4),
-                        child: const Center(
-                          child: SizedBox(
-                            width: 20, height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        ),
-                      ),
-                      errorWidget: (_, __, ___) => Container(
-                        height: 90,
-                        color: AppColors.primarySurface.withOpacity(0.4),
-                        child: const Icon(Icons.shopping_bag_outlined, size: 36, color: AppColors.primaryLight),
-                      ),
-                    )
-                  : Container(
-                      height: 90,
-                      width: double.infinity,
-                      color: AppColors.primarySurface.withOpacity(0.4),
-                      child: const Icon(Icons.shopping_bag_outlined, size: 36, color: AppColors.primaryLight),
                     ),
             ),
 

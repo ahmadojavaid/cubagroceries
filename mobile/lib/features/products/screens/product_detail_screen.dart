@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/app_network_image.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../data/price_model.dart';
 import '../providers/product_provider.dart';
@@ -42,27 +43,12 @@ class ProductDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Product image hero — full width, warm gradient
-          Container(
-            height: 220,
+          // Product image hero
+          AppNetworkImage(
+            imageUrl: product.image,
+            height: 250,
             width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primarySurface.withOpacity(0.6),
-                  AppColors.accentLight.withOpacity(0.5),
-                ],
-              ),
-            ),
-            child: Center(
-              child: Icon(
-                Icons.eco_outlined,
-                size: 72,
-                color: AppColors.primaryLight,
-              ),
-            ),
+            fit: BoxFit.cover,
           ),
 
           Padding(

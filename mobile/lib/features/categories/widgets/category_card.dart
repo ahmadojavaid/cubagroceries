@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/app_network_image.dart';
 import '../data/category_model.dart';
 
 class CategoryCard extends StatelessWidget {
@@ -36,16 +36,13 @@ class CategoryCard extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               clipBehavior: Clip.antiAlias,
-              child: category.image != null
-                  ? CachedNetworkImage(
-                      imageUrl: category.image!,
+              child: AppNetworkImage(
+                      imageUrl: category.image,
                       width: 72,
                       height: 72,
                       fit: BoxFit.cover,
-                      placeholder: (_, __) => _imagePlaceholder(),
-                      errorWidget: (_, __, ___) => _imageFallback(),
-                    )
-                  : _imageFallback(),
+                      errorWidget: _imageFallback(),
+                    ),
             ),
             const SizedBox(height: AppDimens.sm + 2),
             // Category title

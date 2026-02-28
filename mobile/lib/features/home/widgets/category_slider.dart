@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/app_network_image.dart';
 import '../../categories/data/category_model.dart';
 
 class CategorySlider extends StatelessWidget {
@@ -57,18 +57,13 @@ class _CategoryChip extends StatelessWidget {
                 border: Border.all(color: AppColors.border, width: 0.5),
               ),
               clipBehavior: Clip.antiAlias,
-              child: category.image != null
-                  ? CachedNetworkImage(
-                      imageUrl: category.image!,
+              child: AppNetworkImage(
+                      imageUrl: category.image,
                       width: 64,
                       height: 64,
                       fit: BoxFit.cover,
-                      placeholder: (_, __) => Container(
-                        color: AppColors.primarySurface.withOpacity(0.3),
-                      ),
-                      errorWidget: (_, __, ___) => _fallbackIcon(),
-                    )
-                  : _fallbackIcon(),
+                      errorWidget: _fallbackIcon(),
+                    ),
             ),
             const SizedBox(height: 6),
             Text(

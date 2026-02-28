@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/app_network_image.dart';
 import '../data/banner_model.dart';
 
 class BannerSlider extends StatefulWidget {
@@ -65,37 +65,21 @@ class _BannerSliderState extends State<BannerSlider> {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-                  child: banner.image != null
-                      ? CachedNetworkImage(
-                          imageUrl: banner.image!,
+                  child: AppNetworkImage(
+                          imageUrl: banner.image,
                           fit: BoxFit.cover,
                           width: double.infinity,
-                          placeholder: (_, __) => Container(
-                            color: AppColors.surfaceBg,
-                            child: const Center(
-                              child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2),
-                              ),
-                            ),
-                          ),
-                          errorWidget: (_, __, ___) => Container(
+                          height: 170,
+                          errorWidget: Container(
                             color: AppColors.primarySurface,
-                            child: const Icon(Icons.image_outlined,
-                                size: 40, color: AppColors.primaryLight),
-                          ),
-                        )
-                      : Container(
-                          color: AppColors.primarySurface,
-                          child: Center(
-                            child: Text(
-                              banner.title ?? '',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryDark,
+                            child: Center(
+                              child: Text(
+                                banner.title ?? '',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryDark,
+                                ),
                               ),
                             ),
                           ),
