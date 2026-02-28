@@ -9,15 +9,16 @@
 
 ## Backend Micro-Phases
 
-### MP-B1: Banner table, model & migration
-- Create `banners` migration (title, image, sort_order, is_active)
-- Create `Banner` Eloquent model
-- Run migration reminder
+### MP-B1: Banner table, model & migration ✅
+- ✅ `banners` migration: title, image, sort_order, is_active
+- ✅ `Banner` model with fillable, casts, `active()` and `ordered()` scopes
+- ⚠️ Run: `php artisan migrate`
 
-### MP-B2: Filament BannerResource
-- Create BannerResource (CRUD with image upload, sort order, active toggle)
-- Table: image preview, title, sort_order, is_active, created_at
-- Sortable, toggleable active status
+### MP-B2: Filament BannerResource ✅
+- ✅ BannerResource with CRUD, 16:9 image upload, sort order, active toggle
+- ✅ Table: image preview, title, sort_order, is_active (icon), created_at
+- ✅ Default sort by sort_order asc, ternary active filter
+- ✅ Navigation group: Content, icon: heroicon-o-photo
 
 ### MP-B3: Add `is_featured` to categories
 - Create migration adding `is_featured` boolean to `category` table (default false)
@@ -65,6 +66,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 4 | 0 | 4 |
+| Backend | 4 | 2 | 2 |
 | Mobile | 5 | 0 | 5 |
-| **Total** | **9** | **0** | **9** |
+| **Total** | **9** | **2** | **7** |
