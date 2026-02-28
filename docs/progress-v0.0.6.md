@@ -104,23 +104,29 @@
 - ✅ Tap notification → navigates to order detail via `/orders/{orderNumber}`
 - ✅ BottomNavigationBar set to `fixed` type for 6 items
 
-### MP-M6: Firebase FCM setup in Flutter
-- Add `firebase_messaging` and `firebase_core` packages
-- Create Firebase project and add `google-services.json`
-- Initialize Firebase in main.dart
-- Request notification permission
-- Get FCM token and send to backend via `POST /api/v1/device-token`
+### MP-M6: Firebase FCM setup in Flutter ✅
+- ✅ Added `firebase_core` and `firebase_messaging` to pubspec.yaml
+- ⚠️ Firebase project + `google-services.json` — manual step (see below)
+- ✅ `Firebase.initializeApp()` in main.dart
+- ✅ Created `FcmService` (core/services/fcm_service.dart) — requests permission, gets token, sends to backend
+- ✅ Created `fcmServiceProvider` — injected into AuthNotifier
+- ✅ FCM initialized after login, register, and checkAuth
+- ✅ Added `google-services` plugin to Android Gradle config
 
-### MP-M7: FCM push notification handling
-- Handle foreground notifications (show local notification or in-app banner)
-- Handle background/terminated notification taps (navigate to order)
-- Token refresh handling (re-send to backend)
+### MP-M7: FCM push notification handling ✅
+- ✅ Created `FcmNotificationHandler` (core/services/fcm_notification_handler.dart)
+- ✅ Foreground: shows SnackBar with title/body + "View" action for order notifications
+- ✅ Background tap: navigates to order detail via `onMessageOpenedApp`
+- ✅ Terminated tap: checks `getInitialMessage()` on startup
+- ✅ Background handler registered as top-level function
+- ✅ Token refresh: `onTokenRefresh` listener re-sends to backend
 
-### MP-M8: Error states & empty states polish
-- Audit all screens for missing error states
-- Add consistent error widget with retry across: Home, Categories, Products, Orders, Profile, Complaints, Notifications
-- Add consistent empty state widget across all list screens
-- Create reusable `ErrorStateWidget` and `EmptyStateWidget` in core/widgets/
+### MP-M8: Error states & empty states polish ✅
+- ✅ `ErrorStateWidget` and `EmptyStateWidget` already existed in core/widgets/shared_widgets.dart
+- ✅ Refactored order_history_screen: added missing error state, replaced inline empty with shared widget
+- ✅ Refactored complaints_history_screen: replaced inline error/empty with shared widgets
+- ✅ Refactored notification_inbox_screen: replaced inline error/empty with shared widgets
+- ✅ Home screen already uses shared ErrorStateWidget (verified)
 
 ### MP-M9: Offline handling
 - Add connectivity check (connectivity_plus package)
@@ -150,5 +156,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 10 | 10 | 0 |
-| Mobile | 11 | 5 | 6 |
-| **Total** | **21** | **15** | **6** |
+| Mobile | 11 | 8 | 3 |
+| **Total** | **21** | **18** | **3** |

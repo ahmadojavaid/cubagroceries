@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/shared_widgets.dart';
 import '../data/complaint_model.dart';
 import '../providers/complaint_provider.dart';
 
@@ -61,9 +62,17 @@ class _ComplaintsHistoryScreenState
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.error != null && state.complaints.isEmpty
-              ? _buildError(state.error!)
+              ? ErrorStateWidget(
+                  message: state.error!,
+                  onRetry: () => ref
+                      .read(complaintListProvider.notifier)
+                      .fetchComplaints(forceRefresh: true),
+                )
               : state.complaints.isEmpty
-                  ? _buildEmpty()
+                  ? const EmptyStateWidget(
+                      icon: Icons.chat_bubble_outline,
+                      message: 'No complaints yet\nWe hope everything is going well!',
+                    )
                   : RefreshIndicator(
                       color: AppColors.primary,
                       onRefresh: () => ref
@@ -90,53 +99,6 @@ class _ComplaintsHistoryScreenState
     );
   }
 
-  Widget _buildError(String error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline,
-              size: 48, color: AppColors.textHint),
-          const SizedBox(height: AppDimens.md),
-          Text(error,
-              style: const TextStyle(color: AppColors.textSecondary)),
-          const SizedBox(height: AppDimens.md),
-          TextButton(
-            onPressed: () => ref
-                .read(complaintListProvider.notifier)
-                .fetchComplaints(forceRefresh: true),
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmpty() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.chat_bubble_outline,
-              size: 64, color: AppColors.textHint.withOpacity(0.5)),
-          const SizedBox(height: AppDimens.md),
-          const Text(
-            'No complaints yet',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: AppDimens.xs),
-          const Text(
-            'We hope everything is going well!',
-            style: TextStyle(fontSize: 13, color: AppColors.textHint),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _ComplaintCard extends StatelessWidget {

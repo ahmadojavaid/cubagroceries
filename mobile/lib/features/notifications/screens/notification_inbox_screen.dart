@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/shared_widgets.dart';
 import '../data/notification_model.dart';
 import '../providers/notification_provider.dart';
 
@@ -64,9 +65,17 @@ class _NotificationInboxScreenState
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.error != null && state.notifications.isEmpty
-              ? _buildError(state.error!)
+              ? ErrorStateWidget(
+                  message: state.error!,
+                  onRetry: () => ref
+                      .read(notificationListProvider.notifier)
+                      .fetchNotifications(forceRefresh: true),
+                )
               : state.notifications.isEmpty
-                  ? _buildEmpty()
+                  ? const EmptyStateWidget(
+                      icon: Icons.notifications_none_rounded,
+                      message: 'No notifications yet\nYou\'ll be notified about order updates here',
+                    )
                   : RefreshIndicator(
                       color: AppColors.primary,
                       onRefresh: () => ref
@@ -112,53 +121,6 @@ class _NotificationInboxScreenState
     }
   }
 
-  Widget _buildError(String error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline,
-              size: 48, color: AppColors.textHint),
-          const SizedBox(height: AppDimens.md),
-          Text(error,
-              style: const TextStyle(color: AppColors.textSecondary)),
-          const SizedBox(height: AppDimens.md),
-          TextButton(
-            onPressed: () => ref
-                .read(notificationListProvider.notifier)
-                .fetchNotifications(forceRefresh: true),
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmpty() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.notifications_none_rounded,
-              size: 64, color: AppColors.textHint.withOpacity(0.5)),
-          const SizedBox(height: AppDimens.md),
-          const Text(
-            'No notifications yet',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: AppDimens.xs),
-          const Text(
-            'You\'ll be notified about order updates here',
-            style: TextStyle(fontSize: 13, color: AppColors.textHint),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _NotificationTile extends StatelessWidget {

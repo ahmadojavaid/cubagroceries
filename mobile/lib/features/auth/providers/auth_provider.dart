@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_exception.dart';
 import '../../../core/providers/api_provider.dart';
+import '../../../core/services/fcm_service.dart';
+import '../../../core/providers/fcm_provider.dart';
 
 /// Represents the current auth state
 class AuthState {
@@ -35,8 +37,9 @@ class AuthState {
 /// Auth state notifier — manages login, register, logout, and token persistence
 class AuthNotifier extends StateNotifier<AuthState> {
   final ApiClient _api;
+  final FcmService _fcm;
 
-  AuthNotifier(this._api) : super(const AuthState());
+  AuthNotifier(this._api, this._fcm) : super(const AuthState());
 
   /// Check if user has a stored token on app start
   Future<void> checkAuth() async {
@@ -50,6 +53,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
             isAuthenticated: true,
             user: Map<String, dynamic>.from(data['data']),
           );
+          // Send FCM token after auth verification
+          _fcm.initialize();
           return;
         }
       } catch (_) {
@@ -88,6 +93,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           isAuthenticated: true,
           user: Map<String, dynamic>.from(data['data']['user']),
         );
+        _fcm.initialize();
         return true;
       }
 
@@ -119,6 +125,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           isAuthenticated: true,
           user: Map<String, dynamic>.from(data['data']['user']),
         );
+        _fcm.initialize();
         return true;
       }
 
@@ -161,5 +168,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
 /// Auth provider
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final api = ref.watch(apiClientProvider);
-  return AuthNotifier(api);
+  final fcm = ref.watch(fcmServiceProvider);
+  return AuthNotifier(api, fcm);
 });

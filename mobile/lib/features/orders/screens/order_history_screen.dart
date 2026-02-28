@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/shared_widgets.dart';
 import '../data/order_model.dart';
 import '../providers/order_provider.dart';
 
@@ -50,9 +51,19 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
       ),
       body: state.isLoading && state.orders.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : state.orders.isEmpty
-              ? _buildEmpty()
-              : RefreshIndicator(
+          : state.error != null && state.orders.isEmpty
+              ? ErrorStateWidget(
+                  message: state.error!,
+                  onRetry: () => ref
+                      .read(orderListProvider.notifier)
+                      .fetchOrders(forceRefresh: true),
+                )
+              : state.orders.isEmpty
+                  ? const EmptyStateWidget(
+                      icon: Icons.receipt_long_outlined,
+                      message: 'No orders yet\nYour order history will appear here',
+                    )
+                  : RefreshIndicator(
                   color: AppColors.primary,
                   onRefresh: () => ref
                       .read(orderListProvider.notifier)
@@ -84,34 +95,6 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
     );
   }
 
-  Widget _buildEmpty() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: const BoxDecoration(
-              color: AppColors.surfaceBg,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.receipt_long_outlined,
-                size: 36, color: AppColors.textHint),
-          ),
-          const SizedBox(height: AppDimens.md),
-          const Text('No orders yet',
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary)),
-          const SizedBox(height: AppDimens.xs),
-          const Text('Your order history will appear here',
-              style: TextStyle(fontSize: 13, color: AppColors.textHint)),
-        ],
-      ),
-    );
-  }
 }
 
 class _OrderCard extends StatelessWidget {
