@@ -116,7 +116,7 @@
 ### MP-M3: Core Dependencies ✅
 - ✅ Verified scaffolder added: `dio`, `go_router`, `flutter_secure_storage`
 - ✅ Added: `flutter_riverpod`, `hive`, `hive_flutter`, `cached_network_image`, `shimmer`, `pull_to_refresh`, `intl`
-- ✅ Added dev deps: `hive_generator`, `build_runner`
+- ✅ Dropped `hive_generator`/`build_runner` (Dart SDK conflict; will use Hive with JSON serialization instead)
 - **Terminal**: `cd mobile && flutter pub get`
 
 ### MP-M4: Theme Extraction from ProKit
