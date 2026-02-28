@@ -185,15 +185,17 @@ class AppTheme {
         ),
       ),
 
-      // Bottom Navigation — Lifted surface
+      // Bottom Navigation — Premium feel
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.cardBg,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textHint,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
-        selectedLabelStyle: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600),
-        unselectedLabelStyle: GoogleFonts.inter(fontSize: 11),
+        selectedIconTheme: const IconThemeData(size: 24),
+        unselectedIconTheme: const IconThemeData(size: 23),
+        selectedLabelStyle: GoogleFonts.dmSans(fontSize: 11.5, fontWeight: FontWeight.w600, height: 1.8),
+        unselectedLabelStyle: GoogleFonts.inter(fontSize: 11, height: 1.8),
       ),
 
       // Divider
