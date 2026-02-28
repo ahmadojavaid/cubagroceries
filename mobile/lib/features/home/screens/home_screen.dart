@@ -9,6 +9,7 @@ import '../providers/home_provider.dart';
 import '../widgets/banner_slider.dart';
 import '../widgets/category_slider.dart';
 import '../widgets/featured_section_widget.dart';
+import '../widgets/survey_prompt_card.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -127,7 +128,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: AppDimens.lg),
         ],
 
-        // 3. Featured category sections
+        // 3. Survey prompt
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
+          child: SurveyPromptCard(),
+        ),
+
+        // 4. Featured category sections
         ...homeState.featuredSections.map((section) => Padding(
               padding: const EdgeInsets.only(bottom: AppDimens.lg),
               child: FeaturedSectionWidget(section: section),

@@ -12,6 +12,12 @@ use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\ComplaintController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\DeviceTokenController;
+use App\Http\Controllers\Api\V1\FaqController;
+use App\Http\Controllers\Api\V1\StoreScheduleController;
+use App\Http\Controllers\Api\V1\AppSettingController;
+use App\Http\Controllers\Api\V1\CouponController;
+use App\Http\Controllers\Api\V1\ReviewController;
+use App\Http\Controllers\Api\V1\SurveyController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -79,5 +85,25 @@ Route::prefix('v1')->group(function () {
 
         // Device Token (FCM)
         Route::post('/device-token', [DeviceTokenController::class, 'store']);
+
+        // FAQs
+        Route::get('/faqs', [FaqController::class, 'index']);
+
+        // Store Schedules
+        Route::get('/store-schedules', [StoreScheduleController::class, 'index']);
+
+        // App Settings (public config)
+        Route::get('/settings', [AppSettingController::class, 'index']);
+
+        // Coupons
+        Route::post('/coupons/apply', [CouponController::class, 'apply']);
+
+        // Reviews
+        Route::get('/products/{productId}/reviews', [ReviewController::class, 'forProduct']);
+        Route::post('/reviews', [ReviewController::class, 'store']);
+
+        // Surveys
+        Route::get('/surveys', [SurveyController::class, 'index']);
+        Route::post('/surveys/{surveyId}/respond', [SurveyController::class, 'respond']);
     });
 });

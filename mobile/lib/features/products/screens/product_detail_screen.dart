@@ -5,6 +5,7 @@ import '../../../core/theme/app_dimens.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../data/price_model.dart';
 import '../providers/product_provider.dart';
+import '../widgets/product_reviews_section.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   final int productId;
@@ -157,6 +158,21 @@ class ProductDetailScreen extends ConsumerWidget {
                   ...product.prices.map<Widget>(
                     (PriceModel price) => _buildPriceRow(context, price),
                   ),
+
+                const SizedBox(height: AppDimens.lg),
+
+                // Reviews
+                ProductReviewsSection(
+                  productId: productId,
+                  onWriteReview: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => WriteReviewDialog(
+                        productId: productId,
+                      ),
+                    );
+                  },
+                ),
 
                 const SizedBox(height: AppDimens.xl),
 

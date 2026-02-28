@@ -240,7 +240,59 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
 
-          const SizedBox(height: AppDimens.xl),
+          const SizedBox(height: AppDimens.lg),
+
+          // Information Links
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.cardBg,
+              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+              border: Border.all(color: AppColors.border, width: 0.5),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Text(
+                    'Information',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                _buildSettingsItem(
+                  icon: Icons.schedule_outlined,
+                  label: 'Store Hours',
+                  onTap: () => context.push('/store-hours'),
+                ),
+                _buildSettingsItem(
+                  icon: Icons.help_outline,
+                  label: 'FAQs',
+                  onTap: () => context.push('/faqs'),
+                ),
+                _buildSettingsItem(
+                  icon: Icons.info_outline,
+                  label: 'About Us',
+                  onTap: () => context.push('/about'),
+                ),
+                _buildSettingsItem(
+                  icon: Icons.description_outlined,
+                  label: 'Terms & Conditions',
+                  onTap: () => context.push('/terms'),
+                ),
+                _buildSettingsItem(
+                  icon: Icons.privacy_tip_outlined,
+                  label: 'Privacy Policy',
+                  onTap: () => context.push('/privacy'),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: AppDimens.lg),
 
           // Logout
           SizedBox(
@@ -259,7 +311,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
           ),
+
+          const SizedBox(height: AppDimens.lg),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: AppColors.textSecondary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
+            const Icon(Icons.chevron_right, size: 20, color: AppColors.textSecondary),
+          ],
+        ),
       ),
     );
   }

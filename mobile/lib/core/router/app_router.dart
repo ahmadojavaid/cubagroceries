@@ -19,6 +19,9 @@ import '../../features/profile/screens/settings_screen.dart';
 import '../../features/complaints/screens/complaint_form_screen.dart';
 import '../../features/complaints/screens/complaints_history_screen.dart';
 import '../../features/notifications/screens/notification_inbox_screen.dart';
+import '../../features/settings/screens/faq_screen.dart';
+import '../../features/settings/screens/store_hours_screen.dart';
+import '../../features/settings/screens/legal_page_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -126,6 +129,41 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/notifications',
         builder: (context, state) => const NotificationInboxScreen(),
+      ),
+
+      // FAQs
+      GoRoute(
+        path: '/faqs',
+        builder: (context, state) => const FaqScreen(),
+      ),
+
+      // Store hours
+      GoRoute(
+        path: '/store-hours',
+        builder: (context, state) => const StoreHoursScreen(),
+      ),
+
+      // Legal pages
+      GoRoute(
+        path: '/about',
+        builder: (context, state) => const LegalPageScreen(
+          title: 'About Us',
+          settingsKey: 'about_us',
+        ),
+      ),
+      GoRoute(
+        path: '/terms',
+        builder: (context, state) => const LegalPageScreen(
+          title: 'Terms & Conditions',
+          settingsKey: 'terms_and_conditions',
+        ),
+      ),
+      GoRoute(
+        path: '/privacy',
+        builder: (context, state) => const LegalPageScreen(
+          title: 'Privacy Policy',
+          settingsKey: 'privacy_policy',
+        ),
       ),
 
       // Complaints

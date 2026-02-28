@@ -8,6 +8,7 @@ import '../../cart/providers/cart_provider.dart';
 import '../../cart/providers/shipping_provider.dart';
 import '../../profile/data/address_model.dart';
 import '../../profile/providers/address_provider.dart';
+import '../../cart/widgets/coupon_input_widget.dart';
 import '../providers/order_provider.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -236,8 +237,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         .where((c) => c.id == _selectedShippingId)
         .firstOrNull;
 
+    final coupon = ref.watch(couponProvider);
     final shippingAmount = selectedShipping?.amountValue ?? 0.0;
-    final grandTotal = cart.subtotal + shippingAmount;
+    final grandTotal = cart.subtotal + shippingAmount - coupon.discount;
 
     if (orderState.isLoading) {
       return const Padding(
@@ -292,10 +294,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
         const Divider(height: AppDimens.lg, color: AppColors.divider),
 
+        // Coupon
+        CouponInputWidget(orderTotal: cart.subtotal),
+        const SizedBox(height: AppDimens.md),
+
         // Totals
         _totalRow('Subtotal', 'Rs ${cart.subtotal.toStringAsFixed(2)}'),
         if (selectedShipping != null)
           _totalRow(selectedShipping.title, selectedShipping.displayAmount),
+        if (coupon.discount > 0)
+          _totalRow('Coupon (${coupon.code})', '- Rs ${coupon.discount.toStringAsFixed(0)}',
+              color: AppColors.success),
         const SizedBox(height: AppDimens.xs),
         _totalRow('Total', 'Rs ${grandTotal.toStringAsFixed(2)}',
             bold: true),
@@ -303,7 +312,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
-  Widget _totalRow(String label, String value, {bool bold = false}) {
+  Widget _totalRow(String label, String value, {bool bold = false, Color? color}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(

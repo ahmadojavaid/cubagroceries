@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\SearchHistory;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -78,6 +79,15 @@ class ProductsController extends Controller
             ])
             ->orderBy('name')
             ->paginate($request->integer('per_page', 20));
+
+        // Log search query
+        if ($request->user()) {
+            SearchHistory::create([
+                'user_id' => $request->user()->id,
+                'query' => $query,
+                'results_count' => $products->total(),
+            ]);
+        }
 
         $products->getCollection()->transform(function ($product) {
             return $this->formatProduct($product);
