@@ -9,11 +9,11 @@
 
 ## Backend Micro-Phases
 
-### MP-B1: Address Model & Migration
-- Create `addresses` migration per db-schema-reference.md (user_id, label, address, city, phone, latitude, longitude, is_default)
-- Create `Address` Eloquent model with `user()` belongsTo relationship
-- Add `addresses()` hasMany to `User` model
-- Run migration reminder
+### MP-B1: Address Model & Migration ✅
+- ✅ `addresses` migration exists: `2026_02_28_000011_create_addresses_table.php` (user_id, label, address, city, phone, latitude, longitude, is_default)
+- ✅ `Address` Eloquent model with `user()` belongsTo, fillable fields, and casts
+- ✅ `User` model has `addresses()` hasMany relationship
+- ✅ Migration already ran in Phase 1 (all 14 tables created together)
 
 ### MP-B2: Filament CustomerResource
 - Create CustomerResource (list only — no create/edit from admin)
@@ -107,6 +107,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 6 | 0 | 6 |
+| Backend | 6 | 1 | 5 |
 | Mobile | 8 | 0 | 8 |
-| **Total** | **14** | **0** | **14** |
+| **Total** | **14** | **1** | **13** |
