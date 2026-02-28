@@ -18,7 +18,7 @@ class NavigationShell extends ConsumerStatefulWidget {
 class _NavigationShellState extends ConsumerState<NavigationShell> {
   int _currentIndex = 0;
 
-  final _screens = const [
+  List<Widget> get _screens => const [
     HomeScreen(),
     CategoriesTabScreen(),
     CartScreen(),
