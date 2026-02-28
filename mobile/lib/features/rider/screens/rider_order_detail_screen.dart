@@ -315,32 +315,7 @@ class _DeliveryAddressSection extends StatelessWidget {
     return _Card(child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const _SectionTitle('Delivery Address'),
-            if (address.hasCoordinates)
-              GestureDetector(
-                onTap: () => LauncherUtils.openGoogleMaps(
-                  latitude: address.latitude, longitude: address.longitude,
-                  addressFallback: '${address.address}, ${address.city ?? ''}',
-                  context: context,
-                ),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: AppColors.primarySurface,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.directions_rounded, size: 14, color: AppColors.primary),
-                    const SizedBox(width: 4),
-                    Text('Navigate', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary)),
-                  ]),
-                ),
-              ),
-          ],
-        ),
+        const _SectionTitle('Delivery Address'),
         const SizedBox(height: 12),
         Text(address.address, style: const TextStyle(fontSize: 14, color: AppColors.textPrimary, height: 1.5)),
         if (address.city != null && address.city!.isNotEmpty) ...[
@@ -393,14 +368,6 @@ class _CustomerSection extends StatelessWidget {
               ],
             ],
           )),
-          if (customer.identity != null) ...[
-            _CircleAction(icon: Icons.phone_rounded, color: AppColors.primary,
-                onTap: () => LauncherUtils.call(phone: customer.identity!, context: context)),
-            const SizedBox(width: 8),
-            _CircleAction(icon: Icons.chat_rounded, color: const Color(0xFF25D366),
-                onTap: () => LauncherUtils.openWhatsApp(phone: customer.identity!,
-                    message: 'Hi! I am your delivery rider from Cuba Groceries.', context: context)),
-          ],
         ]),
       ],
     ));
