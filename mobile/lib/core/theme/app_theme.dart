@@ -75,9 +75,9 @@ class AppTheme {
 
       scaffoldBackgroundColor: AppColors.scaffoldBg,
 
-      // AppBar — Borderless, warm background
+      // AppBar — Slightly lifted from scaffold
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.scaffoldBg,
+        backgroundColor: AppColors.cardBg,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         scrolledUnderElevation: 0.5,
@@ -185,7 +185,7 @@ class AppTheme {
         ),
       ),
 
-      // Bottom Navigation — Clean, borderless
+      // Bottom Navigation — Lifted surface
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.cardBg,
         selectedItemColor: AppColors.primary,

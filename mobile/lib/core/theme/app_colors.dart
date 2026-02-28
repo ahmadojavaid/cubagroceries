@@ -16,10 +16,10 @@ class AppColors {
   static const Color accentLight = Color(0xFFFAEDCD);
   static const Color accentDark = Color(0xFFA47148);
 
-  // Background — Warm off-whites
-  static const Color scaffoldBg = Color(0xFFFEFAF6);
-  static const Color cardBg = Colors.white;
-  static const Color surfaceBg = Color(0xFFFAF6F1);
+  // Background — Warm greys with subtle warmth
+  static const Color scaffoldBg = Color(0xFFF4F1ED);
+  static const Color cardBg = Color(0xFFFAF8F6);
+  static const Color surfaceBg = Color(0xFFEFECE7);
 
   // Text — Warm charcoal hierarchy
   static const Color textPrimary = Color(0xFF2B2D2E);
@@ -33,9 +33,9 @@ class AppColors {
   static const Color warning = Color(0xFFE09F3E);
   static const Color info = Color(0xFF3A86A8);
 
-  // Borders & Dividers — Barely-there warmth
-  static const Color border = Color(0xFFE8E2DA);
-  static const Color divider = Color(0xFFF0EBE3);
+  // Borders & Dividers — Warm grey
+  static const Color border = Color(0xFFDDD8D0);
+  static const Color divider = Color(0xFFE6E2DB);
 
   // Shadows — Warm, diffused
   static const Color shadow = Color(0x0D3E2723);
