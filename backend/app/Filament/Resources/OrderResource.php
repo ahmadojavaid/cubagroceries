@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\DeliveryBoy;
 use App\Models\Order;
+use App\Notifications\OrderStatusChanged;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
@@ -108,7 +109,11 @@ class OrderResource extends Resource
                             return;
                         }
 
+                        $oldStatus = $record->status;
                         $record->update(['status' => $newStatus]);
+
+                        // Send database notification to customer
+                        $record->user->notify(new OrderStatusChanged($record, $oldStatus, $newStatus));
 
                         Notification::make()
                             ->success()

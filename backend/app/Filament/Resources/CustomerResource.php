@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Models\User;
+use Filament\Forms;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -67,6 +69,71 @@ class CustomerResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+
+                Tables\Actions\Action::make('topUp')
+                    ->label('Top Up')
+                    ->icon('heroicon-o-plus-circle')
+                    ->color('success')
+                    ->form([
+                        Forms\Components\TextInput::make('amount')
+                            ->label('Amount (PKR)')
+                            ->numeric()
+                            ->required()
+                            ->minValue(1)
+                            ->maxValue(100000),
+                        Forms\Components\TextInput::make('note')
+                            ->label('Note')
+                            ->placeholder('Reason for top-up')
+                            ->maxLength(255),
+                    ])
+                    ->action(function (User $record, array $data): void {
+                        $record->increment('wallet_amount', $data['amount']);
+
+                        Notification::make()
+                            ->success()
+                            ->title('Wallet Topped Up')
+                            ->body("Rs {$data['amount']} added to {$record->full_name}'s wallet. New balance: Rs {$record->fresh()->wallet_amount}")
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (User $record) => "Top Up: {$record->full_name}"),
+
+                Tables\Actions\Action::make('deduct')
+                    ->label('Deduct')
+                    ->icon('heroicon-o-minus-circle')
+                    ->color('danger')
+                    ->form(fn (User $record) => [
+                        Forms\Components\TextInput::make('amount')
+                            ->label('Amount (PKR)')
+                            ->numeric()
+                            ->required()
+                            ->minValue(1)
+                            ->maxValue((float) $record->wallet_amount),
+                        Forms\Components\TextInput::make('note')
+                            ->label('Note')
+                            ->placeholder('Reason for deduction')
+                            ->maxLength(255),
+                    ])
+                    ->action(function (User $record, array $data): void {
+                        if ($data['amount'] > (float) $record->wallet_amount) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Insufficient Balance')
+                                ->body("Customer only has Rs {$record->wallet_amount} in wallet.")
+                                ->send();
+                            return;
+                        }
+
+                        $record->decrement('wallet_amount', $data['amount']);
+
+                        Notification::make()
+                            ->success()
+                            ->title('Wallet Deducted')
+                            ->body("Rs {$data['amount']} deducted from {$record->full_name}'s wallet. New balance: Rs {$record->fresh()->wallet_amount}")
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (User $record) => "Deduct: {$record->full_name}"),
             ])
             ->bulkActions([])
             ->defaultSort('id', 'desc');

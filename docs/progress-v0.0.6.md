@@ -42,24 +42,24 @@
 - ✅ Columns: subject, customer name, date
 - ✅ Link to complaint view page, empty state with check icon
 
-### MP-B7: Wallet management from admin
-- Add wallet top-up action on CustomerResource (modal: amount, note)
-- Add wallet deduct action on CustomerResource (modal: amount, note)
-- Update user wallet_amount on action
-- Show wallet adjustment history if feasible, otherwise just adjust balance
+### MP-B7: Wallet management from admin ✅
+- ✅ Add wallet top-up action on CustomerResource (modal: amount, note, with confirmation)
+- ✅ Add wallet deduct action on CustomerResource (modal: amount capped to balance, note)
+- ✅ Update user wallet_amount via increment/decrement
+- ✅ Balance validation on deduct (prevents over-deduction)
 
-### MP-B8: Notification system — Order status change triggers
-- Create `App\Notifications\OrderStatusChanged` notification class
-- Uses Laravel's database notification channel (notifications table already exists)
-- Triggered when order status changes (from OrderResource changeStatus action)
-- Notification data: order_id, order_number, old_status, new_status, message
+### MP-B8: Notification system — Order status change triggers ✅
+- ✅ Create `App\Notifications\OrderStatusChanged` notification class
+- ✅ Uses Laravel's database notification channel (notifications table already exists)
+- ✅ Triggered from OrderResource changeStatus action (captures old + new status)
+- ✅ Notification data: order_id, order_number, old_status, new_status, title, message
 
-### MP-B9: API — NotificationController (list, mark read, mark all read)
-- Create `Api\V1\NotificationController`
-- `GET /api/v1/notifications` — paginated, newest first
-- `PUT /api/v1/notifications/{id}/read` — mark single as read
-- `PUT /api/v1/notifications/read-all` — mark all as read
-- Register routes under Sanctum middleware
+### MP-B9: API — NotificationController (list, mark read, mark all read) ✅
+- ✅ Create `Api\V1\NotificationController`
+- ✅ `GET /api/v1/notifications` — paginated, newest first, with meta
+- ✅ `PUT /api/v1/notifications/{id}/read` — mark single as read
+- ✅ `PUT /api/v1/notifications/read-all` — mark all as read
+- ✅ Routes registered under Sanctum middleware
 
 ### MP-B10: Firebase Cloud Messaging — Server-side setup
 - Install `laravel-notification-channels/fcm` or `kreait/laravel-firebase`
@@ -145,6 +145,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 10 | 6 | 4 |
+| Backend | 10 | 9 | 1 |
 | Mobile | 11 | 0 | 11 |
-| **Total** | **21** | **6** | **15** |
+| **Total** | **21** | **9** | **12** |
