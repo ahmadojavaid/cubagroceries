@@ -133,10 +133,11 @@
 - ✅ Token management (save, clear, get, hasToken) via flutter_secure_storage
 - ✅ Deleted old scaffolded `services/api_service.dart`
 
-### MP-M6: Riverpod Foundation
-- Wrap app in `ProviderScope`
-- Create `core/providers/api_provider.dart` (Dio instance provider)
-- Create `features/auth/providers/auth_provider.dart` (auth state)
+### MP-M6: Riverpod Foundation ✅
+- ✅ Wrap app in `ProviderScope` in main.dart
+- ✅ Create `core/providers/api_provider.dart` (singleton ApiClient provider)
+- ✅ Create `features/auth/providers/auth_provider.dart` (AuthState + AuthNotifier)
+- ✅ AuthNotifier: checkAuth, register, login, logout, clearError methods
 
 ### MP-M7: Router Setup
 - Create `core/router/app_router.dart` with go_router
@@ -178,5 +179,5 @@
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
 | Backend | 10 | 10 | 0 |
-| Mobile | 12 | 4 | 8 |
-| **Total** | **28** | **14** | **14** |
+| Mobile | 12 | 5 | 7 |
+| **Total** | **28** | **15** | **13** |
