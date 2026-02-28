@@ -119,11 +119,12 @@
 - ✅ Dropped `hive_generator`/`build_runner` (Dart SDK conflict; will use Hive with JSON serialization instead)
 - **Terminal**: `cd mobile && flutter pub get`
 
-### MP-M4: Theme Extraction from ProKit
-- Extract `GroceryColors.dart` → adapt to `core/theme/app_colors.dart`
-- Extract typography/text styles → `core/theme/app_text_styles.dart`
-- Create `core/theme/app_theme.dart` (ThemeData)
-- Apply theme in `main.dart`
+### MP-M4: Theme Extraction from ProKit ✅
+- ✅ Create `app_colors.dart` — full palette (primary green, accent orange, status colors, order status)
+- ✅ Create `app_text_styles.dart` — headings, body, labels, button, price styles
+- ✅ Create `app_dimens.dart` — spacing, border radius, icon/card sizes
+- ✅ Create `app_theme.dart` — Material 3 ThemeData (appBar, cards, buttons, inputs, bottomNav, chips)
+- ✅ Apply theme in `main.dart`, rename app to CubaGroceriesApp
 
 ### MP-M5: Dio API Client Setup
 - Create `core/api/api_client.dart` (Dio instance, base URL, interceptors)
@@ -176,5 +177,5 @@
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
 | Backend | 10 | 10 | 0 |
-| Mobile | 12 | 2 | 10 |
-| **Total** | **28** | **12** | **16** |
+| Mobile | 12 | 3 | 9 |
+| **Total** | **28** | **13** | **15** |
