@@ -71,11 +71,11 @@
 - ✅ Create `Complaint` model
 - ✅ Create `Address` model
 
-### MP-B7: Database Seeder
-- Create `AdminSeeder` — super admin user (role 1) for Filament login
-- Create `UnitSeeder` — sample units (kg, piece, dozen, pack, litre)
-- Register seeders in `DatabaseSeeder`
-- **Terminal**: `php artisan db:seed`
+### MP-B7: Database Seeder ✅
+- ✅ Create `AdminSeeder` — super admin (admin@cubagroceries.test / password)
+- ✅ Create `UnitSeeder` — 6 units (kg, g, piece, dozen, pack, litre)
+- ✅ Register seeders in `DatabaseSeeder`
+- **Terminal**: `php artisan migrate:fresh --seed` ← **RUN NOW**
 
 ### MP-B8: Filament Auth (Portal Users)
 - Configure Filament to authenticate against `portal_users` table
