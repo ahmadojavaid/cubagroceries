@@ -40,26 +40,26 @@
 - ✅ Display error notification if invalid transition attempted
 - ✅ Hide status action on final states (delivered/cancelled)
 
-### MP-B6: Filament ComplaintResource (list + status management)
-- Create ComplaintResource (list + view, no create)
-- Table: id, customer name, order_id, subject, status (badge), created_at
-- Searchable by subject, customer name
-- Filterable by status (pending, in_progress, resolved, closed)
-- Status change action on list
-- View page: complaint details, customer info, linked order
-- Navigation group: Support, icon: chat-bubble-left-ellipsis
+### MP-B6: Filament ComplaintResource (list + status management) ✅
+- ✅ Create ComplaintResource (list + view, no create)
+- ✅ Table: id, customer name, order_id (linked), subject, status (badge), created_at
+- ✅ Searchable by subject, customer name
+- ✅ Filterable by status (pending, in_progress, resolved, closed)
+- ✅ Status change action on list with confirmation
+- ✅ View page: complaint details, message, customer info, linked order section
+- ✅ Navigation group: Support, icon: chat-bubble-left-ellipsis
 
-### MP-B7: API — ComplaintController@store
-- Create `Api\V1\ComplaintController`
-- `POST /api/v1/complaints` — submit complaint (subject, message, optional order_id)
-- Validate order belongs to user if order_id provided
-- Register route under Sanctum middleware
+### MP-B7: API — ComplaintController@store ✅
+- ✅ Create `Api\V1\ComplaintController`
+- ✅ `POST /api/v1/complaints` — submit complaint (subject, message, optional order_id)
+- ✅ Validate order belongs to user if order_id provided
+- ✅ Register route under Sanctum middleware
 
-### MP-B8: API — ComplaintController@index
-- `GET /api/v1/complaints` — list user's complaints (paginated)
-- Include: id, subject, status, order_id, created_at
-- Sorted newest first
-- Register route
+### MP-B8: API — ComplaintController@index ✅
+- ✅ `GET /api/v1/complaints` — list user's complaints (paginated)
+- ✅ Include: id, subject, status, order (id, order_id, status), created_at
+- ✅ Sorted newest first
+- ✅ Register route
 
 ---
 
@@ -114,6 +114,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 8 | 5 | 3 |
+| Backend | 8 | 8 | 0 |
 | Mobile | 7 | 0 | 7 |
-| **Total** | **15** | **5** | **10** |
+| **Total** | **15** | **8** | **7** |

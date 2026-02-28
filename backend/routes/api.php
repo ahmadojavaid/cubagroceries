@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\WalletController;
 use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\ShippingController;
 use App\Http\Controllers\Api\V1\OrderController;
+use App\Http\Controllers\Api\V1\ComplaintController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -64,5 +65,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/orders', [OrderController::class, 'index']);
         Route::post('/orders', [OrderController::class, 'store']);
         Route::get('/orders/{orderNumber}', [OrderController::class, 'show']);
+
+        // Complaints
+        Route::get('/complaints', [ComplaintController::class, 'index']);
+        Route::post('/complaints', [ComplaintController::class, 'store']);
     });
 });
