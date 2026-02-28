@@ -1,0 +1,275 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimens.dart';
+import '../data/order_model.dart';
+import '../providers/order_provider.dart';
+
+class OrderDetailScreen extends ConsumerStatefulWidget {
+  final String orderNumber;
+
+  const OrderDetailScreen({super.key, required this.orderNumber});
+
+  @override
+  ConsumerState<OrderDetailScreen> createState() =>
+      _OrderDetailScreenState();
+}
+
+class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref
+        .read(orderActionProvider.notifier)
+        .fetchOrderDetail(widget.orderNumber));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(orderActionProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.orderNumber),
+      ),
+      body: state.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : state.error != null
+              ? _buildError(state.error!)
+              : state.placedOrder != null
+                  ? _buildDetail(state.placedOrder!)
+                  : const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildError(String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline,
+              size: 48, color: AppColors.textHint),
+          const SizedBox(height: AppDimens.md),
+          Text(error,
+              style: const TextStyle(color: AppColors.textSecondary)),
+          const SizedBox(height: AppDimens.md),
+          TextButton(
+            onPressed: () => ref
+                .read(orderActionProvider.notifier)
+                .fetchOrderDetail(widget.orderNumber),
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetail(OrderDetailModel order) {
+    final dateStr =
+        DateFormat('MMM d, yyyy • h:mm a').format(order.createdAt);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppDimens.pagePadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Status + order info card
+          _SectionCard(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(order.orderId,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 2),
+                      Text(dateStr,
+                          style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondary)),
+                    ],
+                  ),
+                  _StatusBadge(status: order.status),
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppDimens.md),
+
+          // Delivery address
+          if (order.address != null) ...[
+            _SectionCard(
+              title: 'Delivery Address',
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.location_on_outlined,
+                        size: 18, color: AppColors.primary),
+                    const SizedBox(width: AppDimens.sm),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(order.address!.address,
+                              style: const TextStyle(
+                                  fontSize: 14, height: 1.4)),
+                          if (order.address!.city != null)
+                            Text(order.address!.city!,
+                                style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary)),
+                          if (order.address!.phone != null)
+                            Text(order.address!.phone!,
+                                style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textHint)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimens.md),
+          ],
+
+          // Order items
+          _SectionCard(
+            title: 'Items (${order.items.length})',
+            children: [
+              ...order.items.map((item) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppDimens.sm),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              Text(item.productName,
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500)),
+                              Text(
+                                '${item.quantity} × ${item.displayPrice} / ${item.unitName}',
+                                style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(item.displayLineTotal,
+                            style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  )),
+            ],
+          ),
+
+          const SizedBox(height: AppDimens.md),
+
+          // Total
+          _SectionCard(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w700)),
+                  Text(order.displayTotal,
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary)),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Shared widgets ─────────────────────────────────────────
+
+class _SectionCard extends StatelessWidget {
+  final String? title;
+  final List<Widget> children;
+
+  const _SectionCard({this.title, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppDimens.md),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+        border: Border.all(color: AppColors.border, width: 0.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null) ...[
+            Text(title!,
+                style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary)),
+            const SizedBox(height: AppDimens.sm),
+          ],
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final String status;
+
+  const _StatusBadge({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final (color, bgColor) = _statusColors(status);
+    final label = status[0].toUpperCase() + status.substring(1);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+            fontSize: 12, fontWeight: FontWeight.w600, color: color),
+      ),
+    );
+  }
+
+  (Color, Color) _statusColors(String status) {
+    return switch (status) {
+      'pending' => (AppColors.statusPending, AppColors.statusPending.withValues(alpha: 0.12)),
+      'confirmed' => (AppColors.statusConfirmed, AppColors.statusConfirmed.withValues(alpha: 0.12)),
+      'dispatched' => (AppColors.statusDispatched, AppColors.statusDispatched.withValues(alpha: 0.12)),
+      'delivered' => (AppColors.statusDelivered, AppColors.statusDelivered.withValues(alpha: 0.12)),
+      'cancelled' => (AppColors.statusCancelled, AppColors.statusCancelled.withValues(alpha: 0.12)),
+      _ => (AppColors.textSecondary, AppColors.surfaceBg),
+    };
+  }
+}

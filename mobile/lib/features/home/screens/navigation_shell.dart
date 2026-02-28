@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../cart/screens/cart_screen.dart';
 import '../../categories/screens/categories_tab_screen.dart';
+import '../../orders/screens/order_history_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 import 'home_screen.dart';
 
@@ -19,7 +20,7 @@ class _NavigationShellState extends State<NavigationShell> {
     HomeScreen(),
     CategoriesTabScreen(),
     CartScreen(),
-    _PlaceholderTab(icon: Icons.receipt_long_outlined, label: 'Orders'),
+    OrderHistoryScreen(),
     ProfileScreen(),
   ];
 

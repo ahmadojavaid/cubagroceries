@@ -125,22 +125,24 @@
 - ✅ On success: clear cart, show success snackbar, navigate to order detail
 - ✅ On error: show error snackbar
 
-### MP-M11: Order history screen
-- Build OrderHistoryScreen showing paginated list of orders
-- Each order card: order_id, status badge, total, date, items count
-- Tap navigates to order detail
-- Wire Orders tab in NavigationShell (replace placeholder)
+### MP-M11: Order history screen ✅
+- ✅ Build OrderHistoryScreen with paginated list + pull-to-refresh
+- ✅ Each order card: order_id, status badge, total, date, items count
+- ✅ Tap navigates to order detail
+- ✅ Wire Orders tab in NavigationShell (replaced placeholder)
+- ✅ Infinite scroll (loadMore on scroll near bottom)
 
-### MP-M12: Order detail screen
-- Build OrderDetailScreen showing full order info
-- Sections: status badge, order info, delivery address, line items, totals
-- Route: `/orders/:orderNumber`
+### MP-M12: Order detail screen ✅
+- ✅ Build OrderDetailScreen showing full order info
+- ✅ Sections: status badge, order info, delivery address, line items, totals
+- ✅ Route: `/orders/:orderNumber`
+- ✅ Error state with retry
 
-### MP-M13: Navigation wiring & routes
-- Add routes: `/checkout`, `/orders/:orderNumber`
-- Cart tab uses CartScreen
-- Orders tab uses OrderHistoryScreen
-- Checkout → order detail flow complete
+### MP-M13: Navigation wiring & routes ✅
+- ✅ Add routes: `/checkout`, `/orders/:orderNumber`
+- ✅ Cart tab uses CartScreen with checkout navigation
+- ✅ Orders tab uses OrderHistoryScreen
+- ✅ Checkout → order detail flow complete
 
 ---
 
@@ -149,5 +151,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 13 | 10 | 3 |
-| **Total** | **21** | **18** | **3** |
+| Mobile | 13 | 13 | 0 |
+| **Total** | **21** | **21** | **0** |

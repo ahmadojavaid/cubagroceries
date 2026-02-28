@@ -10,6 +10,8 @@ import '../../features/home/screens/navigation_shell.dart';
 import '../../features/products/screens/product_detail_screen.dart';
 import '../../features/products/screens/product_listing_screen.dart';
 import '../../features/products/screens/search_screen.dart';
+import '../../features/orders/screens/checkout_screen.dart';
+import '../../features/orders/screens/order_detail_screen.dart';
 import '../../features/profile/data/address_model.dart';
 import '../../features/profile/screens/address_form_screen.dart';
 import '../../features/profile/screens/address_list_screen.dart';
@@ -93,6 +95,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final address = state.extra as AddressModel?;
           return AddressFormScreen(address: address);
+        },
+      ),
+
+      // Checkout
+      GoRoute(
+        path: '/checkout',
+        builder: (context, state) => const CheckoutScreen(),
+      ),
+
+      // Order detail
+      GoRoute(
+        path: '/orders/:orderNumber',
+        builder: (context, state) {
+          final orderNumber = state.pathParameters['orderNumber']!;
+          return OrderDetailScreen(orderNumber: orderNumber);
         },
       ),
 
