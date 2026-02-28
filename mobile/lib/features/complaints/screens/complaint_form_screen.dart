@@ -136,7 +136,6 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen> {
                 controller: _subjectController,
                 decoration: const InputDecoration(
                   hintText: 'Brief description of the issue',
-                  prefixIcon: Icon(Icons.subject_rounded, size: 20),
                 ),
                 maxLength: 255,
                 textInputAction: TextInputAction.next,
