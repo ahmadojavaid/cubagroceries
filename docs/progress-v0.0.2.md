@@ -99,16 +99,22 @@
   - productDetailProvider: FutureProvider.family for single product
 - ✅ Wired to `GET /api/v1/products`, `/products/search`, `/products/{id}`
 
-### MP-M3: Home Screen — Category Grid
-- Build Home screen replacing placeholder tab
-- Display category grid (2 columns) with images and titles
-- Tap category → navigate to category products screen
-- Wire to category provider
+### MP-M3: Home Screen — Category Grid ✅
+- ✅ Build HomeScreen replacing placeholder Home tab in NavigationShell
+- ✅ Category grid (2 columns) with CachedNetworkImage and fallback icons
+- ✅ Tap category → sub-categories if hasChildren, else products
+- ✅ Wired to categoriesProvider with pull-to-refresh
+- ✅ Error state with retry, empty state, loading state
+- ✅ Search icon in app bar → /search route
+- ✅ CategoryCard reusable widget created
 
-### MP-M4: Category Listing Screen
-- Build category listing screen showing sub-categories
-- Tap sub-category → navigate to product listing filtered by sub-category
-- Handle categories with no sub-categories (go directly to products)
+### MP-M4: Category Listing Screen ✅
+- ✅ Build CategoryListingScreen showing sub-categories grid
+- ✅ Tap sub-category → product listing with sub_category_id via extra
+- ✅ "View all products" button for parent category
+- ✅ Empty state when no sub-categories
+- ✅ Routes added: /categories/:id, /categories/:id/products, /search
+- ✅ Placeholder screens for products and search until MP-M5/M7
 
 ### MP-M5: Product Listing Screen (Paginated)
 - Build product listing screen with card grid/list
@@ -148,5 +154,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 9 | 2 | 7 |
-| **Total** | **17** | **10** | **7** |
+| Mobile | 9 | 4 | 5 |
+| **Total** | **17** | **12** | **5** |

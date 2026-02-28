@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import 'home_screen.dart';
 
 class NavigationShell extends StatefulWidget {
   const NavigationShell({super.key});
@@ -12,7 +13,7 @@ class _NavigationShellState extends State<NavigationShell> {
   int _currentIndex = 0;
 
   final _screens = const [
-    _PlaceholderTab(icon: Icons.home, label: 'Home'),
+    HomeScreen(),
     _PlaceholderTab(icon: Icons.grid_view, label: 'Categories'),
     _PlaceholderTab(icon: Icons.shopping_cart, label: 'Cart'),
     _PlaceholderTab(icon: Icons.receipt_long, label: 'Orders'),
@@ -29,6 +30,9 @@ class _NavigationShellState extends State<NavigationShell> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textHint,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'Categories'),
