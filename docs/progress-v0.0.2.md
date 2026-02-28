@@ -52,29 +52,31 @@
 - ✅ Table shows prices_count and price range summary
 - **Verify**: Add product with 2+ price-unit combos, verify saved in `price` table
 
-### MP-B6: API — Categories Endpoints
-- Create `app/Http/Controllers/Api/V1/CategoriesController.php`
-- `GET /api/v1/categories` — top-level categories with nested children, with images
-- `GET /api/v1/categories/{id}` — single category with sub-categories
-- `GET /api/v1/categories/{id}/products` — paginated products in category
-- Register routes in `api.php` (protected by Sanctum)
-- Use ApiResponse trait
+### MP-B6: API — Categories Endpoints ✅
+- ✅ Create `app/Http/Controllers/Api/V1/CategoriesController.php`
+- ✅ `GET /api/v1/categories` — top-level with nested children, image URLs via `asset()`
+- ✅ `GET /api/v1/categories/{id}` — single category with sub-categories
+- ✅ `GET /api/v1/categories/{id}/products` — paginated, includes sub-category products
+- ✅ Routes registered in `api.php` (protected by Sanctum)
+- ✅ Uses ApiResponse trait
 - **Verify**: Test all 3 endpoints return correct JSON
 
-### MP-B7: API — Products Endpoints
-- Create `app/Http/Controllers/Api/V1/ProductsController.php`
-- `GET /api/v1/products` — paginated, filterable by category_id/sub_category_id
-- `GET /api/v1/products/{id}` — detail with prices and units eager loaded
-- `GET /api/v1/products/search?q=` — search by name
-- Register routes in `api.php`
-- Use ApiResponse trait
+### MP-B7: API — Products Endpoints ✅
+- ✅ Create `app/Http/Controllers/Api/V1/ProductsController.php`
+- ✅ `GET /api/v1/products` — paginated, filterable by category_id/sub_category_id
+- ✅ `GET /api/v1/products/{id}` — detail with prices and units eager loaded
+- ✅ `GET /api/v1/products/search?q=` — search by name (PostgreSQL `ilike`)
+- ✅ Routes registered in `api.php` (search before show to avoid route conflict)
+- ✅ Uses ApiResponse trait
 - **Verify**: Test all 3 endpoints, confirm no N+1
 
-### MP-B8: Seed Sample Catalog Data
-- Create `CatalogSeeder` with 3-4 top-level categories, 2-3 sub-categories each
-- Add 10-15 sample products across categories with 1-2 prices each
-- Register in `DatabaseSeeder`
-- **Terminal**: `php artisan db:seed --class=CatalogSeeder`
+### MP-B8: Seed Sample Catalog Data ✅
+- ✅ Create `CatalogSeeder` with 4 top-level categories, 2 sub-categories each
+- ✅ 15 sample products across categories with 1-2 prices each
+- ✅ 5 units: kg, piece, dozen, litre, pack
+- ✅ Registered in `DatabaseSeeder`
+- ✅ Uses `firstOrCreate` for safe re-runs
+- ⚠️ Run: `php artisan db:seed --class=CatalogSeeder`
 
 ---
 
@@ -139,6 +141,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 8 | 5 | 3 |
+| Backend | 8 | 8 | 0 |
 | Mobile | 9 | 0 | 9 |
-| **Total** | **17** | **5** | **12** |
+| **Total** | **17** | **8** | **9** |

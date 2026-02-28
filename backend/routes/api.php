@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CategoriesController;
+use App\Http\Controllers\Api\V1\ProductsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -17,9 +19,17 @@ Route::prefix('v1')->group(function () {
         Route::get('/user', [AuthController::class, 'user']);
     });
 
-    // Future protected API routes will go here
-    // Route::middleware('auth:sanctum')->group(function () {
-    //     Route::apiResource('categories', CategoriesController::class);
-    //     ...
-    // });
+    // Protected API routes
+    Route::middleware('auth:sanctum')->group(function () {
+
+        // Categories
+        Route::get('/categories', [CategoriesController::class, 'index']);
+        Route::get('/categories/{id}', [CategoriesController::class, 'show']);
+        Route::get('/categories/{id}/products', [CategoriesController::class, 'products']);
+
+        // Products
+        Route::get('/products', [ProductsController::class, 'index']);
+        Route::get('/products/search', [ProductsController::class, 'search']);
+        Route::get('/products/{id}', [ProductsController::class, 'show']);
+    });
 });
