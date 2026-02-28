@@ -504,13 +504,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               _menuDivider(),
               _menuItem(
-                icon: Icons.notifications_outlined,
-                title: 'Notifications',
-                subtitle: 'Order updates & alerts',
-                onTap: () => context.push('/notifications'),
-              ),
-              _menuDivider(),
-              _menuItem(
                 icon: Icons.settings_outlined,
                 title: 'Settings',
                 subtitle: 'Password, FAQs & more',
