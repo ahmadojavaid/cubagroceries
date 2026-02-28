@@ -94,37 +94,36 @@
 - ✅ Create `ShippingChargeModel` (id, title, amount, displayAmount, amountValue)
 - ✅ Create `ShippingNotifier` — fetches `GET /api/v1/shipping-charges`
 
-### MP-M6: Order data models
-- Create `OrderModel` (id, orderId, status, totalAmount, itemsCount, createdAt)
-- Create `OrderDetailModel` (full detail with address + line items)
-- Create `OrderItemModel` (productName, unitName, quantity, price)
-- Create `OrderAddressModel` (address, city, phone)
+### MP-M6: Order data models ✅
+- ✅ Create `OrderModel` (id, orderId, status, totalAmount, productsCount, createdAt)
+- ✅ Create `OrderDetailModel` (full detail with address + line items)
+- ✅ Create `OrderItemModel` (productName, unitName, quantity, price)
+- ✅ Create `OrderAddressModel` (address, city, phone)
 
-### MP-M7: Order provider
-- Create `OrderProvider` (Riverpod StateNotifier)
-- Methods: placeOrder, fetchOrders (paginated), fetchOrderDetail
-- placeOrder calls `POST /api/v1/orders`, returns success/error
-- fetchOrders calls `GET /api/v1/orders` with pagination
+### MP-M7: Order provider ✅
+- ✅ Create `OrderListNotifier` — fetchOrders (paginated), loadMore
+- ✅ Create `OrderActionNotifier` — placeOrder, fetchOrderDetail
+- ✅ placeOrder calls `POST /api/v1/orders`, returns OrderDetailModel
+- ✅ fetchOrders calls `GET /api/v1/orders` with pagination + loadMore
 
-### MP-M8: Checkout flow — Address selection step
-- Build CheckoutScreen with stepper/multi-step UI
-- Step 1: Select delivery address from saved addresses
-- Show address cards, default pre-selected
-- "Add New Address" link
-- "Next" button to proceed
+### MP-M8: Checkout flow — Address selection step ✅
+- ✅ Build CheckoutScreen with Stepper/multi-step UI
+- ✅ Step 1: Select delivery address from saved addresses
+- ✅ Show address radio cards, default pre-selected
+- ✅ "Add New Address" link
+- ✅ "Next" button with validation
 
-### MP-M9: Checkout flow — Shipping selection step
-- Step 2: Select shipping option
-- Show shipping charges as radio cards (title + amount)
-- Pre-select first option
-- "Next" button
+### MP-M9: Checkout flow — Shipping selection step ✅
+- ✅ Step 2: Select shipping option
+- ✅ Show shipping charges as radio cards (title + amount)
+- ✅ Pre-select first option
+- ✅ "Next" button
 
-### MP-M10: Checkout flow — Review & Confirm step
-- Step 3: Order review
-- Show: selected address, shipping, cart items summary, subtotal, shipping, grand total
-- "Place Order" button with loading state
-- On success: clear cart, show success, navigate to order detail
-- On error: show error snackbar
+### MP-M10: Checkout flow — Review & Confirm step ✅
+- ✅ Step 3: Order review with address, items, subtotal, shipping, grand total
+- ✅ "Place Order" button with loading state
+- ✅ On success: clear cart, show success snackbar, navigate to order detail
+- ✅ On error: show error snackbar
 
 ### MP-M11: Order history screen
 - Build OrderHistoryScreen showing paginated list of orders
@@ -150,5 +149,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 13 | 5 | 8 |
-| **Total** | **21** | **13** | **8** |
+| Mobile | 13 | 10 | 3 |
+| **Total** | **21** | **18** | **3** |
