@@ -54,10 +54,10 @@
 
 ## Mobile Micro-Phases
 
-### MP-M1: Profile Data Layer
-- Create `UserModel` (id, identity, email, firstname, lastname, date_of_birth, wallet_amount)
-- Create `ProfileProvider` (Riverpod) — fetchProfile, updateProfile
-- Wire to `GET /api/v1/profile` and `PUT /api/v1/profile`
+### MP-M1: Profile Data Layer ✅
+- ✅ `UserModel` with fromJson, toJson, copyWith, fullName getter
+- ✅ `ProfileProvider` (StateNotifier) — fetchProfile, updateProfile, clearError
+- ✅ Wired to `GET /profile` and `PUT /profile` via ApiClient
 
 ### MP-M2: Address Data Layer
 - Create `AddressModel` (id, label, address, city, phone, latitude, longitude, is_default)
@@ -108,5 +108,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 6 | 6 | 0 |
-| Mobile | 8 | 0 | 8 |
-| **Total** | **14** | **6** | **8** |
+| Mobile | 8 | 1 | 7 |
+| **Total** | **14** | **7** | **7** |
