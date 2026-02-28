@@ -9,11 +9,11 @@
 
 ## Backend Micro-Phases
 
-### MP-B1: Filament DeliveryBoyResource (CRUD)
-- Create DeliveryBoyResource with full CRUD
-- Table columns: id, name, phone, payment (PKR), created_at
-- Form: name (required), phone (required), payment (numeric, default 0)
-- Navigation group: Operations, icon: truck (or user-group)
+### MP-B1: Filament DeliveryBoyResource (CRUD) ✅
+- ✅ Create DeliveryBoyResource with full CRUD
+- ✅ Table columns: id, name, phone, payment (PKR), created_at
+- ✅ Form: name (required), phone (required), payment (numeric, default 0)
+- ✅ Navigation group: Operations, icon: user-group
 
 ### MP-B2: Add delivery_boy_id to orderdetails
 - Create migration to add `delivery_boy_id` (nullable FK → deliveryboy.id) to `orderdetails`
@@ -113,6 +113,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 8 | 0 | 8 |
+| Backend | 8 | 1 | 7 |
 | Mobile | 7 | 0 | 7 |
-| **Total** | **15** | **0** | **15** |
+| **Total** | **15** | **1** | **14** |
