@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\ProductsController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\WalletController;
+use App\Http\Controllers\Api\V1\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -24,6 +25,10 @@ Route::prefix('v1')->group(function () {
 
     // Protected API routes
     Route::middleware('auth:sanctum')->group(function () {
+
+        // Home & Banners
+        Route::get('/home', [HomeController::class, 'home']);
+        Route::get('/banners', [HomeController::class, 'banners']);
 
         // Categories
         Route::get('/categories', [CategoriesController::class, 'index']);

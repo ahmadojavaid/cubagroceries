@@ -45,6 +45,10 @@ class CategoryResource extends Resource
                             ->placeholder('None (top-level category)')
                             ->helperText('Leave empty to create a top-level category'),
 
+                        Forms\Components\Toggle::make('is_featured')
+                            ->label('Featured on Home')
+                            ->helperText('Show this category with products on the home screen'),
+
                         Forms\Components\FileUpload::make('image')
                             ->image()
                             ->disk('public')
@@ -85,6 +89,11 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('products_count')
                     ->label('Products')
                     ->counts('products')
+                    ->sortable(),
+
+                Tables\Columns\IconColumn::make('is_featured')
+                    ->label('Featured')
+                    ->boolean()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('children_count')

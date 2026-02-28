@@ -20,24 +20,27 @@
 - ✅ Default sort by sort_order asc, ternary active filter
 - ✅ Navigation group: Content, icon: heroicon-o-photo
 
-### MP-B3: Add `is_featured` to categories
-- Create migration adding `is_featured` boolean to `category` table (default false)
-- Update Category model fillable + cast
-- Add `is_featured` toggle to CategoryResource form and table
+### MP-B3: Add `is_featured` to categories ✅
+- ✅ Migration: adds `is_featured` boolean to `category` table (default false)
+- ✅ Category model: fillable + cast + `featured()` scope
+- ✅ CategoryResource: toggle in form + icon column in table
+- ⚠️ Run: `php artisan migrate`
 
-### MP-B4: API — Banners endpoint + Home data endpoint
-- `GET /api/v1/banners` — active banners ordered by sort_order
-- `GET /api/v1/home` — combined endpoint: banners + featured categories with their products (limit 6 per category)
-- Register routes
+### MP-B4: API — Banners endpoint + Home data endpoint ✅
+- ✅ `HomeController` with `banners()` and `home()` methods
+- ✅ `GET /api/v1/banners` — active banners ordered by sort_order
+- ✅ `GET /api/v1/home` — banners + featured categories with products (limit 6, in-stock only)
+- ✅ Routes registered under Sanctum middleware
 
 ---
 
 ## Mobile Micro-Phases
 
-### MP-M1: Banner & Home data layer
-- Create `BannerModel` (id, title, image)
-- Create `HomeProvider` (Riverpod) — fetches `/api/v1/home` data (banners + featured sections)
-- State holds banners list and featured category sections
+### MP-M1: Banner & Home data layer ✅
+- ✅ `BannerModel` (id, title, image)
+- ✅ `FeaturedSection` model (category + products list)
+- ✅ `HomeProvider` (StateNotifier) — fetches `/home`, caches data, force refresh
+- ✅ State holds banners + featured sections
 
 ### MP-M2: Banner slider widget
 - Build `BannerSlider` widget with PageView + auto-scroll + dot indicators
@@ -66,6 +69,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 4 | 2 | 2 |
-| Mobile | 5 | 0 | 5 |
-| **Total** | **9** | **2** | **7** |
+| Backend | 4 | 4 | 0 |
+| Mobile | 5 | 1 | 4 |
+| **Total** | **9** | **5** | **4** |

@@ -12,7 +12,15 @@ class Category extends Model
         'title',
         'image',
         'parent_id',
+        'is_featured',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_featured' => 'boolean',
+        ];
+    }
 
     // Relationships
 
@@ -36,5 +44,10 @@ class Category extends Model
     public function scopeTopLevel($query)
     {
         return $query->whereNull('parent_id');
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
     }
 }
