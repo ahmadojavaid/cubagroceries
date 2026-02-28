@@ -63,9 +63,10 @@ class Coupon extends Model
 
     public function getDisplayValueAttribute(): string
     {
-        if ($this->type === 'percentage') {
-            return $this->value . '%';
-        }
-        return 'Rs ' . number_format($this->value, 0);
+        return match ($this->type) {
+            'percentage' => $this->value . '%',
+            'free_delivery' => 'Free Delivery',
+            default => 'Rs ' . number_format($this->value, 0),
+        };
     }
 }

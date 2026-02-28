@@ -59,6 +59,7 @@ class OrderController extends Controller
             'items.*.product_id' => 'required|integer|exists:product,id',
             'items.*.unit_id' => 'required|integer|exists:unit,id',
             'items.*.quantity' => 'required|integer|min:1',
+            'coupon_code' => 'nullable|string',
             'use_wallet' => 'nullable|boolean',
         ]);
 
@@ -115,13 +116,58 @@ class OrderController extends Controller
         $shippingAmount = 0;
         if (!empty($validated['shipping_charge_id'])) {
             $shipping = \App\Models\ShippingCharge::find($validated['shipping_charge_id']);
-            $shippingAmount = $shipping ? $shipping->amount : 0;
+            if ($shipping) {
+                if ($shipping->min_order_amount && $subtotal < $shipping->min_order_amount) {
+                    return $this->error(
+                        "'{$shipping->title}' requires a minimum order of Rs " . number_format($shipping->min_order_amount, 0) . '.',
+                        422
+                    );
+                }
+                $shippingAmount = $shipping->amount;
+            }
         }
 
-        $totalAmount = $subtotal + $shippingAmount;
+        // Validate and calculate coupon discount
+        $couponDiscount = 0;
+        $couponCode = null;
+        if (!empty($validated['coupon_code'])) {
+            $coupon = \App\Models\Coupon::where('code', strtoupper($validated['coupon_code']))
+                ->first();
+
+            if ($coupon && $coupon->is_active && !$coupon->isExpired() && !$coupon->isUsedUp()) {
+                if (!$coupon->min_order_amount || $subtotal >= $coupon->min_order_amount) {
+                    $couponCode = $coupon->code;
+
+                    switch ($coupon->type) {
+                        case 'percentage':
+                            $couponDiscount = $subtotal * $coupon->value / 100;
+                            if ($coupon->max_discount) {
+                                $couponDiscount = min($couponDiscount, $coupon->max_discount);
+                            }
+                            $couponDiscount = min($couponDiscount, $subtotal);
+                            break;
+
+                        case 'fixed':
+                            $couponDiscount = min($coupon->value, $subtotal);
+                            break;
+
+                        case 'free_delivery':
+                            $couponDiscount = $shippingAmount;
+                            break;
+                    }
+
+                    $couponDiscount = round($couponDiscount, 2);
+
+                    // Increment usage
+                    $coupon->increment('used_count');
+                }
+            }
+        }
+
+        $totalAmount = $subtotal + $shippingAmount - $couponDiscount;
 
         // Create order in a transaction
-        $order = DB::transaction(function () use ($user, $address, $lineItems, $totalAmount) {
+        $order = DB::transaction(function () use ($user, $address, $lineItems, $totalAmount, $couponCode, $couponDiscount) {
             // Create order
             $order = Order::create([
                 'order_id' => OrderIdGenerator::generate(),

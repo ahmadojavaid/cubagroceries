@@ -190,6 +190,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   Widget _buildShippingStep() {
     final state = ref.watch(shippingProvider);
+    final cart = ref.watch(cartProvider);
+    final subtotal = cart.subtotal;
 
     if (state.isLoading && state.charges.isEmpty) {
       return const Padding(
@@ -206,19 +208,40 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       );
     }
 
-    // Pre-select first option
+    // Pre-select first eligible option
     if (_selectedShippingId == null && state.charges.isNotEmpty) {
-      _selectedShippingId = state.charges.first.id;
+      final firstEligible = state.charges
+          .where((c) => c.isAvailableFor(subtotal))
+          .firstOrNull;
+      _selectedShippingId = firstEligible?.id ?? state.charges.first.id;
+    }
+
+    // If selected option became ineligible, switch to first eligible
+    final selectedCharge = state.charges
+        .where((c) => c.id == _selectedShippingId)
+        .firstOrNull;
+    if (selectedCharge != null && !selectedCharge.isAvailableFor(subtotal)) {
+      final firstEligible = state.charges
+          .where((c) => c.isAvailableFor(subtotal))
+          .firstOrNull;
+      if (firstEligible != null) {
+        _selectedShippingId = firstEligible.id;
+      }
     }
 
     return Column(
       children: state.charges
-          .map((charge) => _ShippingRadioCard(
-                charge: charge,
-                isSelected: _selectedShippingId == charge.id,
-                onTap: () =>
-                    setState(() => _selectedShippingId = charge.id),
-              ))
+          .map((charge) {
+            final eligible = charge.isAvailableFor(subtotal);
+            return _ShippingRadioCard(
+              charge: charge,
+              isSelected: _selectedShippingId == charge.id,
+              enabled: eligible,
+              onTap: eligible
+                  ? () => setState(() => _selectedShippingId = charge.id)
+                  : null,
+            );
+          })
           .toList(),
     );
   }
@@ -240,7 +263,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     final coupon = ref.watch(couponProvider);
     final shippingAmount = selectedShipping?.amountValue ?? 0.0;
-    final grandTotal = cart.subtotal + shippingAmount - coupon.discount;
+    // For free_delivery coupons, discount applies to shipping, not subtotal
+    final effectiveShipping = coupon.isFreeDelivery
+        ? 0.0
+        : shippingAmount;
+    final couponItemDiscount = coupon.isFreeDelivery
+        ? 0.0
+        : coupon.discount;
+    final grandTotal = cart.subtotal + effectiveShipping - couponItemDiscount;
 
     if (orderState.isLoading) {
       return const Padding(
@@ -296,14 +326,24 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         const Divider(height: AppDimens.lg, color: AppColors.divider),
 
         // Coupon
-        CouponInputWidget(orderTotal: cart.subtotal),
+        CouponInputWidget(
+          orderTotal: cart.subtotal,
+          shippingAmount: shippingAmount,
+        ),
         const SizedBox(height: AppDimens.md),
 
         // Totals
         _totalRow('Subtotal', 'Rs ${cart.subtotal.toStringAsFixed(2)}'),
         if (selectedShipping != null)
-          _totalRow(selectedShipping.title, selectedShipping.displayAmount),
-        if (coupon.discount > 0)
+          coupon.isFreeDelivery
+              ? _totalRow(
+                  selectedShipping.title,
+                  'FREE',
+                  color: AppColors.success,
+                  strikethrough: selectedShipping.displayAmount,
+                )
+              : _totalRow(selectedShipping.title, selectedShipping.displayAmount),
+        if (coupon.isApplied && !coupon.isFreeDelivery && coupon.discount > 0)
           _totalRow('Coupon (${coupon.code})', '- Rs ${coupon.discount.toStringAsFixed(0)}',
               color: AppColors.success),
         const SizedBox(height: AppDimens.xs),
@@ -313,7 +353,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
-  Widget _totalRow(String label, String value, {bool bold = false, Color? color}) {
+  Widget _totalRow(String label, String value,
+      {bool bold = false, Color? color, String? strikethrough}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -323,14 +364,28 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               style: TextStyle(
                 fontSize: bold ? 16 : 14,
                 fontWeight: bold ? FontWeight.w700 : FontWeight.normal,
-                color: bold ? AppColors.textPrimary : AppColors.textSecondary,
+                color: color ?? (bold ? AppColors.textPrimary : AppColors.textSecondary),
               )),
-          Text(value,
-              style: TextStyle(
-                fontSize: bold ? 16 : 14,
-                fontWeight: bold ? FontWeight.w700 : FontWeight.normal,
-                color: AppColors.textPrimary,
-              )),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (strikethrough != null) ...[
+                Text(strikethrough,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textHint,
+                      decoration: TextDecoration.lineThrough,
+                    )),
+                const SizedBox(width: 6),
+              ],
+              Text(value,
+                  style: TextStyle(
+                    fontSize: bold ? 16 : 14,
+                    fontWeight: bold ? FontWeight.w700 : FontWeight.normal,
+                    color: color ?? AppColors.textPrimary,
+                  )),
+            ],
+          ),
         ],
       ),
     );
@@ -372,15 +427,18 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             })
         .toList();
 
+    final coupon = ref.read(couponProvider);
     final order = await ref.read(orderActionProvider.notifier).placeOrder(
           addressId: _selectedAddressId!,
           items: items,
           shippingChargeId: _selectedShippingId,
+          couponCode: coupon.code,
         );
 
     if (order != null && mounted) {
-      // Clear cart on success
+      // Clear cart and coupon on success
       ref.read(cartProvider.notifier).clearCart();
+      ref.read(couponProvider.notifier).clear();
 
       // Show success and navigate to order detail
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -388,8 +446,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         backgroundColor: AppColors.success,
       ));
 
-      // Replace checkout with order detail
-      context.go('/orders/${order.orderId}');
+      // Go home first, then push order detail on top
+      context.go('/home');
+      context.push('/orders/${order.orderId}');
     } else if (mounted) {
       final error = ref.read(orderActionProvider).error;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -494,52 +553,76 @@ class _AddressRadioCard extends StatelessWidget {
 class _ShippingRadioCard extends StatelessWidget {
   final ShippingChargeModel charge;
   final bool isSelected;
-  final VoidCallback onTap;
+  final bool enabled;
+  final VoidCallback? onTap;
 
   const _ShippingRadioCard({
     required this.charge,
     required this.isSelected,
-    required this.onTap,
+    this.enabled = true,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final dimmed = !enabled;
+
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: AppDimens.sm),
-        padding: const EdgeInsets.all(AppDimens.md),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primarySurface.withValues(alpha: 0.5)
-              : AppColors.cardBg,
-          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
-            width: isSelected ? 1.5 : 0.5,
+      child: Opacity(
+        opacity: dimmed ? 0.45 : 1.0,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: AppDimens.sm),
+          padding: const EdgeInsets.all(AppDimens.md),
+          decoration: BoxDecoration(
+            color: isSelected && enabled
+                ? AppColors.primarySurface.withValues(alpha: 0.5)
+                : AppColors.cardBg,
+            borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+            border: Border.all(
+              color: isSelected && enabled ? AppColors.primary : AppColors.border,
+              width: isSelected && enabled ? 1.5 : 0.5,
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              isSelected
-                  ? Icons.radio_button_checked
-                  : Icons.radio_button_off,
-              color: isSelected ? AppColors.primary : AppColors.textHint,
-              size: 22,
-            ),
-            const SizedBox(width: AppDimens.sm),
-            Expanded(
-              child: Text(charge.title,
-                  style: const TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.w500)),
-            ),
-            Text(charge.displayAmount,
-                style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary)),
-          ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    isSelected && enabled
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off,
+                    color: isSelected && enabled ? AppColors.primary : AppColors.textHint,
+                    size: 22,
+                  ),
+                  const SizedBox(width: AppDimens.sm),
+                  Expanded(
+                    child: Text(charge.title,
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w500)),
+                  ),
+                  Text(charge.displayAmount,
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary)),
+                ],
+              ),
+              if (dimmed && charge.minOrderAmount != null) ...[
+                Padding(
+                  padding: const EdgeInsets.only(left: 34, top: 4),
+                  child: Text(
+                    'Min. order Rs ${charge.minOrderAmount!.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textHint,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

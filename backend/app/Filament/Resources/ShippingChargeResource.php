@@ -40,6 +40,14 @@ class ShippingChargeResource extends Resource
                             ->minValue(0)
                             ->step(0.01)
                             ->placeholder('0.00'),
+
+                        Forms\Components\TextInput::make('min_order_amount')
+                            ->label('Min Order Amount')
+                            ->numeric()
+                            ->prefix('PKR')
+                            ->minValue(0)
+                            ->placeholder('No minimum')
+                            ->helperText('Leave empty for no minimum order requirement'),
                     ])
                     ->columns(2),
             ]);
@@ -59,6 +67,12 @@ class ShippingChargeResource extends Resource
 
                 Tables\Columns\TextColumn::make('amount')
                     ->money('PKR')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('min_order_amount')
+                    ->label('Min Order')
+                    ->money('PKR')
+                    ->placeholder('—')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')

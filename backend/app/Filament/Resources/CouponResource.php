@@ -40,16 +40,19 @@ class CouponResource extends Resource
                             ->options([
                                 'fixed' => 'Fixed Amount (Rs)',
                                 'percentage' => 'Percentage (%)',
+                                'free_delivery' => 'Free Delivery',
                             ])
                             ->required()
                             ->default('fixed')
                             ->live(),
 
                         Forms\Components\TextInput::make('value')
-                            ->required()
                             ->numeric()
                             ->minValue(0)
-                            ->prefix(fn (Forms\Get $get) => $get('type') === 'percentage' ? '%' : 'Rs'),
+                            ->prefix(fn (Forms\Get $get) => $get('type') === 'percentage' ? '%' : 'Rs')
+                            ->required(fn (Forms\Get $get) => $get('type') !== 'free_delivery')
+                            ->visible(fn (Forms\Get $get) => $get('type') !== 'free_delivery')
+                            ->helperText(fn (Forms\Get $get) => $get('type') === 'free_delivery' ? 'Not needed for free delivery coupons' : null),
 
                         Forms\Components\TextInput::make('min_order_amount')
                             ->label('Minimum Order Amount')
@@ -102,14 +105,20 @@ class CouponResource extends Resource
 
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
-                    ->color(fn (string $state) => $state === 'percentage' ? 'info' : 'success'),
+                    ->color(fn (string $state) => match ($state) {
+                        'percentage' => 'info',
+                        'free_delivery' => 'warning',
+                        default => 'success',
+                    }),
 
                 Tables\Columns\TextColumn::make('value')
                     ->label('Discount')
                     ->formatStateUsing(function ($state, Coupon $record) {
-                        return $record->type === 'percentage'
-                            ? $state . '%'
-                            : 'Rs ' . number_format($state, 0);
+                        return match ($record->type) {
+                            'percentage' => $state . '%',
+                            'free_delivery' => 'Free Delivery',
+                            default => 'Rs ' . number_format($state, 0),
+                        };
                     }),
 
                 Tables\Columns\TextColumn::make('min_order_amount')

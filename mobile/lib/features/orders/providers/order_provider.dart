@@ -161,6 +161,7 @@ class OrderActionNotifier extends StateNotifier<PlaceOrderState> {
     required int addressId,
     required List<Map<String, dynamic>> items,
     int? shippingChargeId,
+    String? couponCode,
     bool useWallet = false,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
@@ -170,6 +171,7 @@ class OrderActionNotifier extends StateNotifier<PlaceOrderState> {
         'address_id': addressId,
         'items': items,
         if (shippingChargeId != null) 'shipping_charge_id': shippingChargeId,
+        if (couponCode != null) 'coupon_code': couponCode,
         'use_wallet': useWallet,
       });
       final data = response.data;

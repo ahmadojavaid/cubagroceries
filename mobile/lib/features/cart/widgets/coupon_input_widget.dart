@@ -7,25 +7,26 @@ import '../../../core/theme/app_dimens.dart';
 /// Holds applied coupon state
 class CouponState {
   final String? code;
+  final String? type; // fixed, percentage, free_delivery
   final double discount;
   final String? description;
 
-  const CouponState({this.code, this.discount = 0, this.description});
+  const CouponState({this.code, this.type, this.discount = 0, this.description});
 
-  CouponState copyWith({String? code, double? discount, String? description}) {
-    return CouponState(
-      code: code ?? this.code,
-      discount: discount ?? this.discount,
-      description: description ?? this.description,
-    );
-  }
+  bool get isFreeDelivery => type == 'free_delivery';
+  bool get isApplied => code != null;
 }
 
 class CouponNotifier extends StateNotifier<CouponState> {
   CouponNotifier() : super(const CouponState());
 
-  void apply(String code, double discount, String? description) {
-    state = CouponState(code: code, discount: discount, description: description);
+  void apply(String code, String type, double discount, String? description) {
+    state = CouponState(
+      code: code,
+      type: type,
+      discount: discount,
+      description: description,
+    );
   }
 
   void clear() {
@@ -41,8 +42,13 @@ final couponProvider =
 /// Coupon input widget for checkout
 class CouponInputWidget extends ConsumerStatefulWidget {
   final double orderTotal;
+  final double shippingAmount;
 
-  const CouponInputWidget({super.key, required this.orderTotal});
+  const CouponInputWidget({
+    super.key,
+    required this.orderTotal,
+    this.shippingAmount = 0,
+  });
 
   @override
   ConsumerState<CouponInputWidget> createState() => _CouponInputWidgetState();
@@ -73,6 +79,7 @@ class _CouponInputWidgetState extends ConsumerState<CouponInputWidget> {
       final response = await api.post('/coupons/apply', data: {
         'code': code,
         'order_total': widget.orderTotal,
+        'shipping_amount': widget.shippingAmount,
       });
 
       if (!mounted) return;
@@ -82,6 +89,7 @@ class _CouponInputWidgetState extends ConsumerState<CouponInputWidget> {
         final couponData = data['data'];
         ref.read(couponProvider.notifier).apply(
               couponData['code'],
+              couponData['type'] ?? 'fixed',
               (couponData['discount'] as num).toDouble(),
               couponData['description'],
             );
@@ -131,7 +139,9 @@ class _CouponInputWidgetState extends ConsumerState<CouponInputWidget> {
                     ),
                   ),
                   Text(
-                    'You save Rs ${coupon.discount.toStringAsFixed(0)}',
+                    coupon.isFreeDelivery
+                        ? 'Free delivery on this order!'
+                        : 'You save Rs ${coupon.discount.toStringAsFixed(0)}',
                     style: TextStyle(
                       fontSize: 12,
                       color: AppColors.success.withOpacity(0.8),
