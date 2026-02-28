@@ -27,6 +27,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->authGuard('portal')
             ->brandName('Cuba Groceries')
             ->colors([
                 'primary' => Color::Green,

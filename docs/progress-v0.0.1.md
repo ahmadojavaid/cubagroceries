@@ -77,11 +77,10 @@
 - ✅ Register seeders in `DatabaseSeeder`
 - **Terminal**: `php artisan migrate:fresh --seed` ← **RUN NOW**
 
-### MP-B8: Filament Auth (Portal Users)
-- Configure Filament to authenticate against `portal_users` table
-- Create custom `PortalUser` auth guard in `auth.php`
-- Configure FilamentPanelProvider to use portal guard
-- **Verify**: Admin can log in at `https://cubagroceries.test/admin/login`
+### MP-B8: Filament Auth (Portal Users) ✅
+- ✅ Add `portal` guard + `portal_users` provider in `config/auth.php`
+- ✅ Configure FilamentPanelProvider with `->authGuard('portal')`
+- **Verify**: Log in at `https://cubagroceries.test/admin/login` with `admin@cubagroceries.test` / `password`
 
 ### MP-B9: Sanctum API Auth
 - Verify Sanctum is installed (scaffolder should have done this)
@@ -173,6 +172,6 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
-| Backend | 10 | 5 | 5 |
+| Backend | 10 | 8 | 2 |
 | Mobile | 12 | 0 | 12 |
-| **Total** | **28** | **5** | **23** |
+| **Total** | **28** | **8** | **20** |
