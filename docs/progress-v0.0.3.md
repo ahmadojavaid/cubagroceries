@@ -93,18 +93,18 @@
 - ✅ ProfileScreen refactored to use extracted widget
 - ✅ Reusable across checkout and other screens
 
-### MP-M7: Settings Screen (password change + logout)
-- Build SettingsScreen with change password form (current, new, confirm)
-- Logout button with confirmation dialog
-- Wire password change to `PUT /api/v1/profile/password`
-- Wire logout to existing auth provider
-- Route: `/settings`
+### MP-M7: Settings Screen (password change + logout) ✅
+- ✅ SettingsScreen with change password form (current, new, confirm)
+- ✅ Password visibility toggles, client-side validation (min 8, match)
+- ✅ Wired to `PUT /profile/password` via ApiClient with error handling
+- ✅ Logout button with confirmation dialog, wired to AuthProvider
+- ✅ Redirects to `/login` after logout
 
-### MP-M8: Navigation Wiring & Profile Tab
-- Add routes: `/profile`, `/addresses`, `/addresses/add`, `/addresses/:id/edit`, `/settings`
-- Profile tab in NavigationShell uses ProfileScreen
-- Profile screen links to: addresses, settings
-- Back navigation works correctly
+### MP-M8: Navigation Wiring & Profile Tab ✅
+- ✅ Routes registered: `/addresses`, `/addresses/add`, `/addresses/:id/edit`, `/settings`
+- ✅ Profile tab in NavigationShell uses ProfileScreen (done in MP-M3)
+- ✅ Profile screen links to addresses and settings
+- ✅ Address form pops with result, settings logout navigates to login
 
 ---
 
@@ -113,5 +113,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 6 | 6 | 0 |
-| Mobile | 8 | 6 | 2 |
-| **Total** | **14** | **12** | **2** |
+| Mobile | 8 | 8 | 0 |
+| **Total** | **14** | **14** | **0** |
