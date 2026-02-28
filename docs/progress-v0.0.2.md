@@ -17,17 +17,21 @@
 - ✅ Navigation group: Catalog, icon: scale
 - **Verify**: Units manageable at `/admin/units`
 
-### MP-B2: Filament CategoryResource (CRUD — Basic)
-- Create `app/Filament/Resources/CategoryResource.php`
-- Form: title (required), parent_id (select, nullable — top-level categories only), image (file upload)
-- Table: id, title, parent category name, image thumbnail, product count, created_at
-- Use `withCount('products')` to avoid N+1
+### MP-B2: Filament CategoryResource (CRUD — Basic) ✅
+- ✅ Create `app/Filament/Resources/CategoryResource.php`
+- ✅ Form: title (required), parent_id (select filtered to top-level, excludes self), image (file upload)
+- ✅ Table: id, image (circular), title, parent name, products count, children count, created_at
+- ✅ Uses `counts('products')` and `counts('children')` to avoid N+1
+- ✅ Filter: top-level vs sub-categories
+- ✅ Pages: ListCategories, CreateCategory, EditCategory
+- ✅ Navigation group: Catalog, sorted second
 - **Verify**: Categories manageable at `/admin/categories`
 
-### MP-B3: Filament CategoryResource — Image Upload Config
-- Configure storage disk for category images (`public` disk, `categories/` directory)
-- Run `php artisan storage:link` if not done
-- Ensure image displays in table and form
+### MP-B3: Filament CategoryResource — Image Upload Config ✅
+- ✅ Image upload configured: `public` disk, `categories/` directory
+- ✅ Image resize: 400x400, 1:1 crop, max 2MB
+- ✅ Table shows circular image thumbnail with fallback avatar
+- ⚠️ Run `php artisan storage:link` if not already done
 - **Verify**: Upload image, see it in table thumbnail
 
 ### MP-B4: Filament ProductResource (CRUD — Basic)
@@ -131,6 +135,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 8 | 1 | 7 |
+| Backend | 8 | 3 | 5 |
 | Mobile | 9 | 0 | 9 |
-| **Total** | **17** | **1** | **16** |
+| **Total** | **17** | **3** | **14** |
