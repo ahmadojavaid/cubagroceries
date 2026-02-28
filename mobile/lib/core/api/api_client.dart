@@ -1,12 +1,14 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'api_exception.dart';
 
 /// Dio API client with token interceptor and error handling
 class ApiClient {
-  // Use artisan serve for emulator: php artisan serve --host=0.0.0.0 --port=8000
+  // Herd serves at cubagroceries.test with self-signed SSL
   // 10.0.2.2 maps to host machine from Android emulator
-  static const String baseUrl = 'http://10.0.2.2:8000/api/v1';
+  static const String baseUrl = 'https://10.0.2.2/api/v1';
   static const String tokenKey = 'auth_token';
 
   final Dio _dio;
@@ -21,8 +23,16 @@ class ApiClient {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Host': 'cubagroceries.test',
           },
         )) {
+    // Accept self-signed certificates (Herd .test domains)
+    (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      final client = HttpClient()
+        ..badCertificateCallback = (cert, host, port) => true;
+      return client;
+    };
+
     _dio.interceptors.addAll([
       _authInterceptor(),
       _errorInterceptor(),
