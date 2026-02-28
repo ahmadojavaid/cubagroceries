@@ -27,18 +27,24 @@ class FeaturedCategory {
   final int id;
   final String title;
   final String? image;
+  final int? parentId;
 
   const FeaturedCategory({
     required this.id,
     required this.title,
     this.image,
+    this.parentId,
   });
+
+  /// Whether this is a sub-category (has a parent).
+  bool get isSubCategory => parentId != null;
 
   factory FeaturedCategory.fromJson(Map<String, dynamic> json) {
     return FeaturedCategory(
       id: json['id'] as int,
       title: json['title'] ?? '',
       image: ImageUrlHelper.rewrite(json['image'] as String?),
+      parentId: json['parent_id'] as int?,
     );
   }
 }

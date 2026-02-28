@@ -97,6 +97,80 @@ class ProductsController extends Controller
     }
 
     /**
+     * Get user's recent search history (unique queries, latest first).
+     * GET /api/v1/search-history
+     */
+    public function searchHistory(Request $request): JsonResponse
+    {
+        $history = SearchHistory::where('user_id', $request->user()->id)
+            ->select('id', 'query', 'results_count', 'created_at')
+            ->latest()
+            ->take(15)
+            ->get()
+            ->unique('query')
+            ->take(10)
+            ->values();
+
+        return $this->success($history);
+    }
+
+    /**
+     * Clear all search history.
+     * DELETE /api/v1/search-history
+     */
+    public function clearSearchHistory(Request $request): JsonResponse
+    {
+        SearchHistory::where('user_id', $request->user()->id)->delete();
+
+        return $this->success(null, 'Search history cleared.');
+    }
+
+    /**
+     * Delete a single search history item.
+     * DELETE /api/v1/search-history/{id}
+     */
+    public function deleteSearchHistoryItem(Request $request, int $id): JsonResponse
+    {
+        SearchHistory::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->delete();
+
+        return $this->success(null, 'Search entry removed.');
+    }
+
+    /**
+     * Get related products (same category, excluding current product).
+     * GET /api/v1/products/{id}/related
+     */
+    public function related(int $id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+
+        $related = Product::where('id', '!=', $product->id)
+            ->where(function ($q) use ($product) {
+                $q->where('category_id', $product->category_id);
+                if ($product->sub_category_id) {
+                    $q->orWhere('sub_category_id', $product->sub_category_id);
+                }
+            })
+            ->where('stock', '>', 0)
+            ->with([
+                'category:id,title',
+                'subCategory:id,title',
+                'prices.unit:id,name,abbreviation',
+            ])
+            ->inRandomOrder()
+            ->limit(8)
+            ->get();
+
+        $formatted = $related->map(function ($p) {
+            return $this->formatProduct($p);
+        })->values();
+
+        return $this->success($formatted);
+    }
+
+    /**
      * Format a product for API response.
      */
     private function formatProduct(Product $product): array

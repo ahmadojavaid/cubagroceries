@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_dimens.dart';
 import '../../../core/widgets/offline_banner.dart';
 import '../../cart/screens/cart_screen.dart';
 import '../../cart/providers/cart_provider.dart';
@@ -28,6 +28,12 @@ class _NavigationShellState extends ConsumerState<NavigationShell> {
         ProfileScreen(),
       ];
 
+  void _onTap(int index) {
+    if (index == _currentIndex) return;
+    HapticFeedback.lightImpact();
+    setState(() => _currentIndex = index);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cartItemCount = ref.watch(cartProvider).items.length;
@@ -44,151 +50,153 @@ class _NavigationShellState extends ConsumerState<NavigationShell> {
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppColors.cardBg,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadowMedium,
-              blurRadius: 12,
-              offset: const Offset(0, -2),
-            ),
-          ],
+      bottomNavigationBar: _ModernNavBar(
+        currentIndex: _currentIndex,
+        cartCount: cartItemCount,
+        onTap: _onTap,
+      ),
+    );
+  }
+}
+
+// ─── Modern Nav Bar ─────────────────────────────────────────
+
+class _ModernNavBar extends StatelessWidget {
+  final int currentIndex;
+  final int cartCount;
+  final ValueChanged<int> onTap;
+
+  const _ModernNavBar({
+    required this.currentIndex,
+    required this.cartCount,
+    required this.onTap,
+  });
+
+  static const _items = [
+    _NavItemData(Icons.home_outlined, Icons.home_rounded, 'Home'),
+    _NavItemData(Icons.grid_view_outlined, Icons.grid_view_rounded, 'Categories'),
+    _NavItemData(Icons.shopping_bag_outlined, Icons.shopping_bag_rounded, 'Cart'),
+    _NavItemData(Icons.receipt_long_outlined, Icons.receipt_long_rounded, 'Orders'),
+    _NavItemData(Icons.person_outline_rounded, Icons.person_rounded, 'Profile'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    return Container(
+      padding: EdgeInsets.only(bottom: bottomPadding > 0 ? bottomPadding : 8),
+      decoration: const BoxDecoration(
+        color: AppColors.cardBg,
+        border: Border(
+          top: BorderSide(color: AppColors.border, width: 0.5),
         ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _NavItem(
-                  icon: Icons.home_outlined,
-                  activeIcon: Icons.home_rounded,
-                  label: 'Home',
-                  isSelected: _currentIndex == 0,
-                  onTap: () => setState(() => _currentIndex = 0),
-                ),
-                _NavItem(
-                  icon: Icons.grid_view_outlined,
-                  activeIcon: Icons.grid_view_rounded,
-                  label: 'Categories',
-                  isSelected: _currentIndex == 1,
-                  onTap: () => setState(() => _currentIndex = 1),
-                ),
-                _NavItem(
-                  icon: Icons.shopping_bag_outlined,
-                  activeIcon: Icons.shopping_bag_rounded,
-                  label: 'Cart',
-                  isSelected: _currentIndex == 2,
-                  badgeCount: cartItemCount,
-                  onTap: () => setState(() => _currentIndex = 2),
-                ),
-                _NavItem(
-                  icon: Icons.receipt_long_outlined,
-                  activeIcon: Icons.receipt_long_rounded,
-                  label: 'Orders',
-                  isSelected: _currentIndex == 3,
-                  onTap: () => setState(() => _currentIndex = 3),
-                ),
-                _NavItem(
-                  icon: Icons.person_outline_rounded,
-                  activeIcon: Icons.person_rounded,
-                  label: 'Profile',
-                  isSelected: _currentIndex == 4,
-                  onTap: () => setState(() => _currentIndex = 4),
-                ),
-              ],
-            ),
-          ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Row(
+          children: List.generate(_items.length, (i) {
+            final isCart = i == 2;
+            return Expanded(
+              child: _NavBarItem(
+                data: _items[i],
+                isSelected: currentIndex == i,
+                badge: isCart ? cartCount : 0,
+                onTap: () => onTap(i),
+              ),
+            );
+          }),
         ),
       ),
     );
   }
 }
 
-/// Custom nav bar item with active indicator pill
-class _NavItem extends StatelessWidget {
+class _NavItemData {
   final IconData icon;
   final IconData activeIcon;
   final String label;
+
+  const _NavItemData(this.icon, this.activeIcon, this.label);
+}
+
+class _NavBarItem extends StatelessWidget {
+  final _NavItemData data;
   final bool isSelected;
-  final int badgeCount;
+  final int badge;
   final VoidCallback onTap;
 
-  const _NavItem({
-    required this.icon,
-    required this.activeIcon,
-    required this.label,
+  const _NavBarItem({
+    required this.data,
     required this.isSelected,
-    this.badgeCount = 0,
+    this.badge = 0,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? AppColors.primary : AppColors.textHint;
-
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 64,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Active indicator pill
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: isSelected ? 24 : 0,
-              height: 3,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(2),
-              ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Icon container with animated background pill
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOutCubic,
+            padding: EdgeInsets.symmetric(
+              horizontal: isSelected ? 20 : 12,
+              vertical: 6,
             ),
-            const SizedBox(height: 4),
-            // Icon with optional badge
-            _buildIcon(color),
-            const SizedBox(height: 3),
-            // Label
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: isSelected ? 11 : 10.5,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                color: color,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppColors.primary.withOpacity(0.12)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(24),
             ),
-          ],
-        ),
+            child: _buildIcon(),
+          ),
+          const SizedBox(height: 4),
+          // Label
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+              color: isSelected ? AppColors.primary : AppColors.textHint,
+              letterSpacing: isSelected ? 0.1 : 0,
+            ),
+            child: Text(data.label),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildIcon(Color color) {
-    final iconWidget = Icon(
-      isSelected ? activeIcon : icon,
-      color: color,
-      size: isSelected ? 24 : 22,
+  Widget _buildIcon() {
+    final icon = Icon(
+      isSelected ? data.activeIcon : data.icon,
+      size: 23,
+      color: isSelected ? AppColors.primary : AppColors.textHint,
     );
 
-    if (badgeCount > 0) {
+    if (badge > 0) {
       return Badge(
         label: Text(
-          badgeCount > 99 ? '99+' : '$badgeCount',
+          badge > 99 ? '99+' : '$badge',
           style: const TextStyle(
             fontSize: 9,
             fontWeight: FontWeight.w700,
             color: Colors.white,
           ),
         ),
-        backgroundColor: AppColors.error,
-        child: iconWidget,
+        backgroundColor: AppColors.primary,
+        offset: const Offset(10, -6),
+        child: icon,
       );
     }
 
-    return iconWidget;
+    return icon;
   }
 }

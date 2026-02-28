@@ -47,17 +47,21 @@ class HomeController extends Controller
                 'image' => $b->image ? asset('storage/' . $b->image) : null,
             ]);
 
-        // Featured categories with their products (limit 6 per category)
+        // Featured categories (top-level AND sub-categories) with products
         $featuredCategories = Category::featured()
-            ->topLevel()
             ->with(['children:id,parent_id'])
             ->orderBy('title')
-            ->get(['id', 'title', 'image']);
+            ->get(['id', 'title', 'image', 'parent_id']);
 
         $sections = $featuredCategories->map(function ($category) {
-            // Collect this category ID + child IDs
-            $categoryIds = collect([$category->id])
-                ->merge($category->children->pluck('id'));
+            // For top-level: collect category + all child IDs
+            // For sub-category: just this category's ID
+            if ($category->parent_id === null) {
+                $categoryIds = collect([$category->id])
+                    ->merge($category->children->pluck('id'));
+            } else {
+                $categoryIds = collect([$category->id]);
+            }
 
             // Get products with prices
             $products = \App\Models\Product::where(function ($q) use ($categoryIds) {
@@ -74,6 +78,7 @@ class HomeController extends Controller
                     'id' => $category->id,
                     'title' => $category->title,
                     'image' => $category->image ? asset('storage/' . $category->image) : null,
+                    'parent_id' => $category->parent_id,
                 ],
                 'products' => $products->map(fn ($p) => [
                     'id' => $p->id,

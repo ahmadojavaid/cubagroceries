@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../../../core/widgets/app_network_image.dart';
@@ -8,6 +9,7 @@ import '../../../core/widgets/shared_widgets.dart';
 import '../data/price_model.dart';
 import '../data/product_model.dart';
 import '../providers/product_provider.dart';
+import '../widgets/product_card.dart';
 import '../widgets/product_reviews_section.dart';
 import '../../cart/data/cart_item_model.dart';
 import '../../cart/providers/cart_provider.dart';
@@ -96,6 +98,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     const SizedBox(height: AppDimens.lg + 4),
                   ],
 
+                  // Rating indicator
+                  ProductRatingIndicator(
+                    productId: widget.productId,
+                    productName: product.name,
+                  ),
+                  const SizedBox(height: AppDimens.lg + 4),
+
                   // Description
                   if (product.description != null &&
                       product.description!.isNotEmpty) ...[
@@ -103,8 +112,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     const SizedBox(height: AppDimens.lg + 4),
                   ],
 
-                  // Reviews
-                  _buildReviewsCard(context),
+                  // Related products
+                  _RelatedProductsSection(productId: widget.productId),
                 ]),
               ),
             ),
@@ -186,10 +195,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             onTap: () => Navigator.of(context).pop(),
           ),
         ),
-        // Stock badge (top right, only shows Out of Stock)
+        // Cart button (top right)
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 8,
+          right: 12,
+          child: _buildCartButton(context),
+        ),
+        // Stock badge (below cart button, only shows Out of Stock)
         if (!product.inStock)
           Positioned(
-            top: MediaQuery.of(context).padding.top + 12,
+            top: MediaQuery.of(context).padding.top + 56,
             right: 16,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -204,6 +219,43 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                 ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildCartButton(BuildContext context) {
+    final cart = ref.watch(cartProvider);
+    final itemCount = cart.itemCount;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        _circleButton(
+          icon: Icons.shopping_cart_outlined,
+          onTap: () => context.push('/cart'),
+        ),
+        if (itemCount > 0)
+          Positioned(
+            top: -4,
+            right: -4,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                itemCount > 99 ? '99+' : '$itemCount',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
           ),
@@ -401,29 +453,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // ───────────── Reviews Card ─────────────
-
-  Widget _buildReviewsCard(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppDimens.md),
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-        border: Border.all(color: AppColors.border.withOpacity(0.6)),
-      ),
-      child: ProductReviewsSection(
-        productId: widget.productId,
-        onWriteReview: () {
-          showDialog(
-            context: context,
-            builder: (_) => WriteReviewDialog(productId: widget.productId),
-          );
-        },
       ),
     );
   }
@@ -636,6 +665,61 @@ class _PriceChip extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// ───────────── Related Products ─────────────
+
+class _RelatedProductsSection extends ConsumerWidget {
+  final int productId;
+
+  const _RelatedProductsSection({required this.productId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final relatedAsync = ref.watch(relatedProductsProvider(productId));
+
+    return relatedAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (products) {
+        if (products.isEmpty) return const SizedBox.shrink();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'You might also like',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: AppDimens.md),
+            SizedBox(
+              height: 230,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: products.length,
+                separatorBuilder: (_, __) =>
+                    const SizedBox(width: AppDimens.sm + 2),
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return SizedBox(
+                    width: 160,
+                    child: ProductCard(
+                      product: product,
+                      onTap: () => context.push('/products/${product.id}'),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

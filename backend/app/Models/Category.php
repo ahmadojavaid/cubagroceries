@@ -39,6 +39,24 @@ class Category extends Model
         return $this->hasMany(Product::class);
     }
 
+    /**
+     * Products where this category is the sub_category.
+     */
+    public function subCategoryProducts()
+    {
+        return $this->hasMany(Product::class, 'sub_category_id');
+    }
+
+    /**
+     * Count all products belonging to this category (as main or sub).
+     */
+    public function getAllProductsCountAttribute(): int
+    {
+        return Product::where('category_id', $this->id)
+            ->orWhere('sub_category_id', $this->id)
+            ->count();
+    }
+
     // Scopes
 
     public function scopeTopLevel($query)

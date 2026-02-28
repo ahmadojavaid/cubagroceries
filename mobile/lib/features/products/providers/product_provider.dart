@@ -172,6 +172,24 @@ final searchProductsProvider =
   return ProductsNotifier(api);
 });
 
+/// Related products provider
+final relatedProductsProvider =
+    FutureProvider.family<List<ProductModel>, int>((ref, productId) async {
+  final api = ref.watch(apiClientProvider);
+  try {
+    final response = await api.get('/products/$productId/related');
+    final data = response.data;
+    if (data['success'] == true && data['data'] != null) {
+      return (data['data'] as List)
+          .map((p) => ProductModel.fromJson(Map<String, dynamic>.from(p)))
+          .toList();
+    }
+    return [];
+  } catch (_) {
+    return [];
+  }
+});
+
 /// Single product detail provider
 final productDetailProvider = FutureProvider.family<ProductModel?, int>(
   (ref, productId) async {

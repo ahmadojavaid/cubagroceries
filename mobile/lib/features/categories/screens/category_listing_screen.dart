@@ -21,10 +21,7 @@ class CategoryListingScreen extends ConsumerWidget {
         ref.read(categoriesProvider.notifier).getChildren(categoryId);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(parent?.title ?? 'Category'),
-      ),
-      body: _buildBody(context, catState, children),
+      body: _buildBody(context, catState, children, parent),
     );
   }
 
@@ -32,112 +29,206 @@ class CategoryListingScreen extends ConsumerWidget {
     BuildContext context,
     CategoriesState state,
     List<CategoryModel> children,
+    CategoryModel? parent,
   ) {
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (children.isEmpty) {
-      return EmptyStateWidget(
-        icon: Icons.folder_open_outlined,
-        message: 'No sub-categories found',
-        actionLabel: 'View all products',
-        onAction: () => context.push('/categories/$categoryId/products'),
+      return Scaffold(
+        appBar: AppBar(title: Text(parent?.title ?? 'Category')),
+        body: EmptyStateWidget(
+          icon: Icons.folder_open_outlined,
+          message: 'No sub-categories found',
+          actionLabel: 'View all products',
+          onAction: () => context.push('/categories/$categoryId/products'),
+        ),
       );
     }
 
     return CustomScrollView(
       slivers: [
-        // "View all" banner at top
+        // Collapsing header with category image
+        SliverAppBar(
+          expandedHeight: parent?.image != null ? 200 : 0,
+          floating: false,
+          pinned: true,
+          flexibleSpace: parent?.image != null
+              ? FlexibleSpaceBar(
+                  title: Text(
+                    parent!.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      shadows: [
+                        Shadow(color: Colors.black54, blurRadius: 12),
+                      ],
+                    ),
+                  ),
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      AppNetworkImage(
+                        imageUrl: parent.image,
+                        fit: BoxFit.cover,
+                      ),
+                      // Dark gradient overlay
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.6),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : null,
+          title: parent?.image == null
+              ? Text(parent?.title ?? 'Category')
+              : null,
+        ),
+
+        // "Browse all" card
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
               AppDimens.pagePadding,
-              AppDimens.md,
+              AppDimens.lg,
               AppDimens.pagePadding,
-              AppDimens.sm,
+              4,
             ),
-            child: Material(
-              color: AppColors.primarySurface.withOpacity(0.4),
-              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-              child: InkWell(
-                onTap: () =>
-                    context.push('/categories/$categoryId/products'),
-                borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimens.md,
-                    vertical: 14,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.grid_view_rounded,
-                        size: 20,
-                        color: AppColors.primary.withOpacity(0.8),
-                      ),
-                      const SizedBox(width: AppDimens.sm + 2),
-                      Expanded(
-                        child: Text(
-                          'View all products',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primary,
-                                  ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_rounded,
-                        size: 18,
-                        color: AppColors.primary.withOpacity(0.6),
-                      ),
+            child: GestureDetector(
+              onTap: () => context.push('/categories/$categoryId/products'),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primary,
+                      AppColors.primary.withOpacity(0.85),
                     ],
                   ),
+                  borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.25),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.grid_view_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Browse All Products',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            ),
+                          ),
+                          Text(
+                            'View everything in ${parent?.title ?? 'this category'}',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
         ),
 
-        // Section header
+        // Section header with count
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
               AppDimens.pagePadding,
-              AppDimens.md,
+              AppDimens.lg + 4,
               AppDimens.pagePadding,
-              AppDimens.sm,
+              AppDimens.md,
             ),
-            child: Text(
-              'Sub-categories',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+            child: Row(
+              children: [
+                Text(
+                  'Sub-categories',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySurface,
+                    borderRadius: BorderRadius.circular(AppDimens.radiusFull),
                   ),
+                  child: Text(
+                    '${children.length}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
 
-        // Sub-category grid
+        // Sub-category list — horizontal image cards
         SliverPadding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimens.pagePadding,
           ),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: AppDimens.md,
-              mainAxisSpacing: AppDimens.md,
-              childAspectRatio: 1.0,
-            ),
+          sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final subCat = children[index];
-                return _SubCategoryGridCard(
-                  category: subCat,
-                  onTap: () => context.push(
-                    '/categories/$categoryId/products',
-                    extra: {'sub_category_id': subCat.id},
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppDimens.sm + 2),
+                  child: _SubCategoryCard(
+                    category: subCat,
+                    onTap: () => context.push(
+                      '/categories/$categoryId/products',
+                      extra: {'sub_category_id': subCat.id},
+                    ),
                   ),
                 );
               },
@@ -146,7 +237,6 @@ class CategoryListingScreen extends ConsumerWidget {
           ),
         ),
 
-        // Bottom spacing
         const SliverToBoxAdapter(
           child: SizedBox(height: AppDimens.xl),
         ),
@@ -155,12 +245,12 @@ class CategoryListingScreen extends ConsumerWidget {
   }
 }
 
-/// Grid card for sub-categories — bigger image, clean layout
-class _SubCategoryGridCard extends StatelessWidget {
+/// Horizontal card — image on left, title + arrow on right
+class _SubCategoryCard extends StatelessWidget {
   final CategoryModel category;
   final VoidCallback onTap;
 
-  const _SubCategoryGridCard({
+  const _SubCategoryCard({
     required this.category,
     required this.onTap,
   });
@@ -174,53 +264,65 @@ class _SubCategoryGridCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
         child: Container(
+          height: 80,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-            border: Border.all(
-              color: AppColors.border.withOpacity(0.5),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadow,
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            border: Border.all(color: AppColors.border.withOpacity(0.5)),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
-              // Rounded image container
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.primarySurface.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+              // Image
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(AppDimens.radiusLg),
+                  bottomLeft: Radius.circular(AppDimens.radiusLg),
                 ),
-                clipBehavior: Clip.antiAlias,
-                child: AppNetworkImage(
-                  imageUrl: category.image,
+                child: SizedBox(
                   width: 80,
                   height: 80,
-                  fit: BoxFit.cover,
-                  errorWidget: const ImageFallback(size: 80),
+                  child: AppNetworkImage(
+                    imageUrl: category.image,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorWidget: Container(
+                      color: AppColors.primarySurface,
+                      child: const Icon(Icons.category_rounded,
+                          color: AppColors.primary, size: 28),
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: AppDimens.sm + 4),
               // Title
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    category.title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              // Arrow
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: AppDimens.sm + 2),
-                child: Text(
-                  category.title,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                padding: const EdgeInsets.only(right: 14),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySurface,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 16,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ],
