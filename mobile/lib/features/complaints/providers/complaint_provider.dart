@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_exception.dart';
@@ -89,10 +90,16 @@ class ComplaintListNotifier extends StateNotifier<ComplaintListState> {
       final data = response.data;
 
       if (data['success'] == true) {
-        final list = (data['data'] as List)
-            .map((c) =>
-                ComplaintModel.fromJson(Map<String, dynamic>.from(c)))
-            .toList();
+        final rawList = data['data'] as List;
+        final list = <ComplaintModel>[];
+        for (final c in rawList) {
+          try {
+            list.add(ComplaintModel.fromJson(Map<String, dynamic>.from(c)));
+          } catch (parseErr) {
+            // Skip malformed entries rather than crashing
+            debugPrint('Failed to parse complaint: $parseErr');
+          }
+        }
 
         state = ComplaintListState(
           complaints: list,
@@ -106,6 +113,7 @@ class ComplaintListNotifier extends StateNotifier<ComplaintListState> {
         );
       }
     } catch (e) {
+      debugPrint('Complaints fetch error: $e');
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to load complaints. Please try again.',
