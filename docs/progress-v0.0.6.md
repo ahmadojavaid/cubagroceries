@@ -25,22 +25,22 @@
 - ✅ Uses StatsOverviewWidget with grouped query (single DB call)
 - ✅ Color-coded per status with matching icons and descriptions
 
-### MP-B4: Filament Dashboard — Today's Birthdays widget
-- Create `Filament\Widgets\TodaysBirthdaysWidget` (table widget)
-- Query users where date_of_birth month+day = today
-- Show name, email, phone
-- Show "No birthdays today" if empty
+### MP-B4: Filament Dashboard — Today's Birthdays widget ✅
+- ✅ Create `TodaysBirthdaysWidget` (table widget)
+- ✅ Query users where date_of_birth month+day = today
+- ✅ Show name, email, phone, date of birth
+- ✅ Show "No birthdays today" empty state with cake icon
 
-### MP-B5: Filament Dashboard — Recent Orders widget
-- Create `Filament\Widgets\RecentOrdersWidget` (table widget)
-- Show last 5 orders: order_id, customer name, status badge, total, date
-- Link to order view page
+### MP-B5: Filament Dashboard — Recent Orders widget ✅
+- ✅ Create `RecentOrdersWidget` (table widget)
+- ✅ Show last 5 orders: order_id, customer name, status badge, total, date
+- ✅ Link to order view page via eye icon action
 
-### MP-B6: Filament Dashboard — Pending Complaints widget
-- Create `Filament\Widgets\PendingComplaintsWidget` (table widget)
-- Show complaints where status = pending (limit 5)
-- Columns: subject, customer name, date
-- Link to complaint view page
+### MP-B6: Filament Dashboard — Pending Complaints widget ✅
+- ✅ Create `PendingComplaintsWidget` (table widget)
+- ✅ Show complaints where status = pending (limit 5)
+- ✅ Columns: subject, customer name, date
+- ✅ Link to complaint view page, empty state with check icon
 
 ### MP-B7: Wallet management from admin
 - Add wallet top-up action on CustomerResource (modal: amount, note)
@@ -145,6 +145,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 10 | 3 | 7 |
+| Backend | 10 | 6 | 4 |
 | Mobile | 11 | 0 | 11 |
-| **Total** | **21** | **3** | **18** |
+| **Total** | **21** | **6** | **15** |
