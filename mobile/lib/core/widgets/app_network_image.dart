@@ -1,112 +1,18 @@
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../theme/app_colors.dart';
 
-/// Custom cache manager that sends the Host header for Herd .test domains.
-class _HerdCacheManager extends CacheManager {
-  static const key = 'herdImageCache';
-  static final _instance = _HerdCacheManager._();
-
-  factory _HerdCacheManager() => _instance;
-
-  _HerdCacheManager._()
-      : super(Config(
-          key,
-          stalePeriod: const Duration(days: 7),
-          maxNrOfCacheObjects: 200,
-          fileService: _HerdHttpFileService(),
-        ));
-}
-
-class _HerdHttpFileService extends FileService {
-  final HttpClient _httpClient;
-
-  _HerdHttpFileService()
-      : _httpClient = HttpClient()
-          ..badCertificateCallback = (cert, host, port) => true;
-
-  @override
-  Future<FileServiceResponse> get(String url,
-      {Map<String, String>? headers}) async {
-    final uri = Uri.parse(url);
-    final request = await _httpClient.getUrl(uri);
-
-    // Add Host header for emulator → Herd routing
-    request.headers.set('Host', 'cubagroceries.test');
-
-    if (headers != null) {
-      headers.forEach((key, value) {
-        request.headers.set(key, value);
-      });
-    }
-
-    final response = await request.close();
-
-    return HttpGetResponse(HttpFileServiceResponse(response));
-  }
-}
-
-class HttpFileServiceResponse extends FileServiceResponse {
-  final HttpClientResponse _response;
-
-  HttpFileServiceResponse(this._response);
-
-  @override
-  Stream<List<int>> get content => _response;
-
-  @override
-  int? get contentLength => _response.contentLength;
-
-  @override
-  String get eTag => _response.headers.value('etag') ?? '';
-
-  @override
-  String get fileExtension {
-    final contentType = _response.headers.contentType;
-    if (contentType != null) {
-      switch (contentType.subType) {
-        case 'jpeg':
-        case 'jpg':
-          return '.jpg';
-        case 'png':
-          return '.png';
-        case 'gif':
-          return '.gif';
-        case 'webp':
-          return '.webp';
-      }
-    }
-    return '.jpg';
-  }
-
-  @override
-  int get statusCode => _response.statusCode;
-
-  @override
-  DateTime get validTill {
-    final cacheControl = _response.headers.value('cache-control');
-    if (cacheControl != null && cacheControl.contains('max-age=')) {
-      final maxAge = int.tryParse(
-          cacheControl.split('max-age=').last.split(',').first.trim());
-      if (maxAge != null) {
-        return DateTime.now().add(Duration(seconds: maxAge));
-      }
-    }
-    return DateTime.now().add(const Duration(days: 7));
-  }
-}
-
-/// App-wide network image widget that handles Herd self-signed certs.
-class AppNetworkImage extends StatelessWidget {
+/// App-wide network image widget that handles:
+/// - Herd self-signed SSL certs
+/// - Host header for emulator → Herd routing
+class AppNetworkImage extends StatefulWidget {
   final String? imageUrl;
   final double? width;
   final double? height;
   final BoxFit fit;
   final Widget? placeholder;
   final Widget? errorWidget;
-  final BorderRadius? borderRadius;
 
   const AppNetworkImage({
     super.key,
@@ -116,49 +22,116 @@ class AppNetworkImage extends StatelessWidget {
     this.fit = BoxFit.cover,
     this.placeholder,
     this.errorWidget,
-    this.borderRadius,
   });
 
   @override
+  State<AppNetworkImage> createState() => _AppNetworkImageState();
+}
+
+class _AppNetworkImageState extends State<AppNetworkImage> {
+  static final HttpClient _client = HttpClient()
+    ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+
+  /// Simple in-memory cache shared across all instances
+  static final Map<String, Uint8List> _cache = {};
+
+  Uint8List? _imageBytes;
+  bool _loading = true;
+  bool _error = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadImage();
+  }
+
+  @override
+  void didUpdateWidget(covariant AppNetworkImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.imageUrl != widget.imageUrl) {
+      _loadImage();
+    }
+  }
+
+  Future<void> _loadImage() async {
+    final url = widget.imageUrl;
+    if (url == null || url.isEmpty) {
+      if (mounted) setState(() { _loading = false; _error = true; });
+      return;
+    }
+
+    // Check cache first
+    if (_cache.containsKey(url)) {
+      if (mounted) setState(() { _imageBytes = _cache[url]; _loading = false; });
+      return;
+    }
+
+    try {
+      final uri = Uri.parse(url);
+      final request = await _client.getUrl(uri);
+      request.headers.set('Host', 'cubagroceries.test');
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        final bytes = await _consolidate(response);
+        _cache[url] = bytes;
+        if (mounted) setState(() { _imageBytes = bytes; _loading = false; });
+      } else {
+        if (mounted) setState(() { _loading = false; _error = true; });
+      }
+    } catch (e) {
+      debugPrint('AppNetworkImage error: $e');
+      if (mounted) setState(() { _loading = false; _error = true; });
+    }
+  }
+
+  Future<Uint8List> _consolidate(HttpClientResponse response) async {
+    final builder = BytesBuilder(copy: false);
+    await for (final chunk in response) {
+      builder.add(chunk);
+    }
+    return builder.takeBytes();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (imageUrl == null || imageUrl!.isEmpty) {
-      return errorWidget ?? _defaultError();
+    if (_loading) {
+      return widget.placeholder ?? _defaultPlaceholder();
     }
 
-    final image = CachedNetworkImage(
-      imageUrl: imageUrl!,
-      width: width,
-      height: height,
-      fit: fit,
-      cacheManager: _HerdCacheManager(),
-      placeholder: (_, __) =>
-          placeholder ??
-          Container(
-            color: AppColors.surfaceBg,
-            child: const Center(
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
-          ),
-      errorWidget: (_, __, ___) => errorWidget ?? _defaultError(),
+    if (_error || _imageBytes == null) {
+      return widget.errorWidget ?? _defaultError();
+    }
+
+    return Image.memory(
+      _imageBytes!,
+      width: widget.width,
+      height: widget.height,
+      fit: widget.fit,
+      errorBuilder: (_, __, ___) => widget.errorWidget ?? _defaultError(),
     );
+  }
 
-    if (borderRadius != null) {
-      return ClipRRect(borderRadius: borderRadius!, child: image);
-    }
-    return image;
+  Widget _defaultPlaceholder() {
+    return Container(
+      width: widget.width,
+      height: widget.height,
+      color: AppColors.surfaceBg,
+      child: const Center(
+        child: SizedBox(
+          width: 20, height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+    );
   }
 
   Widget _defaultError() {
     return Container(
-      width: width,
-      height: height,
+      width: widget.width,
+      height: widget.height,
       color: AppColors.primarySurface,
-      child: const Icon(Icons.image_outlined,
-          size: 32, color: AppColors.primaryLight),
+      child: const Icon(Icons.image_outlined, size: 32, color: AppColors.primaryLight),
     );
   }
 }
