@@ -56,20 +56,20 @@
 - ✅ Create `notifications` migration (uuid PK, polymorphic notifiable, json data, read_at)
 - **Terminal**: `php artisan migrate:fresh` ← **RUN NOW**
 
-### MP-B6: Eloquent Models
-- Create `PortalUser` model with role constants, guard config
-- Modify `User` model (fillable, hidden, casts, HasApiTokens)
-- Create `Category` model (parent/children self-ref, products relationship)
-- Create `Unit` model
-- Create `Product` model (category, subCategory, prices, unit relationships)
-- Create `Price` model (product, unit relationships)
-- Create `Order` model (user, address, products relationships)
-- Create `OrderAddress` model
-- Create `Orderproduct` model
-- Create `ShippingCharge` model
-- Create `DeliveryBoy` model
-- Create `Complaint` model
-- Create `Address` model
+### MP-B6: Eloquent Models ✅
+- ✅ Create `PortalUser` model with role constants (SUPER_ADMIN=1, ADMIN=2, STAFF=3), helpers
+- ✅ Modify `User` model (HasApiTokens, fillable matches schema, relationships, fullName accessor)
+- ✅ Create `Category` model (parent/children self-ref, products, topLevel scope)
+- ✅ Create `Unit` model
+- ✅ Create `Product` model (category, subCategory, prices relationships, inStock scope)
+- ✅ Create `Price` model (product, unit relationships)
+- ✅ Create `Order` model (table: orderdetails, user, address, products relationships)
+- ✅ Create `OrderAddress` model
+- ✅ Create `Orderproduct` model
+- ✅ Create `ShippingCharge` model
+- ✅ Create `DeliveryBoy` model
+- ✅ Create `Complaint` model
+- ✅ Create `Address` model
 
 ### MP-B7: Database Seeder
 - Create `AdminSeeder` — super admin user (role 1) for Filament login
