@@ -16,8 +16,10 @@ import '../../features/profile/data/address_model.dart';
 import '../../features/profile/screens/address_form_screen.dart';
 import '../../features/profile/screens/address_list_screen.dart';
 import '../../features/profile/screens/settings_screen.dart';
+import '../../features/complaints/screens/complaint_detail_screen.dart';
 import '../../features/complaints/screens/complaint_form_screen.dart';
 import '../../features/complaints/screens/complaints_history_screen.dart';
+import '../../features/complaints/data/complaint_model.dart';
 import '../../features/notifications/screens/notification_inbox_screen.dart';
 import '../../features/settings/screens/faq_screen.dart';
 import '../../features/settings/screens/store_hours_screen.dart';
@@ -170,6 +172,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/complaints',
         builder: (context, state) => const ComplaintsHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/complaints/detail',
+        builder: (context, state) {
+          final complaint = state.extra as ComplaintModel;
+          return ComplaintDetailScreen(complaint: complaint);
+        },
       ),
       GoRoute(
         path: '/complaints/new',

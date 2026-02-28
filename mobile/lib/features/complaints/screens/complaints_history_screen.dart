@@ -71,7 +71,8 @@ class _ComplaintsHistoryScreenState
               : state.complaints.isEmpty
                   ? const EmptyStateWidget(
                       icon: Icons.chat_bubble_outline,
-                      message: 'No complaints yet\nWe hope everything is going well!',
+                      message:
+                          'No complaints yet\nWe hope everything is going well!',
                     )
                   : RefreshIndicator(
                       color: AppColors.primary,
@@ -91,87 +92,107 @@ class _ComplaintsHistoryScreenState
                                   child: CircularProgressIndicator()),
                             );
                           }
+                          final complaint = state.complaints[index];
                           return _ComplaintCard(
-                              complaint: state.complaints[index]);
+                            complaint: complaint,
+                            onTap: () => context.push(
+                              '/complaints/detail',
+                              extra: complaint,
+                            ),
+                          );
                         },
                       ),
                     ),
     );
   }
-
 }
 
 class _ComplaintCard extends StatelessWidget {
   final ComplaintModel complaint;
+  final VoidCallback onTap;
 
-  const _ComplaintCard({required this.complaint});
+  const _ComplaintCard({required this.complaint, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final dateStr =
-        DateFormat('MMM d, yyyy').format(complaint.createdAt);
+    final dateStr = DateFormat('MMM d, yyyy').format(complaint.createdAt);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppDimens.sm),
-      padding: const EdgeInsets.all(AppDimens.md),
-      decoration: BoxDecoration(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDimens.sm),
+      child: Material(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: AppColors.border, width: 0.5),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Subject + status
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  complaint.subject,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+          child: Container(
+            padding: const EdgeInsets.all(AppDimens.md),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+              border: Border.all(color: AppColors.border, width: 0.5),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Subject + status
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        complaint.subject,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppDimens.sm),
+                    _statusBadge(complaint.status, complaint.displayStatus),
+                  ],
                 ),
-              ),
-              const SizedBox(width: AppDimens.sm),
-              _statusBadge(complaint.status, complaint.displayStatus),
-            ],
-          ),
 
-          const SizedBox(height: AppDimens.sm),
+                const SizedBox(height: AppDimens.sm),
 
-          // Order reference + date
-          Row(
-            children: [
-              if (complaint.orderNumber != null) ...[
-                Icon(Icons.receipt_outlined,
-                    size: 14, color: AppColors.textHint),
-                const SizedBox(width: 4),
-                Text(
-                  complaint.orderNumber!,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
+                // Order reference + date + chevron
+                Row(
+                  children: [
+                    if (complaint.orderNumber != null) ...[
+                      Icon(Icons.receipt_outlined,
+                          size: 14, color: AppColors.textHint),
+                      const SizedBox(width: 4),
+                      Text(
+                        complaint.orderNumber!,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(width: AppDimens.md),
+                    ],
+                    Icon(Icons.calendar_today_outlined,
+                        size: 14, color: AppColors.textHint),
+                    const SizedBox(width: 4),
+                    Text(
+                      dateStr,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textHint,
+                      ),
+                    ),
+                    const Spacer(),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: AppColors.textHint,
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppDimens.md),
               ],
-              Icon(Icons.calendar_today_outlined,
-                  size: 14, color: AppColors.textHint),
-              const SizedBox(width: 4),
-              Text(
-                dateStr,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textHint,
-                ),
-              ),
-            ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
