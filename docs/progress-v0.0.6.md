@@ -15,15 +15,15 @@
 - ✅ Each card shows count with icon and description
 - ✅ Register widget on Filament dashboard (auto-discovered, removed default AccountWidget)
 
-### MP-B2: Filament Dashboard — Revenue stat card
-- Add Revenue card to StatsOverviewWidget (sum of all delivered order totals)
-- Add "Today's Orders" count card
-- Add "Pending Orders" count card
+### MP-B2: Filament Dashboard — Revenue stat card ✅
+- ✅ Add Revenue card to StatsOverviewWidget (sum of all delivered order totals, formatted as Rs)
+- ✅ Add "Today's Orders" count card
+- ✅ Add "Pending Orders" count card
 
-### MP-B3: Filament Dashboard — Order status breakdown widget
-- Create widget showing Pending / Confirmed / Dispatched / Delivered / Cancelled counts
-- Use Filament StatsOverviewWidget or custom card layout
-- Color-coded per status
+### MP-B3: Filament Dashboard — Order status breakdown widget ✅
+- ✅ Create `OrderStatusBreakdownWidget` showing all 5 status counts
+- ✅ Uses StatsOverviewWidget with grouped query (single DB call)
+- ✅ Color-coded per status with matching icons and descriptions
 
 ### MP-B4: Filament Dashboard — Today's Birthdays widget
 - Create `Filament\Widgets\TodaysBirthdaysWidget` (table widget)
@@ -145,6 +145,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 10 | 1 | 9 |
+| Backend | 10 | 3 | 7 |
 | Mobile | 11 | 0 | 11 |
-| **Total** | **21** | **1** | **20** |
+| **Total** | **21** | **3** | **18** |

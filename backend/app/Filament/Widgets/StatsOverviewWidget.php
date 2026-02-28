@@ -2,12 +2,14 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\OrderStatus;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Number;
 
 class StatsOverviewWidget extends BaseWidget
 {
@@ -15,11 +17,28 @@ class StatsOverviewWidget extends BaseWidget
 
     protected function getStats(): array
     {
+        $revenue = Order::where('status', OrderStatus::Delivered)->sum('total_amount');
+
         return [
             Stat::make('Total Orders', Order::count())
                 ->description('All orders placed')
                 ->descriptionIcon('heroicon-m-shopping-bag')
                 ->color('primary'),
+
+            Stat::make('Revenue', 'Rs ' . Number::format($revenue, 2))
+                ->description('From delivered orders')
+                ->descriptionIcon('heroicon-m-banknotes')
+                ->color('success'),
+
+            Stat::make("Today's Orders", Order::whereDate('created_at', today())->count())
+                ->description('Orders placed today')
+                ->descriptionIcon('heroicon-m-calendar')
+                ->color('info'),
+
+            Stat::make('Pending Orders', Order::where('status', OrderStatus::Pending)->count())
+                ->description('Awaiting confirmation')
+                ->descriptionIcon('heroicon-m-clock')
+                ->color('warning'),
 
             Stat::make('Total Customers', User::count())
                 ->description('Registered customers')
