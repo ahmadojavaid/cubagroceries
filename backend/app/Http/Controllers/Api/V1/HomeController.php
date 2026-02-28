@@ -79,6 +79,7 @@ class HomeController extends Controller
                     'id' => $p->id,
                     'name' => $p->name,
                     'description' => $p->description,
+                    'image' => $p->image ? asset('storage/' . $p->image) : null,
                     'stock' => $p->stock,
                     'prices' => $p->prices->map(fn ($price) => [
                         'id' => $price->id,

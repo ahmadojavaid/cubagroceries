@@ -1,13 +1,16 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 
-import 'dart:async';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Accept self-signed certificates (Herd .test domains)
+  HttpOverrides.global = _DevHttpOverrides();
 
   try {
     await Hive.initFlutter();
@@ -35,6 +38,15 @@ void main() async {
     debugPrint('Uncaught error: $error');
     debugPrint('$stack');
   });
+}
+
+/// Accept self-signed certificates in development
+class _DevHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (cert, host, port) => true;
+  }
 }
 
 class CubaGroceriesApp extends ConsumerWidget {

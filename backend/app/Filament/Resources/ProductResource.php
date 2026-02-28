@@ -74,6 +74,16 @@ class ProductResource extends Resource
                             ->rows(3)
                             ->columnSpanFull()
                             ->placeholder('Product description...'),
+
+                        Forms\Components\FileUpload::make('image')
+                            ->image()
+                            ->disk('public')
+                            ->directory('products')
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('1:1')
+                            ->imageResizeTargetWidth('600')
+                            ->imageResizeTargetHeight('600')
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
 

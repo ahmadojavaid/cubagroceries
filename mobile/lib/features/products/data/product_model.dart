@@ -1,3 +1,4 @@
+import '../../../core/api/image_url_helper.dart';
 import 'price_model.dart';
 
 /// Product model matching API response from GET /api/v1/products
@@ -5,6 +6,7 @@ class ProductModel {
   final int id;
   final String name;
   final String? description;
+  final String? image;
   final int stock;
   final CategoryRef? category;
   final CategoryRef? subCategory;
@@ -14,6 +16,7 @@ class ProductModel {
     required this.id,
     required this.name,
     this.description,
+    this.image,
     required this.stock,
     this.category,
     this.subCategory,
@@ -25,6 +28,7 @@ class ProductModel {
       id: json['id'],
       name: json['name'] ?? '',
       description: json['description'],
+      image: ImageUrlHelper.rewrite(json['image'] as String?),
       stock: json['stock'] ?? 0,
       category: json['category'] != null
           ? CategoryRef.fromJson(Map<String, dynamic>.from(json['category']))

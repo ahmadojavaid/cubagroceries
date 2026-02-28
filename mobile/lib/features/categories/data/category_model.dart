@@ -1,3 +1,5 @@
+import '../../../core/api/image_url_helper.dart';
+
 /// Category model matching API response from GET /api/v1/categories
 class CategoryModel {
   final int id;
@@ -16,7 +18,7 @@ class CategoryModel {
     return CategoryModel(
       id: json['id'],
       title: json['title'] ?? '',
-      image: json['image'],
+      image: ImageUrlHelper.rewrite(json['image'] as String?),
       children: json['children'] != null
           ? (json['children'] as List)
               .map((c) => CategoryModel.fromJson(Map<String, dynamic>.from(c)))

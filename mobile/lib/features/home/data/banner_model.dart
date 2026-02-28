@@ -1,3 +1,5 @@
+import '../../../core/api/image_url_helper.dart';
+
 /// Banner model matching API response
 class BannerModel {
   final int id;
@@ -14,7 +16,7 @@ class BannerModel {
     return BannerModel(
       id: json['id'] as int,
       title: json['title'] as String?,
-      image: json['image'] as String?,
+      image: ImageUrlHelper.rewrite(json['image'] as String?),
     );
   }
 }

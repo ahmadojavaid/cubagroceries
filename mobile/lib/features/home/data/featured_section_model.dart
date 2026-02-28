@@ -1,3 +1,4 @@
+import '../../../core/api/image_url_helper.dart';
 import '../../products/data/product_model.dart';
 
 /// A featured category section with its products for the home screen
@@ -37,7 +38,7 @@ class FeaturedCategory {
     return FeaturedCategory(
       id: json['id'] as int,
       title: json['title'] ?? '',
-      image: json['image'] as String?,
+      image: ImageUrlHelper.rewrite(json['image'] as String?),
     );
   }
 }

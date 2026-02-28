@@ -105,6 +105,7 @@ class ProductsController extends Controller
             'id' => $product->id,
             'name' => $product->name,
             'description' => $product->description,
+            'image' => $product->image ? asset('storage/' . $product->image) : null,
             'stock' => $product->stock,
             'category' => $product->category ? [
                 'id' => $product->category->id,
