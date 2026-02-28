@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\WalletController;
 use App\Http\Controllers\Api\V1\HomeController;
+use App\Http\Controllers\Api\V1\ShippingController;
+use App\Http\Controllers\Api\V1\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -54,5 +56,11 @@ Route::prefix('v1')->group(function () {
 
         // Wallet
         Route::get('/wallet', [WalletController::class, 'balance']);
+
+        // Shipping
+        Route::get('/shipping-charges', [ShippingController::class, 'index']);
+
+        // Orders
+        Route::post('/orders', [OrderController::class, 'store']);
     });
 });

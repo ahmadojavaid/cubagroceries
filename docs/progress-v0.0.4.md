@@ -15,28 +15,28 @@
 - ✅ Simple form: title (required), amount (required, numeric)
 - ✅ Navigation group: Operations, icon: truck
 
-### MP-B2: API — ShippingController
-- Create `Api\V1\ShippingController`
-- `GET /api/v1/shipping-charges` — list all shipping options
-- Register route under Sanctum middleware
+### MP-B2: API — ShippingController ✅
+- ✅ Create `Api\V1\ShippingController`
+- ✅ `GET /api/v1/shipping-charges` — list all shipping options
+- ✅ Register route under Sanctum middleware
 
-### MP-B3: Order ID generator utility
-- Create `App\Services\OrderIdGenerator` (or helper)
-- Pattern: "CUBA" + 8 random digits (e.g., CUBA89162301)
-- Ensure uniqueness check against `orderdetails` table
-- Unit-testable static method
+### MP-B3: Order ID generator utility ✅
+- ✅ Create `App\Services\OrderIdGenerator`
+- ✅ Pattern: "CUBA" + 8 random digits (e.g., CUBA89162301)
+- ✅ Ensure uniqueness check against `orderdetails` table
+- ✅ Unit-testable static method
 
-### MP-B4: API — OrderController@store (place order)
-- Create `Api\V1\OrderController`
-- `POST /api/v1/orders` — validate items, check stock, calculate total
-- Create order + snapshot address into `orderaddress` + create line items in `orderproduct`
-- Use OrderIdGenerator for order_id
-- Register route
+### MP-B4: API — OrderController@store (place order) ✅
+- ✅ Create `Api\V1\OrderController`
+- ✅ `POST /api/v1/orders` — validate items, check stock, calculate total
+- ✅ Create order + snapshot address into `orderaddress` + create line items in `orderproduct`
+- ✅ Use OrderIdGenerator for order_id
+- ✅ Register route
 
-### MP-B5: Stock deduction on order placement
-- Deduct stock from `product` table for each ordered item
-- Reject order if any item is out of stock (validate before creating)
-- Wrap in DB transaction (order + address + items + stock all atomic)
+### MP-B5: Stock deduction on order placement ✅
+- ✅ Deduct stock from `product` table for each ordered item
+- ✅ Reject order if any item is out of stock (validate before creating)
+- ✅ Wrap in DB transaction (order + address + items + stock all atomic)
 
 ### MP-B6: API — OrderController@index (order history)
 - `GET /api/v1/orders` — paginated order history for authenticated user
@@ -148,6 +148,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 8 | 1 | 7 |
+| Backend | 8 | 5 | 3 |
 | Mobile | 13 | 0 | 13 |
-| **Total** | **21** | **1** | **20** |
+| **Total** | **21** | **5** | **16** |
