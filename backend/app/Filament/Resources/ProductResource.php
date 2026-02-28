@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\GalleryImagePicker;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Category;
 use App\Models\Product;
@@ -75,15 +76,11 @@ class ProductResource extends Resource
                             ->columnSpanFull()
                             ->placeholder('Product description...'),
 
-                        Forms\Components\FileUpload::make('image')
-                            ->image()
-                            ->disk('public')
-                            ->directory('products')
-                            ->imageResizeMode('cover')
-                            ->imageCropAspectRatio('1:1')
-                            ->imageResizeTargetWidth('600')
-                            ->imageResizeTargetHeight('600')
-                            ->columnSpanFull(),
+                        GalleryImagePicker::make(
+                            field: 'image',
+                            folder: 'products',
+                            directory: 'products',
+                        ),
                     ])
                     ->columns(2),
 
@@ -152,6 +149,17 @@ class ProductResource extends Resource
                     ->label('Prices')
                     ->counts('prices')
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('avg_rating')
+                    ->label('Rating')
+                    ->state(function (Product $record): string {
+                        $reviews = $record->reviews()->where('status', 'approved');
+                        $count = $reviews->count();
+                        if ($count === 0) return '—';
+                        $avg = $reviews->avg('rating');
+                        return number_format($avg, 1) . ' ★ (' . $count . ')';
+                    })
+                    ->placeholder('—'),
 
                 Tables\Columns\TextColumn::make('prices_summary')
                     ->label('Price Range')

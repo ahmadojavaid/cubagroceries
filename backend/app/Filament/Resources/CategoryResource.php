@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\GalleryImagePicker;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use Filament\Forms;
@@ -49,16 +50,11 @@ class CategoryResource extends Resource
                             ->label('Featured on Home')
                             ->helperText('Show this category with products on the home screen'),
 
-                        Forms\Components\FileUpload::make('image')
-                            ->image()
-                            ->disk('public')
-                            ->directory('categories')
-                            ->imageResizeMode('cover')
-                            ->imageCropAspectRatio('1:1')
-                            ->imageResizeTargetWidth('400')
-                            ->imageResizeTargetHeight('400')
-                            ->maxSize(2048)
-                            ->columnSpanFull(),
+                        GalleryImagePicker::make(
+                            field: 'image',
+                            folder: 'categories',
+                            directory: 'categories',
+                        ),
                     ])
                     ->columns(2),
             ]);
@@ -86,10 +82,13 @@ class CategoryResource extends Resource
                     ->placeholder('Top-level')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('products_count')
+                Tables\Columns\TextColumn::make('all_products_count')
                     ->label('Products')
-                    ->counts('products')
-                    ->sortable(),
+                    ->getStateUsing(fn ($record) => $record->all_products_count)
+                    ->sortable(query: function ($query, string $direction) {
+                        // Can't sort by accessor, fallback to products_count
+                        $query->withCount('products')->orderBy('products_count', $direction);
+                    }),
 
                 Tables\Columns\IconColumn::make('is_featured')
                     ->label('Featured')

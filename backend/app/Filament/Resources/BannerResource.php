@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\GalleryImagePicker;
 use App\Filament\Resources\BannerResource\Pages;
 use App\Models\Banner;
 use Filament\Forms;
@@ -39,17 +40,11 @@ class BannerResource extends Resource
                             ->label('Active')
                             ->default(true),
 
-                        Forms\Components\FileUpload::make('image')
-                            ->image()
-                            ->required()
-                            ->disk('public')
-                            ->directory('banners')
-                            ->imageResizeMode('cover')
-                            ->imageCropAspectRatio('16:9')
-                            ->imageResizeTargetWidth('1200')
-                            ->imageResizeTargetHeight('675')
-                            ->maxSize(3072)
-                            ->columnSpanFull(),
+                        GalleryImagePicker::make(
+                            field: 'image',
+                            folder: 'banners',
+                            directory: 'banners',
+                        ),
                     ])
                     ->columns(2),
             ]);
