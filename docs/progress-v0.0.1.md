@@ -48,13 +48,13 @@
 - ✅ Create `orderproduct` migration (id, order_id FK → orderdetails, product_id FK, unit_id FK, quantity, price, timestamps)
 - **Terminal**: `php artisan migrate:fresh` (run after MP-B5)
 
-### MP-B5: Migrations — Operations & System Domain
-- Create `shippingcharge` migration (id, title, amount, timestamps)
-- Create `deliveryboy` migration (id, name, phone, payment, timestamps)
-- Create `complaint` migration (id, user_id FK, order_id FK nullable, subject, message, status, timestamps)
-- Create `addresses` migration (id, user_id FK, label, address, city, phone, latitude, longitude, is_default, timestamps)
-- Verify `notifications` table migration exists (Laravel default)
-- **Terminal**: `php artisan migrate:fresh`
+### MP-B5: Migrations — Operations & System Domain ✅
+- ✅ Create `shippingcharge` migration (id, title, amount, timestamps)
+- ✅ Create `deliveryboy` migration (id, name, phone, payment, timestamps)
+- ✅ Create `complaint` migration (id, user_id FK, order_id FK nullable, subject, message, status, timestamps)
+- ✅ Create `addresses` migration (id, user_id FK, label, address, city, phone, lat/lng, is_default, timestamps)
+- ✅ Create `notifications` migration (uuid PK, polymorphic notifiable, json data, read_at)
+- **Terminal**: `php artisan migrate:fresh` ← **RUN NOW**
 
 ### MP-B6: Eloquent Models
 - Create `PortalUser` model with role constants, guard config
@@ -173,6 +173,6 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
-| Backend | 10 | 4 | 6 |
+| Backend | 10 | 5 | 5 |
 | Mobile | 12 | 0 | 12 |
-| **Total** | **28** | **4** | **24** |
+| **Total** | **28** | **5** | **23** |
