@@ -19,20 +19,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   Future<void> _initialize() async {
-    // Small delay for branding visibility
-    await Future.delayed(const Duration(seconds: 1));
+    // Branding delay
+    await Future.delayed(const Duration(seconds: 2));
 
+    if (!mounted) return;
+
+    // Try checking auth, but always navigate
+    bool isLoggedIn = false;
     try {
       await ref.read(authProvider.notifier).checkAuth()
           .timeout(const Duration(seconds: 5));
+      isLoggedIn = ref.read(authProvider).isAuthenticated;
     } catch (_) {
-      // API unreachable or timeout — proceed to login
+      // API error or timeout — just go to login
     }
 
     if (!mounted) return;
 
-    final auth = ref.read(authProvider);
-    if (auth.isAuthenticated) {
+    if (isLoggedIn) {
       context.go('/home');
     } else {
       context.go('/login');
@@ -47,7 +51,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // App icon placeholder
             Container(
               width: 120,
               height: 120,
