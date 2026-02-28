@@ -82,18 +82,19 @@
 - ✅ Configure FilamentPanelProvider with `->authGuard('portal')`
 - **Verify**: Log in at `https://cubagroceries.test/admin/login` with `admin@cubagroceries.test` / `password`
 
-### MP-B9: Sanctum API Auth
-- Verify Sanctum is installed (scaffolder should have done this)
-- Configure Sanctum for `users` table
-- Create `Api\V1\AuthController` (register, login, logout, user) matching our schema fields
-- Create API routes under `api/v1/auth/*`
-- Add rate limiting (5/min on auth routes)
-- **Verify**: Test all 4 endpoints with Postman
+### MP-B9: Sanctum API Auth ✅
+- ✅ Sanctum already installed by scaffolder
+- ✅ Create `Api\V1\AuthController` (register, login, logout, user) with schema fields
+- ✅ Routes under `api/v1/auth/*` with proper grouping
+- ✅ Rate limiting 5/min on public auth routes (register, login)
+- ✅ Deleted old scaffolded Auth\AuthController
+- ✅ API exception handling (ValidationException → 422, NotFound → 404)
+- **Verify**: Test with Postman: POST `/api/v1/auth/register`, POST `/api/v1/auth/login`, etc.
 
-### MP-B10: API Response Helpers
-- Create `ApiResponse` trait or helper class
-- Standardize success/error/paginated response format per `api-architecture.md`
-- Apply to AuthController
+### MP-B10: API Response Helpers ✅
+- ✅ Create `App\Traits\ApiResponse` trait (success, paginated, error methods)
+- ✅ Response format matches `api-architecture.md` spec
+- ✅ Applied to AuthController
 
 ---
 
@@ -172,6 +173,6 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
-| Backend | 10 | 8 | 2 |
+| Backend | 10 | 10 | 0 |
 | Mobile | 12 | 0 | 12 |
-| **Total** | **28** | **8** | **20** |
+| **Total** | **28** | **10** | **18** |
