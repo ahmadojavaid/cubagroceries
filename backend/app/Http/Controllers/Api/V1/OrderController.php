@@ -18,6 +18,36 @@ class OrderController extends Controller
     use ApiResponse;
 
     /**
+     * Order history for authenticated user (paginated).
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $orders = Order::where('user_id', $request->user()->id)
+            ->withCount('products')
+            ->orderByDesc('created_at')
+            ->paginate($request->input('per_page', 20));
+
+        return $this->paginated($orders);
+    }
+
+    /**
+     * Order detail by order_number.
+     */
+    public function show(Request $request, string $orderNumber): JsonResponse
+    {
+        $order = Order::where('order_id', $orderNumber)
+            ->where('user_id', $request->user()->id)
+            ->with(['address', 'products.product', 'products.unit'])
+            ->first();
+
+        if (!$order) {
+            return $this->error('Order not found', 404);
+        }
+
+        return $this->success($order);
+    }
+
+    /**
      * Place a new order.
      */
     public function store(Request $request): JsonResponse

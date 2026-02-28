@@ -38,26 +38,26 @@
 - ✅ Reject order if any item is out of stock (validate before creating)
 - ✅ Wrap in DB transaction (order + address + items + stock all atomic)
 
-### MP-B6: API — OrderController@index (order history)
-- `GET /api/v1/orders` — paginated order history for authenticated user
-- Include: order_id, status, total_amount, items count, created_at
-- Sorted by newest first
-- Register route
+### MP-B6: API — OrderController@index (order history) ✅
+- ✅ `GET /api/v1/orders` — paginated order history for authenticated user
+- ✅ Include: order_id, status, total_amount, products_count, created_at
+- ✅ Sorted by newest first
+- ✅ Register route
 
-### MP-B7: API — OrderController@show (order detail)
-- `GET /api/v1/orders/{order_number}` — full order detail by order_id string
-- Include: order info, address snapshot, line items with product name + unit + price
-- Ownership check (user can only see own orders)
-- Register route
+### MP-B7: API — OrderController@show (order detail) ✅
+- ✅ `GET /api/v1/orders/{order_number}` — full order detail by order_id string
+- ✅ Include: order info, address snapshot, line items with product name + unit + price
+- ✅ Ownership check (user can only see own orders)
+- ✅ Register route
 
-### MP-B8: Filament OrderResource (list + view + status)
-- Create OrderResource (list + view only, no create/edit)
-- Table: id, order_id, customer name, status (badge), total_amount, items count, created_at
-- Searchable by order_id, customer name
-- Filterable by status
-- View page (infolist): order info, address, line items table
-- Status change action (select from: pending, confirmed, dispatched, delivered, cancelled)
-- Navigation group: Orders, icon: shopping-bag
+### MP-B8: Filament OrderResource (list + view + status) ✅
+- ✅ Create OrderResource (list + view only, no create/edit)
+- ✅ Table: id, order_id, customer name, status (badge), total_amount, items count, created_at
+- ✅ Searchable by order_id, customer name
+- ✅ Filterable by status
+- ✅ View page (infolist): order info, customer, address, line items with RepeatableEntry
+- ✅ Status change action (select from: pending, confirmed, dispatched, delivered, cancelled)
+- ✅ Navigation group: Orders, icon: shopping-bag
 
 ---
 
@@ -148,6 +148,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 8 | 5 | 3 |
+| Backend | 8 | 8 | 0 |
 | Mobile | 13 | 0 | 13 |
-| **Total** | **21** | **5** | **16** |
+| **Total** | **21** | **8** | **13** |

@@ -61,6 +61,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/shipping-charges', [ShippingController::class, 'index']);
 
         // Orders
+        Route::get('/orders', [OrderController::class, 'index']);
         Route::post('/orders', [OrderController::class, 'store']);
+        Route::get('/orders/{orderNumber}', [OrderController::class, 'show']);
     });
 });
