@@ -9,11 +9,11 @@
 
 ## Backend Micro-Phases
 
-### MP-B1: Filament Dashboard — Stats overview widgets
-- Create `Filament\Widgets\StatsOverviewWidget`
-- Cards: Total Orders, Total Customers, Total Categories, Total Products
-- Each card shows count with icon and description
-- Register widget on Filament dashboard
+### MP-B1: Filament Dashboard — Stats overview widgets ✅
+- ✅ Create `Filament\Widgets\StatsOverviewWidget`
+- ✅ Cards: Total Orders, Total Customers, Total Categories, Total Products
+- ✅ Each card shows count with icon and description
+- ✅ Register widget on Filament dashboard (auto-discovered, removed default AccountWidget)
 
 ### MP-B2: Filament Dashboard — Revenue stat card
 - Add Revenue card to StatsOverviewWidget (sum of all delivered order totals)
@@ -145,6 +145,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 10 | 0 | 10 |
+| Backend | 10 | 1 | 9 |
 | Mobile | 11 | 0 | 11 |
-| **Total** | **21** | **0** | **21** |
+| **Total** | **21** | **1** | **20** |
