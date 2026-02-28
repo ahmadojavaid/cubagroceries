@@ -19,10 +19,12 @@ class User extends Authenticatable
         'password',
         'date_of_birth',
         'wallet_amount',
+        'fcm_token',
     ];
 
     protected $hidden = [
         'password',
+        'fcm_token',
     ];
 
     protected function casts(): array

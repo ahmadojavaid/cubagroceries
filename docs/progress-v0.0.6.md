@@ -61,12 +61,13 @@
 - ✅ `PUT /api/v1/notifications/read-all` — mark all as read
 - ✅ Routes registered under Sanctum middleware
 
-### MP-B10: Firebase Cloud Messaging — Server-side setup
-- Install `laravel-notification-channels/fcm` or `kreait/laravel-firebase`
-- Add FCM notification channel to OrderStatusChanged notification
-- API endpoint to save FCM device token: `POST /api/v1/device-token`
-- Add `fcm_token` column to users table (migration)
-- Store token on login/register from mobile app
+### MP-B10: Firebase Cloud Messaging — Server-side setup ✅
+- ✅ Created `FcmService` using FCM legacy HTTP API (lightweight, no heavy packages)
+- ✅ FCM push sent from `OrderStatusChanged` notification's `toArray()` when user has token
+- ✅ API endpoint: `POST /api/v1/device-token` via `DeviceTokenController`
+- ✅ Migration: `add_fcm_token_to_users_table` (varchar 500, nullable)
+- ✅ `fcm_token` added to User model fillable + hidden
+- ✅ Firebase server_key config in `config/services.php` (reads `FIREBASE_SERVER_KEY` env)
 
 ---
 
@@ -145,6 +146,6 @@
 
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
-| Backend | 10 | 9 | 1 |
+| Backend | 10 | 10 | 0 |
 | Mobile | 11 | 0 | 11 |
-| **Total** | **21** | **9** | **12** |
+| **Total** | **21** | **10** | **11** |
