@@ -126,11 +126,12 @@
 - ✅ Create `app_theme.dart` — Material 3 ThemeData (appBar, cards, buttons, inputs, bottomNav, chips)
 - ✅ Apply theme in `main.dart`, rename app to CubaGroceriesApp
 
-### MP-M5: Dio API Client Setup
-- Create `core/api/api_client.dart` (Dio instance, base URL, interceptors)
-- Create `core/api/api_response.dart` (typed response wrapper)
-- Token interceptor reading from flutter_secure_storage
-- Error handling interceptor
+### MP-M5: Dio API Client Setup ✅
+- ✅ Create `api_client.dart` — Dio with base URL, timeouts, auth interceptor, error interceptor
+- ✅ Create `api_response.dart` — typed wrapper with PaginationMeta, firstError helper
+- ✅ Create `api_exception.dart` — typed exceptions (isValidation, isUnauthorized, etc.)
+- ✅ Token management (save, clear, get, hasToken) via flutter_secure_storage
+- ✅ Deleted old scaffolded `services/api_service.dart`
 
 ### MP-M6: Riverpod Foundation
 - Wrap app in `ProviderScope`
@@ -177,5 +178,5 @@
 |------|-------|------|-----------|
 | Pre-Flight | 6 | 0 | 6 |
 | Backend | 10 | 10 | 0 |
-| Mobile | 12 | 3 | 9 |
-| **Total** | **28** | **13** | **15** |
+| Mobile | 12 | 4 | 8 |
+| **Total** | **28** | **14** | **14** |
