@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../../../core/widgets/shared_widgets.dart';
 import '../../categories/providers/category_provider.dart';
+import '../../notifications/providers/notification_provider.dart';
 import '../providers/home_provider.dart';
 import '../widgets/banner_slider.dart';
 import '../widgets/category_slider.dart';
@@ -25,6 +26,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Future.microtask(() {
       ref.read(homeProvider.notifier).fetchHome();
       ref.read(categoriesProvider.notifier).fetchCategories();
+      ref.read(notificationListProvider.notifier).fetchNotifications();
     });
   }
 
@@ -48,6 +50,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: const Icon(Icons.search_rounded),
             onPressed: () => context.push('/search'),
           ),
+          _buildNotificationBell(context),
         ],
       ),
       body: RefreshIndicator(
@@ -55,6 +58,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onRefresh: _refresh,
         child: _buildBody(homeState, catState),
       ),
+    );
+  }
+
+  Widget _buildNotificationBell(BuildContext context) {
+    final unreadCount = ref.watch(unreadNotificationCountProvider);
+
+    return IconButton(
+      icon: unreadCount > 0
+          ? Badge(
+              label: Text(
+                unreadCount > 99 ? '99+' : '$unreadCount',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              backgroundColor: AppColors.error,
+              child: const Icon(Icons.notifications_outlined),
+            )
+          : const Icon(Icons.notifications_outlined),
+      onPressed: () => context.push('/notifications'),
     );
   }
 
