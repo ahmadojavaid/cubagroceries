@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../categories/screens/categories_tab_screen.dart';
 import 'home_screen.dart';
 
 class NavigationShell extends StatefulWidget {
@@ -14,7 +15,7 @@ class _NavigationShellState extends State<NavigationShell> {
 
   final _screens = const [
     HomeScreen(),
-    _PlaceholderTab(icon: Icons.grid_view, label: 'Categories'),
+    CategoriesTabScreen(),
     _PlaceholderTab(icon: Icons.shopping_cart, label: 'Cart'),
     _PlaceholderTab(icon: Icons.receipt_long, label: 'Orders'),
     _PlaceholderTab(icon: Icons.person, label: 'Profile'),

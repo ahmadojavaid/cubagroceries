@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/shared_widgets.dart';
 import '../../categories/providers/category_provider.dart';
 import '../../categories/widgets/category_card.dart';
 
@@ -48,15 +49,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildBody(CategoriesState state) {
     if (state.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return ListView(
+        padding: const EdgeInsets.all(AppDimens.md),
+        children: [
+          const SizedBox(height: AppDimens.xl),
+          const ShimmerBox(width: 220, height: 24),
+          const SizedBox(height: AppDimens.lg),
+          const ShimmerBox(width: 120, height: 20),
+          const SizedBox(height: AppDimens.sm),
+          const CategoryGridShimmer(),
+        ],
+      );
     }
 
     if (state.error != null) {
-      return _buildError(state.error!);
+      return ErrorStateWidget(
+        message: state.error!,
+        onRetry: () => ref
+            .read(categoriesProvider.notifier)
+            .fetchCategories(forceRefresh: true),
+      );
     }
 
     if (state.categories.isEmpty) {
-      return _buildEmpty();
+      return const EmptyStateWidget(
+        icon: Icons.storefront_outlined,
+        message: 'No categories available',
+      );
     }
 
     return ListView(
@@ -113,53 +132,5 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  Widget _buildError(String message) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppDimens.lg),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-            const SizedBox(height: AppDimens.md),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: AppDimens.md),
-            ElevatedButton(
-              onPressed: () => ref
-                  .read(categoriesProvider.notifier)
-                  .fetchCategories(forceRefresh: true),
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  Widget _buildEmpty() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.storefront_outlined,
-              size: 48, color: AppColors.textHint),
-          const SizedBox(height: AppDimens.md),
-          Text(
-            'No categories available',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: AppColors.textSecondary),
-          ),
-        ],
-      ),
-    );
-  }
 }

@@ -143,17 +143,23 @@
 - ✅ Clear button in app bar, autofocus on open
 - ✅ Route /search now uses real screen
 
-### MP-M8: Shimmer Loading & Image Caching
-- Add shimmer loading placeholders to: home screen, category listing, product listing
-- Configure `cached_network_image` for product/category images
-- Add error/fallback image widget
-- Add empty state widget for lists with no data
+### MP-M8: Shimmer Loading & Image Caching ✅
+- ✅ Created `core/widgets/shared_widgets.dart` with reusable widgets:
+  - CategoryGridShimmer, ProductGridShimmer, ShimmerBox
+  - ImageFallback, EmptyStateWidget, ErrorStateWidget
+- ✅ HomeScreen uses shimmer loading + shared error/empty widgets
+- ✅ ProductListingScreen uses ProductGridShimmer + shared widgets
+- ✅ CachedNetworkImage used in CategoryCard and CategoriesTabScreen
+- ✅ Removed duplicate error/empty widget code from screens
 
-### MP-M9: Navigation Wiring
-- Add routes to GoRouter: `/categories/:id`, `/products`, `/products/:id`, `/search`
-- Wire all navigation: home → category → products → detail
-- Wire search from home app bar
-- Ensure back navigation works correctly
+### MP-M9: Navigation Wiring ✅
+- ✅ All routes wired: /categories/:id, /categories/:id/products, /products/:id, /search
+- ✅ Navigation flow: Home → category → sub-categories → products → detail
+- ✅ Search accessible from Home and Categories app bars
+- ✅ Categories tab: CategoriesTabScreen with expandable list + sub-category chips
+- ✅ NavigationShell updated: Home + Categories tabs use real screens
+- ✅ Back navigation via GoRouter push/pop
+- ✅ All placeholder screens removed from router
 
 ---
 
@@ -162,5 +168,5 @@
 | Area | Total | Done | Remaining |
 |------|-------|------|-----------|
 | Backend | 8 | 8 | 0 |
-| Mobile | 9 | 7 | 2 |
-| **Total** | **17** | **15** | **2** |
+| Mobile | 9 | 9 | 0 |
+| **Total** | **17** | **17** | **0** |

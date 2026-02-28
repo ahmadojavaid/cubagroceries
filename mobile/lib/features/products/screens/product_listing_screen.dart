@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/widgets/shared_widgets.dart';
 import '../../categories/providers/category_provider.dart';
 import '../providers/product_provider.dart';
 import '../widgets/product_card.dart';
@@ -78,15 +79,18 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
 
   Widget _buildBody(BuildContext context, ProductsState state) {
     if (state.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const ProductGridShimmer();
     }
 
     if (state.error != null && state.products.isEmpty) {
-      return _buildError(context, state.error!);
+      return ErrorStateWidget(message: state.error!, onRetry: _fetchProducts);
     }
 
     if (state.products.isEmpty) {
-      return _buildEmpty(context);
+      return const EmptyStateWidget(
+        icon: Icons.inventory_2_outlined,
+        message: 'No products found',
+      );
     }
 
     return GridView.builder(
@@ -119,51 +123,5 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
     );
   }
 
-  Widget _buildError(BuildContext context, String message) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppDimens.lg),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-            const SizedBox(height: AppDimens.md),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: AppDimens.md),
-            ElevatedButton(
-              onPressed: _fetchProducts,
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  Widget _buildEmpty(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.inventory_2_outlined,
-              size: 48, color: AppColors.textHint),
-          const SizedBox(height: AppDimens.md),
-          Text(
-            'No products found',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: AppColors.textSecondary),
-          ),
-        ],
-      ),
-    );
-  }
 }
