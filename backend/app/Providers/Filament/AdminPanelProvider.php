@@ -29,14 +29,16 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->authGuard('portal')
             ->brandName('Cuba Groceries')
+            ->favicon(asset('favicon.ico'))
             ->colors([
-                'primary' => Color::Green,
+                'primary' => Color::Orange,
             ])
             ->maxContentWidth(\Filament\Support\Enums\MaxWidth::Full)
             ->navigationGroups([
                 'Orders',
                 'Users',
                 'Catalog',
+                'Reviews',
                 'Operations',
                 'Marketing',
                 'Content',

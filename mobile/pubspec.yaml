@@ -49,6 +49,9 @@ dependencies:
   # Connectivity
   connectivity_plus: ^6.1.4
 
+  # URL Launcher (Maps, WhatsApp)
+  url_launcher: ^6.3.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
