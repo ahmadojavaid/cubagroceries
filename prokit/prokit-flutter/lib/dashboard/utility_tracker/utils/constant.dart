@@ -1,1 +1,0 @@
-const DEFAULT_UTILITY_RADIUS = 20.0;

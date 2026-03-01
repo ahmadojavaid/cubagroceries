@@ -1,1 +1,0 @@
-const PRO_SCAN_DEFAULT_RADIUS = 24.0;

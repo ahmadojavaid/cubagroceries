@@ -1,0 +1,20 @@
+# ProKit (commercial UI kit — extracted, not a dependency)
+prokit/
+
+# Project docs (internal)
+docs/
+
+# Local dev scripts
+scaffold.ps1
+open.ps1
+start.ps1
+stop.ps1
+
+# IDE / workspace
+*.code-workspace
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
