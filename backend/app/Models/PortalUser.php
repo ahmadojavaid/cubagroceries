@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class PortalUser extends Authenticatable
+class PortalUser extends Authenticatable implements FilamentUser
 {
     const ROLE_SUPER_ADMIN = 1;
     const ROLE_ADMIN = 2;
@@ -30,6 +32,11 @@ class PortalUser extends Authenticatable
             'password' => 'hashed',
             'role' => 'integer',
         ];
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
     }
 
     // Helpers
