@@ -2,13 +2,11 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../config/app_config.dart';
 import 'api_exception.dart';
 
 /// Dio API client with token interceptor and error handling
 class ApiClient {
-  // Herd serves at cubagroceries.test with self-signed SSL
-  // 10.0.2.2 maps to host machine from Android emulator
-  static const String baseUrl = 'https://10.0.2.2/api/v1';
   static const String tokenKey = 'auth_token';
 
   final Dio _dio;
@@ -17,21 +15,23 @@ class ApiClient {
   ApiClient({FlutterSecureStorage? storage})
       : _storage = storage ?? const FlutterSecureStorage(),
         _dio = Dio(BaseOptions(
-          baseUrl: baseUrl,
+          baseUrl: AppConfig.baseUrl,
           connectTimeout: const Duration(seconds: 15),
           receiveTimeout: const Duration(seconds: 15),
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Host': 'cubagroceries.test',
+            if (AppConfig.hostHeader != null) 'Host': AppConfig.hostHeader!,
           },
         )) {
-    // Accept self-signed certificates (Herd .test domains)
-    (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-      final client = HttpClient()
-        ..badCertificateCallback = (cert, host, port) => true;
-      return client;
-    };
+    // Accept self-signed certificates only in dev (Herd .test domains)
+    if (AppConfig.trustSelfSigned) {
+      (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+        final client = HttpClient()
+          ..badCertificateCallback = (cert, host, port) => true;
+        return client;
+      };
+    }
 
     _dio.interceptors.addAll([
       _authInterceptor(),

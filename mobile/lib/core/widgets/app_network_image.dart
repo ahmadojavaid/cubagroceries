@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import '../config/app_config.dart';
 import '../theme/app_colors.dart';
 
 /// App-wide network image widget that handles:
-/// - Herd self-signed SSL certs
-/// - Host header for emulator → Herd routing
+/// - Herd self-signed SSL certs (dev only)
+/// - Host header for emulator → Herd routing (dev only)
+/// - Production: standard HTTPS image loading
 class AppNetworkImage extends StatefulWidget {
   final String? imageUrl;
   final double? width;
@@ -30,7 +32,9 @@ class AppNetworkImage extends StatefulWidget {
 
 class _AppNetworkImageState extends State<AppNetworkImage> {
   static final HttpClient _client = HttpClient()
-    ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    ..badCertificateCallback = AppConfig.trustSelfSigned
+        ? (X509Certificate cert, String host, int port) => true
+        : null;
 
   /// Simple in-memory cache shared across all instances
   static final Map<String, Uint8List> _cache = {};
@@ -69,7 +73,9 @@ class _AppNetworkImageState extends State<AppNetworkImage> {
     try {
       final uri = Uri.parse(url);
       final request = await _client.getUrl(uri);
-      request.headers.set('Host', 'cubagroceries.test');
+      if (AppConfig.hostHeader != null) {
+        request.headers.set('Host', AppConfig.hostHeader!);
+      }
       final response = await request.close();
 
       if (response.statusCode == 200) {
