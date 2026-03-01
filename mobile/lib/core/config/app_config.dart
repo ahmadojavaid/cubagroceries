@@ -1,7 +1,7 @@
 /// App environment configuration
 class AppConfig {
   // Toggle this for production builds
-  static const bool isProduction = false;
+  static const bool isProduction = true;
 
   // API Base URLs
   static const String _prodBaseUrl = 'https://cubagroceries.zegobyte.com/api/v1';
