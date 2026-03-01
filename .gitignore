@@ -3,6 +3,7 @@ prokit/
 
 # Project docs (internal)
 docs/
+serversetup.md
 
 # Local dev scripts
 scaffold.ps1
