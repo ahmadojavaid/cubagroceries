@@ -19,7 +19,6 @@ use App\Models\Faq;
 use App\Models\SearchHistory;
 use App\Models\StoreSchedule;
 use App\Models\Survey;
-use App\Models\SurveyResponse;
 use App\Models\User;
 use App\Notifications\OrderStatusChanged;
 use Illuminate\Database\Seeder;
@@ -541,35 +540,9 @@ class SampleDataSeeder extends Seeder
 
     private function seedSurveys(array $customers): void
     {
-        $surveys = [
-            [
-                'question' => 'How did you hear about Cuba Groceries?',
-                'options' => ['Social Media', 'Friend/Family', 'Google Search', 'Flyer/Banner', 'Other'],
-            ],
-            [
-                'question' => 'How would you rate our delivery speed?',
-                'options' => ['Excellent', 'Good', 'Average', 'Poor'],
-            ],
-            [
-                'question' => 'Which product category do you shop most?',
-                'options' => ['Fruits', 'Vegetables', 'Dairy', 'Beverages', 'Bakery'],
-            ],
-        ];
-
-        foreach ($surveys as $i => $data) {
-            $survey = Survey::firstOrCreate(
-                ['question' => $data['question']],
-                array_merge($data, ['is_active' => true, 'sort_order' => $i + 1])
-            );
-
-            // Add some responses
-            foreach (array_slice($customers, 0, 3) as $customer) {
-                SurveyResponse::firstOrCreate(
-                    ['survey_id' => $survey->id, 'user_id' => $customer->id],
-                    ['answer' => $data['options'][array_rand($data['options'])]]
-                );
-            }
-        }
+        // Surveys are seeded by SurveySeeder with multi-question format
+        // Just call it here to keep sample data complete
+        $this->call(SurveySeeder::class);
     }
 
     private function seedSearchHistory(array $customers): void
