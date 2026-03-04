@@ -6,7 +6,10 @@ use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\DeliveryBoy;
 use App\Models\Order;
+use App\Models\Orderproduct;
 use App\Models\OrderStatusHistory;
+use App\Models\Price;
+use App\Models\Product;
 use App\Notifications\OrderStatusChanged;
 use App\Notifications\RiderJobAssigned;
 use Filament\Forms;
@@ -262,28 +265,74 @@ class OrderResource extends Resource
 
                 Infolists\Components\Section::make('Order Items')
                     ->schema([
-                        Infolists\Components\RepeatableEntry::make('products')
+                        Infolists\Components\ViewEntry::make('order_items_table')
                             ->label('')
-                            ->schema([
-                                Infolists\Components\TextEntry::make('product.name')
-                                    ->label('Product'),
-
-                                Infolists\Components\TextEntry::make('unit.name')
-                                    ->label('Unit'),
-
-                                Infolists\Components\TextEntry::make('quantity')
-                                    ->label('Qty'),
-
-                                Infolists\Components\TextEntry::make('price')
-                                    ->label('Price')
-                                    ->money('PKR'),
-
-                                Infolists\Components\TextEntry::make('line_total')
-                                    ->label('Total')
-                                    ->state(fn ($record) => number_format($record->price * $record->quantity, 2))
-                                    ->prefix('PKR '),
+                            ->view('filament.infolists.order-items-editable'),
+                    ])
+                    ->headerActions([
+                        Infolists\Components\Actions\Action::make('addItem')
+                            ->label('Add Item')
+                            ->icon('heroicon-o-plus')
+                            ->color('success')
+                            ->visible(fn ($record) => !$record->status->isFinal())
+                            ->form([
+                                Forms\Components\Select::make('product_id')
+                                    ->label('Product')
+                                    ->searchable()
+                                    ->getSearchResultsUsing(function (string $search) {
+                                        return Product::where('name', 'ilike', "%{$search}%")
+                                            ->where('stock', '>', 0)
+                                            ->limit(20)
+                                            ->pluck('name', 'id');
+                                    })
+                                    ->getOptionLabelUsing(fn ($value) => Product::find($value)?->name)
+                                    ->required()
+                                    ->live(),
+                                Forms\Components\Select::make('price_id')
+                                    ->label('Unit & Price')
+                                    ->options(function (Forms\Get $get) {
+                                        $productId = $get('product_id');
+                                        if (!$productId) return [];
+                                        return Price::where('product_id', $productId)
+                                            ->with('unit')
+                                            ->get()
+                                            ->mapWithKeys(fn ($p) => [
+                                                $p->id => $p->unit->name . ' — Rs ' . number_format($p->price, 0),
+                                            ]);
+                                    })
+                                    ->required()
+                                    ->live(),
+                                Forms\Components\TextInput::make('quantity')
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->default(1)
+                                    ->required(),
                             ])
-                            ->columns(5),
+                            ->action(function (Order $record, array $data): void {
+                                $price = Price::with('unit')->findOrFail($data['price_id']);
+
+                                Orderproduct::create([
+                                    'order_id' => $record->id,
+                                    'product_id' => $data['product_id'],
+                                    'unit_id' => $price->unit_id,
+                                    'quantity' => $data['quantity'],
+                                    'price' => $price->price,
+                                ]);
+
+                                // Deduct stock
+                                Product::where('id', $data['product_id'])
+                                    ->decrement('stock', $data['quantity']);
+
+                                // Recalculate total
+                                self::recalculateOrderTotal($record);
+
+                                Notification::make()
+                                    ->success()
+                                    ->title('Item Added')
+                                    ->body($price->product?->name ?? 'Product' . ' added to order.')
+                                    ->send();
+                            })
+                            ->modalHeading('Add Item to Order'),
                     ]),
 
                 Infolists\Components\Section::make('Fulfilment Trail')
@@ -293,6 +342,16 @@ class OrderResource extends Resource
                             ->view('filament.infolists.order-fulfilment-trail'),
                     ]),
             ]);
+    }
+
+    /**
+     * Recalculate order total from its line items.
+     */
+    public static function recalculateOrderTotal(Order $order): void
+    {
+        $order->load('products');
+        $newTotal = $order->products->sum(fn ($item) => $item->price * $item->quantity);
+        $order->update(['total_amount' => $newTotal]);
     }
 
     public static function getRelations(): array
