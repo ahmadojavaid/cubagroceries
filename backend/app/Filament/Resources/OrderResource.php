@@ -212,7 +212,15 @@ class OrderResource extends Resource
                             ->label('Placed At')
                             ->dateTime('M d, Y H:i'),
                     ])
-                    ->columns(4),
+                    ->columns(4)
+                    ->headerActions([
+                        Infolists\Components\Actions\Action::make('printInvoice')
+                            ->label('Print Invoice')
+                            ->icon('heroicon-o-printer')
+                            ->color('gray')
+                            ->url(fn ($record) => route('orders.invoice', $record))
+                            ->openUrlInNewTab(),
+                    ]),
 
                 Infolists\Components\Section::make('Customer')
                     ->schema([
