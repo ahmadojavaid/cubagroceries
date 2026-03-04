@@ -42,6 +42,11 @@ class CouponController extends Controller
             return $this->error('This coupon has been fully redeemed.', 422);
         }
 
+        // User-specific coupon check
+        if ($coupon->isUserSpecific() && $coupon->user_id !== $request->user()->id) {
+            return $this->error('This coupon is not available for your account.', 422);
+        }
+
         if ($coupon->min_order_amount && $request->order_total < $coupon->min_order_amount) {
             return $this->error(
                 'Minimum order of Rs ' . number_format($coupon->min_order_amount, 0) . ' required.',

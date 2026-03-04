@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -95,6 +96,19 @@ class CouponResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
+
+                Forms\Components\Section::make('User Restriction')
+                    ->schema([
+                        Forms\Components\Select::make('user_id')
+                            ->label('Restrict to Customer')
+                            ->relationship('user', 'firstname')
+                            ->getOptionLabelFromRecordUsing(fn (User $record) => "{$record->firstname} {$record->lastname} ({$record->email})")
+                            ->searchable(['firstname', 'lastname', 'email', 'identity'])
+                            ->preload()
+                            ->placeholder('All customers (no restriction)')
+                            ->helperText('Leave empty to allow all customers. Select a customer to make this a personal promo code.')
+                            ->nullable(),
+                    ]),
             ]);
     }
 
@@ -143,6 +157,16 @@ class CouponResource extends Resource
                     ->label('Expires')
                     ->date('M d, Y')
                     ->placeholder('Never'),
+
+                Tables\Columns\TextColumn::make('user.firstname')
+                    ->label('Restricted To')
+                    ->formatStateUsing(fn ($state, Coupon $record) => $record->user
+                        ? $record->user->firstname . ' ' . $record->user->lastname
+                        : null)
+                    ->placeholder('All')
+                    ->badge()
+                    ->color('warning')
+                    ->toggleable(),
 
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')

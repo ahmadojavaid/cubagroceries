@@ -18,6 +18,7 @@ class Coupon extends Model
         'start_date',
         'end_date',
         'is_active',
+        'user_id',
     ];
 
     protected function casts(): array
@@ -59,6 +60,18 @@ class Coupon extends Model
     public function isUsedUp(): bool
     {
         return $this->usage_limit && $this->used_count >= $this->usage_limit;
+    }
+
+    public function isUserSpecific(): bool
+    {
+        return $this->user_id !== null;
+    }
+
+    // Relationships
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function getDisplayValueAttribute(): string
