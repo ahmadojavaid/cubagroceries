@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
-/// Cuba Groceries — Premium ThemeData
-/// DM Sans for headings, Inter for body. Warm earthy palette.
+/// Asif Groceries — Premium ThemeData
+/// DM Sans for headings, Inter for body. Fresh green palette.
 class AppTheme {
   AppTheme._();
 
@@ -75,7 +75,7 @@ class AppTheme {
 
       scaffoldBackgroundColor: AppColors.scaffoldBg,
 
-      // AppBar — Slightly lifted from scaffold
+      // AppBar
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.cardBg,
         foregroundColor: AppColors.textPrimary,
@@ -95,7 +95,7 @@ class AppTheme {
         ),
       ),
 
-      // Cards — No elevation, subtle border
+      // Cards
       cardTheme: CardThemeData(
         color: AppColors.cardBg,
         elevation: 0,
@@ -107,7 +107,7 @@ class AppTheme {
         margin: EdgeInsets.zero,
       ),
 
-      // Elevated Button — Rounded, no shadow
+      // Elevated Button
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -126,7 +126,7 @@ class AppTheme {
         ),
       ),
 
-      // Outlined Button — Thin border
+      // Outlined Button
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -154,7 +154,7 @@ class AppTheme {
         ),
       ),
 
-      // Input Decoration — Softer, warmer
+      // Input Decoration
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceBg,
@@ -187,7 +187,7 @@ class AppTheme {
         ),
       ),
 
-      // Bottom Navigation — Premium feel
+      // Bottom Navigation
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.cardBg,
         selectedItemColor: AppColors.primary,
@@ -207,9 +207,9 @@ class AppTheme {
         space: 0.5,
       ),
 
-      // Chip — Warm, pill-shaped
+      // Chip
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.accentLight,
+        backgroundColor: AppColors.primarySurface,
         selectedColor: AppColors.primary,
         labelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
         shape: RoundedRectangleBorder(

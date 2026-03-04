@@ -57,7 +57,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       final isRider = ref.read(authProvider).isRider;
       context.go(isRider ? '/rider-home' : '/home');
     } else {
-      // Show onboarding only on first install
       final box = await Hive.openBox('app_prefs');
       final hasSeenOnboarding = box.get('hasSeenOnboarding', defaultValue: false);
       if (!mounted) return;
@@ -79,18 +78,30 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo container
+              // AG Logo
               Container(
-                width: 100,
-                height: 100,
+                width: 130,
+                height: 130,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(28),
-                ),
-                child: const Icon(
-                  Icons.eco_rounded,
-                  size: 52,
                   color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.18),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(14),
+                child: Image.asset(
+                  'assets/images/ag-logo.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const Icon(
+                    Icons.storefront_rounded,
+                    size: 52,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
               const SizedBox(height: 28),
@@ -113,7 +124,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 ),
               ),
               const SizedBox(height: 48),
-              SizedBox(
+              const SizedBox(
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(

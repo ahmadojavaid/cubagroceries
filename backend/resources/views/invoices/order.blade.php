@@ -69,7 +69,7 @@
 
         /* Header */
         .invoice-header {
-            background: linear-gradient(135deg, #1e3a2f 0%, #2d5a47 100%);
+            background: linear-gradient(135deg, #0D4F1A 0%, #1B6B2A 100%);
             color: #fff;
             padding: 32px 40px;
             display: flex;
@@ -238,7 +238,7 @@
             color: #111827;
         }
         .totals-table .grand-total td:last-child {
-            color: #1e3a2f;
+            color: #0D4F1A;
         }
 
         /* Footer */

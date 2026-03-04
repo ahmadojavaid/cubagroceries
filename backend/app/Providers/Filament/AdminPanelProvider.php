@@ -30,10 +30,10 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->authGuard('portal')
-            ->brandName('Asif Groceries')
+            ->brandName('Asif Groceries Admin')
             ->favicon(asset('favicon.ico'))
             ->colors([
-                'primary' => Color::Orange,
+                'primary' => Color::Green,
             ])
             ->maxContentWidth(\Filament\Support\Enums\MaxWidth::Full)
             ->navigationGroups([

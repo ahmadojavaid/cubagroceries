@@ -3,10 +3,10 @@
 # Place your splash image at assets/splash/splash_logo.png
 
 flutter_native_splash:
-  color: "#2D6A4F"
+  color: "#0D4F1A"
   image: "assets/splash/splash_logo.png"
   android: true
   ios: false
   android_12:
-    color: "#2D6A4F"
+    color: "#0D4F1A"
     image: "assets/splash/splash_logo.png"

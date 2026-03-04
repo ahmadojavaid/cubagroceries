@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// Cuba Groceries — Elegant text styles
+/// Asif Groceries — Elegant text styles
 /// Uses DM Sans (headings) + Inter (body) via Google Fonts loaded in AppTheme
 class AppTextStyles {
   AppTextStyles._();

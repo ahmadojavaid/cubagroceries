@@ -1,51 +1,57 @@
 import 'package:flutter/material.dart';
 
-/// Cuba Groceries — Warm Orange Palette
-/// Welcoming, vibrant tones inspired by fresh citrus and warm markets.
+/// Asif Groceries — AG Logo-Derived Palette
+/// Deep forest green (A/G letters), lime green (basket/leaf),
+/// mango orange (fruits), warm neutral backgrounds.
 class AppColors {
   AppColors._();
 
-  // Primary — Rich warm orange
-  static const Color primary = Color(0xFFE8742A);
-  static const Color primaryDark = Color(0xFFC45A1A);
-  static const Color primaryLight = Color(0xFFF5A563);
-  static const Color primarySurface = Color(0xFFFFF0E5);
+  // ── Primary — Deep forest green (from "A" & "G" letterforms) ──
+  static const Color primary = Color(0xFF1B6B2A);
+  static const Color primaryDark = Color(0xFF0D4F1A);
+  static const Color primaryLight = Color(0xFF3D9B4F);
+  static const Color primarySurface = Color(0xFFE6F4EA);
 
-  // Accent — Deep teal for contrast
-  static const Color accent = Color(0xFF1A8A7D);
-  static const Color accentLight = Color(0xFFE0F5F2);
-  static const Color accentDark = Color(0xFF136B61);
+  // ── Accent — Mango orange (from logo fruits) ──
+  static const Color accent = Color(0xFFF5A623);
+  static const Color accentLight = Color(0xFFFFF4E0);
+  static const Color accentDark = Color(0xFFE08A0C);
 
-  // Background — Warm cream tones
-  static const Color scaffoldBg = Color(0xFFFAF7F4);
+  // ── Secondary — Lime green (from logo basket & leaf) ──
+  static const Color secondary = Color(0xFF7CB342);
+  static const Color secondaryLight = Color(0xFFF0F8E8);
+  static const Color secondaryDark = Color(0xFF5C8A2F);
+
+  // ── Background — Warm, natural whites ──
+  static const Color scaffoldBg = Color(0xFFF7F9F5);
   static const Color cardBg = Color(0xFFFFFFFF);
-  static const Color surfaceBg = Color(0xFFF5F0EB);
+  static const Color surfaceBg = Color(0xFFEFF3EB);
 
-  // Text — Warm dark hierarchy
-  static const Color textPrimary = Color(0xFF2C1810);
-  static const Color textSecondary = Color(0xFF6B5E57);
-  static const Color textHint = Color(0xFFADA39B);
+  // ── Text — Green-tinted neutrals for hierarchy ──
+  static const Color textPrimary = Color(0xFF1A2E1A);
+  static const Color textSecondary = Color(0xFF5A6B5A);
+  static const Color textHint = Color(0xFF9CAA9C);
   static const Color textOnPrimary = Colors.white;
 
-  // Status
+  // ── Status ──
   static const Color success = Color(0xFF2E9E5A);
   static const Color error = Color(0xFFD14343);
-  static const Color warning = Color(0xFFF0A830);
+  static const Color warning = Color(0xFFF5A623);
   static const Color info = Color(0xFF3A86A8);
 
-  // Borders & Dividers — Warm neutral
-  static const Color border = Color(0xFFE8E0D8);
-  static const Color divider = Color(0xFFF0EAE3);
+  // ── Borders & Dividers ──
+  static const Color border = Color(0xFFDDE5D8);
+  static const Color divider = Color(0xFFEAF0E5);
 
-  // Shadows — Warm, diffused
-  static const Color shadow = Color(0x0D4A2C17);
-  static const Color shadowMedium = Color(0x1A4A2C17);
+  // ── Shadows ──
+  static const Color shadow = Color(0x0D1A3A1A);
+  static const Color shadowMedium = Color(0x1A1A3A1A);
 
-  // Ratings
-  static const Color ratingStar = Color(0xFFF0A830);
+  // ── Ratings ──
+  static const Color ratingStar = Color(0xFFF5A623);
 
-  // Order status
-  static const Color statusPending = Color(0xFFF0A830);
+  // ── Order status ──
+  static const Color statusPending = Color(0xFFF5A623);
   static const Color statusConfirmed = Color(0xFF3A86A8);
   static const Color statusDispatched = Color(0xFF7B68A6);
   static const Color statusDelivered = Color(0xFF2E9E5A);

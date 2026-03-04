@@ -1,5 +1,5 @@
 name: cubagroceries
-description: "Asif Groceries — Customer mobile app"
+description: "Asif Groceries — Customer & Rider mobile app"
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -66,3 +66,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icon/
+    - assets/sounds/
+    - assets/splash/

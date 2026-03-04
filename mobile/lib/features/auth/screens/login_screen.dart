@@ -56,18 +56,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               children: [
                 const SizedBox(height: 56),
 
-                // Logo
+                // AG Logo
                 Container(
-                  width: 72,
-                  height: 72,
+                  width: 80,
+                  height: 80,
                   decoration: BoxDecoration(
                     color: AppColors.primarySurface.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(22),
                   ),
-                  child: const Icon(
-                    Icons.eco_rounded,
-                    size: 38,
-                    color: AppColors.primary,
+                  padding: const EdgeInsets.all(8),
+                  child: Image.asset(
+                    'assets/images/ag-logo.png',
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Icon(
+                      Icons.storefront_rounded,
+                      size: 38,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
