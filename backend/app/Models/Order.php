@@ -14,6 +14,7 @@ class Order extends Model
         'user_id',
         'status',
         'total_amount',
+        'wallet_amount_used',
         'delivery_boy_id',
     ];
 
@@ -21,6 +22,7 @@ class Order extends Model
     {
         return [
             'total_amount' => 'decimal:2',
+            'wallet_amount_used' => 'decimal:2',
             'status' => OrderStatus::class,
         ];
     }

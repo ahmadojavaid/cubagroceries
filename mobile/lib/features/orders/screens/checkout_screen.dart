@@ -10,6 +10,7 @@ import '../../cart/widgets/free_delivery_milestone.dart';
 import '../../profile/data/address_model.dart';
 import '../../profile/providers/address_provider.dart';
 import '../../cart/widgets/coupon_input_widget.dart';
+import '../../profile/providers/profile_provider.dart';
 import '../providers/order_provider.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -23,6 +24,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   int _currentStep = 0;
   int? _selectedAddressId;
   int? _selectedShippingId;
+  bool _useWallet = false;
 
   @override
   void initState() {
@@ -30,6 +32,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     Future.microtask(() {
       ref.read(addressProvider.notifier).fetchAddresses();
       ref.read(shippingProvider.notifier).fetchCharges();
+      ref.read(profileProvider.notifier).fetchProfile();
     });
   }
 
@@ -269,6 +272,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         .firstOrNull;
 
     final coupon = ref.watch(couponProvider);
+    final profileState = ref.watch(profileProvider);
+    final walletBalance = double.tryParse(profileState.user?.walletAmount ?? '0') ?? 0.0;
+
     final shippingAmount = selectedShipping?.amountValue ?? 0.0;
     // For free_delivery coupons, discount applies to shipping, not subtotal
     final effectiveShipping = coupon.isFreeDelivery
@@ -277,7 +283,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final couponItemDiscount = coupon.isFreeDelivery
         ? 0.0
         : coupon.discount;
-    final grandTotal = cart.subtotal + effectiveShipping - couponItemDiscount;
+    final preWalletTotal = cart.subtotal + effectiveShipping - couponItemDiscount;
+    final walletDeduction = _useWallet ? (walletBalance > 0 ? walletBalance.clamp(0, preWalletTotal) : 0.0) : 0.0;
+    final grandTotal = preWalletTotal - walletDeduction;
 
     if (orderState.isLoading) {
       return const Padding(
@@ -339,6 +347,58 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         ),
         const SizedBox(height: AppDimens.md),
 
+        // Wallet credit toggle
+        if (walletBalance > 0) ...[
+          Container(
+            padding: const EdgeInsets.all(AppDimens.md),
+            decoration: BoxDecoration(
+              color: AppColors.primarySurface.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+              border: Border.all(
+                color: _useWallet ? AppColors.primary : AppColors.border,
+                width: _useWallet ? 1.5 : 0.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+                const SizedBox(width: AppDimens.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Use Wallet Credit',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        'Available: Rs ${walletBalance.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch(
+                  value: _useWallet,
+                  onChanged: (v) => setState(() => _useWallet = v),
+                  activeColor: AppColors.primary,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppDimens.md),
+        ],
+
         // Totals
         _totalRow('Subtotal', 'Rs ${cart.subtotal.toStringAsFixed(2)}'),
         if (selectedShipping != null)
@@ -353,6 +413,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         if (coupon.isApplied && !coupon.isFreeDelivery && coupon.discount > 0)
           _totalRow('Coupon (${coupon.code})', '- Rs ${coupon.discount.toStringAsFixed(0)}',
               color: AppColors.success),
+        if (_useWallet && walletDeduction > 0)
+          _totalRow('Wallet Credit', '- Rs ${walletDeduction.toStringAsFixed(2)}',
+              color: AppColors.primary),
         const SizedBox(height: AppDimens.xs),
         _totalRow('Total', 'Rs ${grandTotal.toStringAsFixed(2)}',
             bold: true),
@@ -440,12 +503,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           items: items,
           shippingChargeId: _selectedShippingId,
           couponCode: coupon.code,
+          useWallet: _useWallet,
         );
 
     if (order != null && mounted) {
       // Clear cart and coupon on success
       ref.read(cartProvider.notifier).clearCart();
       ref.read(couponProvider.notifier).clear();
+
+      // Refresh profile to get updated wallet balance
+      ref.read(profileProvider.notifier).fetchProfile();
 
       // Show success and navigate to order detail
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

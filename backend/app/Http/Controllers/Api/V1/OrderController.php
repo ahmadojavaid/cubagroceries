@@ -166,15 +166,30 @@ class OrderController extends Controller
 
         $totalAmount = $subtotal + $shippingAmount - $couponDiscount;
 
+        // Calculate wallet credit usage
+        $walletUsed = 0;
+        $useWallet = $validated['use_wallet'] ?? false;
+        if ($useWallet && $user->wallet_amount > 0) {
+            $walletUsed = min((float) $user->wallet_amount, $totalAmount);
+            $walletUsed = round($walletUsed, 2);
+            $totalAmount = round($totalAmount - $walletUsed, 2);
+        }
+
         // Create order in a transaction
-        $order = DB::transaction(function () use ($user, $address, $lineItems, $totalAmount, $couponCode, $couponDiscount) {
+        $order = DB::transaction(function () use ($user, $address, $lineItems, $totalAmount, $couponCode, $couponDiscount, $walletUsed) {
             // Create order
             $order = Order::create([
                 'order_id' => OrderIdGenerator::generate(),
                 'user_id' => $user->id,
                 'status' => 'pending',
                 'total_amount' => $totalAmount,
+                'wallet_amount_used' => $walletUsed,
             ]);
+
+            // Deduct wallet balance
+            if ($walletUsed > 0) {
+                $user->decrement('wallet_amount', $walletUsed);
+            }
 
             // Snapshot address
             $order->address()->create([
