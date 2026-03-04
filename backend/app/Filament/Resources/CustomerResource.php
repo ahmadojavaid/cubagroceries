@@ -220,6 +220,13 @@ class CustomerResource extends Resource
                             ->placeholder('No orders yet'),
                     ])
                     ->columns(3),
+
+                Infolists\Components\Section::make('Order History')
+                    ->schema([
+                        Infolists\Components\ViewEntry::make('orders_table')
+                            ->label('')
+                            ->view('filament.infolists.customer-orders'),
+                    ]),
             ]);
     }
 
