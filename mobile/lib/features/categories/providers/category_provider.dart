@@ -8,23 +8,33 @@ class CategoriesState {
   final List<CategoryModel> categories;
   final bool isLoading;
   final String? error;
+  final DateTime? lastFetchedAt;
 
   const CategoriesState({
     this.categories = const [],
     this.isLoading = false,
     this.error,
+    this.lastFetchedAt,
   });
 
   CategoriesState copyWith({
     List<CategoryModel>? categories,
     bool? isLoading,
     String? error,
+    DateTime? lastFetchedAt,
   }) {
     return CategoriesState(
       categories: categories ?? this.categories,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      lastFetchedAt: lastFetchedAt ?? this.lastFetchedAt,
     );
+  }
+
+  /// Data is stale if older than 5 minutes
+  bool get isStale {
+    if (lastFetchedAt == null) return true;
+    return DateTime.now().difference(lastFetchedAt!).inMinutes >= 5;
   }
 }
 
@@ -36,8 +46,8 @@ class CategoriesNotifier extends StateNotifier<CategoriesState> {
 
   /// Fetch all top-level categories with nested children
   Future<void> fetchCategories({bool forceRefresh = false}) async {
-    // Skip if already loaded and not forcing refresh
-    if (state.categories.isNotEmpty && !forceRefresh) return;
+    // Skip if recently fetched and not forcing refresh
+    if (state.categories.isNotEmpty && !forceRefresh && !state.isStale) return;
 
     state = state.copyWith(isLoading: true, error: null);
 
@@ -50,7 +60,7 @@ class CategoriesNotifier extends StateNotifier<CategoriesState> {
             .map((c) => CategoryModel.fromJson(Map<String, dynamic>.from(c)))
             .toList();
 
-        state = CategoriesState(categories: list);
+        state = CategoriesState(categories: list, lastFetchedAt: DateTime.now());
       } else {
         state = state.copyWith(
           isLoading: false,

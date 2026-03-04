@@ -12,6 +12,7 @@ class HomeState {
   final HolidayModel? holiday;
   final bool isLoading;
   final String? error;
+  final DateTime? lastFetchedAt;
 
   const HomeState({
     this.banners = const [],
@@ -19,6 +20,7 @@ class HomeState {
     this.holiday,
     this.isLoading = false,
     this.error,
+    this.lastFetchedAt,
   });
 
   HomeState copyWith({
@@ -28,6 +30,7 @@ class HomeState {
     bool clearHoliday = false,
     bool? isLoading,
     String? error,
+    DateTime? lastFetchedAt,
   }) {
     return HomeState(
       banners: banners ?? this.banners,
@@ -35,11 +38,18 @@ class HomeState {
       holiday: clearHoliday ? null : (holiday ?? this.holiday),
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      lastFetchedAt: lastFetchedAt ?? this.lastFetchedAt,
     );
   }
 
   bool get hasData => banners.isNotEmpty || featuredSections.isNotEmpty;
   bool get isStoreOffline => holiday != null && holiday!.isOffline;
+
+  /// Data is stale if older than 5 minutes
+  bool get isStale {
+    if (lastFetchedAt == null) return true;
+    return DateTime.now().difference(lastFetchedAt!).inMinutes >= 5;
+  }
 }
 
 /// Home notifier — fetches combined /home data
@@ -49,7 +59,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
   HomeNotifier(this._api) : super(const HomeState());
 
   Future<void> fetchHome({bool forceRefresh = false}) async {
-    if (state.hasData && !forceRefresh) return;
+    if (state.hasData && !forceRefresh && !state.isStale) return;
 
     state = state.copyWith(isLoading: true, error: null);
 
@@ -78,6 +88,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
           banners: banners,
           featuredSections: sections,
           holiday: holiday,
+          lastFetchedAt: DateTime.now(),
         );
       } else {
         state = state.copyWith(
