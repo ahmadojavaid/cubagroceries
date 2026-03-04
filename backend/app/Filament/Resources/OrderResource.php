@@ -213,18 +213,30 @@ class OrderResource extends Resource
                             ->label('Rider Phone')
                             ->placeholder('—'),
 
+                        Infolists\Components\TextEntry::make('address.phone')
+                            ->label('Contact Phone')
+                            ->placeholder('—'),
+
                         Infolists\Components\TextEntry::make('address.address')
-                            ->label('Address'),
+                            ->label('Address')
+                            ->columnSpan(2),
 
                         Infolists\Components\TextEntry::make('address.city')
                             ->label('City')
                             ->placeholder('—'),
-
-                        Infolists\Components\TextEntry::make('address.phone')
-                            ->label('Contact Phone')
-                            ->placeholder('—'),
                     ])
-                    ->columns(3),
+                    ->columns(3)
+                    ->headerActions([
+                        Infolists\Components\Actions\Action::make('showLocation')
+                            ->label('Show Location')
+                            ->icon('heroicon-o-map-pin')
+                            ->color('info')
+                            ->url(fn ($record) => $record->address?->latitude && $record->address?->longitude
+                                ? 'https://www.google.com/maps?q=' . $record->address->latitude . ',' . $record->address->longitude
+                                : null)
+                            ->openUrlInNewTab()
+                            ->visible(fn ($record) => $record->address?->latitude && $record->address?->longitude),
+                    ]),
 
                 Infolists\Components\Section::make('Order Items')
                     ->schema([
