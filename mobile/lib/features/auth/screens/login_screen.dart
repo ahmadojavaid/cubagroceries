@@ -227,10 +227,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   height: 52,
                   child: OutlinedButton.icon(
                     onPressed: auth.isLoading ? null : _onGoogleSignIn,
-                    icon: SizedBox(
+                    icon: Image.asset(
+                      'assets/images/google_logo.png',
                       width: 20,
                       height: 20,
-                      child: CustomPaint(painter: _GoogleLogoPainter()),
                     ),
                     label: const Text('Continue with Google'),
                     style: OutlinedButton.styleFrom(
@@ -287,47 +287,4 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
     );
   }
-}
-
-/// Draws the official Google "G" logo using the 4-color arcs
-class _GoogleLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double w = size.width;
-    final double h = size.height;
-    final Rect rect = Rect.fromLTWH(0, 0, w, h);
-    final double strokeWidth = w * 0.18;
-    final Paint paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.butt;
-
-    // Blue (top-right arc)
-    paint.color = const Color(0xFF4285F4);
-    canvas.drawArc(rect.deflate(strokeWidth / 2), -0.6, 1.8, false, paint);
-
-    // Green (bottom-right arc)
-    paint.color = const Color(0xFF34A853);
-    canvas.drawArc(rect.deflate(strokeWidth / 2), 1.2, 1.2, false, paint);
-
-    // Yellow (bottom-left arc)
-    paint.color = const Color(0xFFFBBC05);
-    canvas.drawArc(rect.deflate(strokeWidth / 2), 2.4, 1.0, false, paint);
-
-    // Red (top-left arc)
-    paint.color = const Color(0xFFEA4335);
-    canvas.drawArc(rect.deflate(strokeWidth / 2), 3.4, 1.1, false, paint);
-
-    // Blue horizontal bar
-    final barPaint = Paint()
-      ..color = const Color(0xFF4285F4)
-      ..style = PaintingStyle.fill;
-    canvas.drawRect(
-      Rect.fromLTRB(w * 0.48, h * 0.42, w * 0.98, h * 0.58),
-      barPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
