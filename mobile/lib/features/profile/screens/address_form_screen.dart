@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../data/address_model.dart';
 import '../providers/address_provider.dart';
+import 'map_picker_screen.dart';
 
 class AddressFormScreen extends ConsumerStatefulWidget {
   final AddressModel? address; // null = add mode, non-null = edit mode
@@ -25,6 +27,9 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
   late final TextEditingController _phoneController;
   bool _isSaving = false;
 
+  double? _latitude;
+  double? _longitude;
+
   @override
   void initState() {
     super.initState();
@@ -33,6 +38,8 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
         TextEditingController(text: widget.address?.address ?? '');
     _cityController = TextEditingController(text: widget.address?.city ?? '');
     _phoneController = TextEditingController(text: widget.address?.phone ?? '');
+    _latitude = widget.address?.latitude;
+    _longitude = widget.address?.longitude;
   }
 
   @override
@@ -42,6 +49,30 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
     _cityController.dispose();
     _phoneController.dispose();
     super.dispose();
+  }
+
+  Future<void> _openMapPicker() async {
+    final result = await Navigator.of(context).push<LatLng>(
+      MaterialPageRoute(
+        builder: (_) => MapPickerScreen(
+          initialLatitude: _latitude,
+          initialLongitude: _longitude,
+        ),
+      ),
+    );
+    if (result != null && mounted) {
+      setState(() {
+        _latitude = result.latitude;
+        _longitude = result.longitude;
+      });
+    }
+  }
+
+  void _clearCoordinates() {
+    setState(() {
+      _latitude = null;
+      _longitude = null;
+    });
   }
 
   Future<void> _save() async {
@@ -60,6 +91,8 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
       'phone': _phoneController.text.trim().isEmpty
           ? null
           : _phoneController.text.trim(),
+      'latitude': _latitude,
+      'longitude': _longitude,
     };
 
     final notifier = ref.read(addressProvider.notifier);
@@ -94,6 +127,8 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
         ref.read(addressProvider.notifier).clearError();
       }
     });
+
+    final hasCoordinates = _latitude != null && _longitude != null;
 
     return Scaffold(
       appBar: AppBar(
@@ -159,6 +194,10 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                 ),
                 keyboardType: TextInputType.phone,
               ),
+              const SizedBox(height: AppDimens.lg),
+
+              // ── Map Pin Location ──────────────────────────
+              _buildLocationSection(hasCoordinates),
               const SizedBox(height: AppDimens.xl),
 
               // Save button
@@ -176,6 +215,127 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLocationSection(bool hasCoordinates) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Pin Location',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          'Pin your exact location on the map so the rider can find you easily.',
+          style: TextStyle(fontSize: 12, color: AppColors.textHint),
+        ),
+        const SizedBox(height: AppDimens.sm),
+        if (hasCoordinates) ...[
+          // Show coordinates + mini map preview
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.primarySurface.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+              border: Border.all(color: AppColors.primary, width: 1),
+            ),
+            child: Column(
+              children: [
+                // Static map preview via coordinates
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(AppDimens.radiusMd - 1),
+                  ),
+                  child: SizedBox(
+                    height: 140,
+                    width: double.infinity,
+                    child: GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(_latitude!, _longitude!),
+                        zoom: 16,
+                      ),
+                      markers: {
+                        Marker(
+                          markerId: const MarkerId('pinned'),
+                          position: LatLng(_latitude!, _longitude!),
+                        ),
+                      },
+                      zoomControlsEnabled: false,
+                      scrollGesturesEnabled: false,
+                      rotateGesturesEnabled: false,
+                      tiltGesturesEnabled: false,
+                      zoomGesturesEnabled: false,
+                      myLocationButtonEnabled: false,
+                      mapToolbarEnabled: false,
+                      liteModeEnabled: true,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 10),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.check_circle_rounded,
+                          size: 18, color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${_latitude!.toStringAsFixed(6)}, ${_longitude!.toStringAsFixed(6)}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                      // Change button
+                      GestureDetector(
+                        onTap: _openMapPicker,
+                        child: const Text(
+                          'Change',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Remove button
+                      GestureDetector(
+                        onTap: _clearCoordinates,
+                        child: const Icon(Icons.close_rounded,
+                            size: 18, color: AppColors.error),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ] else ...[
+          // No coordinates — show button to pick
+          OutlinedButton.icon(
+            onPressed: _openMapPicker,
+            icon: const Icon(Icons.map_rounded, size: 20),
+            label: const Text('Pin on Map'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              side: const BorderSide(color: AppColors.primary),
+              minimumSize: const Size(double.infinity, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 

@@ -53,6 +53,10 @@ dependencies:
   # URL Launcher (Maps, WhatsApp)
   url_launcher: ^6.3.1
 
+  # Maps & Location
+  google_maps_flutter: ^2.12.1
+  geolocator: ^13.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
