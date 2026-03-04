@@ -144,13 +144,14 @@ class RiderController extends Controller
             ], 403);
         }
 
+        $oldStatus = $currentStatus;
         $order->update(['status' => $newStatus]);
 
         // Notify customer
         try {
-            $order->user->notify(new OrderStatusChanged($order));
+            $order->user->notify(new OrderStatusChanged($order, $oldStatus, $newStatus));
         } catch (\Throwable $e) {
-            // Don't fail the request if notification fails
+            \Illuminate\Support\Facades\Log::warning('Order notification failed: ' . $e->getMessage());
         }
 
         return response()->json([

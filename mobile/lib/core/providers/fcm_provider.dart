@@ -23,6 +23,5 @@ final fcmNotificationHandlerProvider = Provider<FcmNotificationHandler>((ref) {
       GoRouter.of(context).push('/orders/$orderNumber');
     },
   );
-  handler.initialize();
   return handler;
 });

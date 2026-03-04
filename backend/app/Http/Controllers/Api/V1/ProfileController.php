@@ -60,4 +60,20 @@ class ProfileController extends Controller
 
         return $this->success(message: 'Password changed successfully');
     }
+
+    /**
+     * PUT /api/v1/profile/fcm-token
+     */
+    public function updateFcmToken(Request $request): JsonResponse
+    {
+        $request->validate([
+            'fcm_token' => 'required|string|max:500',
+        ]);
+
+        $request->user()->update([
+            'fcm_token' => $request->fcm_token,
+        ]);
+
+        return $this->success(message: 'FCM token updated');
+    }
 }

@@ -164,6 +164,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // Ignore errors — still clear local state
     }
     await _api.clearToken();
+    FcmService.clearToken();
     state = const AuthState(isAuthenticated: false);
   }
 

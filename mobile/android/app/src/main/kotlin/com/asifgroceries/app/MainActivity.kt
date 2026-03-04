@@ -76,6 +76,17 @@ class MainActivity : FlutterActivity() {
             }
             manager.createNotificationChannel(defaultChannel)
 
+            // Order notifications channel — for customer order status updates
+            val orderChannel = NotificationChannel(
+                "order_notifications",
+                "Order Updates",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notifications about your order status changes"
+                enableVibration(true)
+            }
+            manager.createNotificationChannel(orderChannel)
+
             // Rider job alert channel — high importance with custom alert sound
             val alarmSound = Uri.parse(
                 "android.resource://${packageName}/raw/rider_alert"

@@ -2,52 +2,62 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import '../api/api_client.dart';
 
-/// Handles Firebase Cloud Messaging initialization, permissions, and token management.
+/// Manages FCM token retrieval, registration with backend, and refresh handling.
 class FcmService {
   final ApiClient _api;
+  static String? _currentToken;
 
   FcmService(this._api);
 
   /// Initialize FCM: request permission, get token, send to backend.
   Future<void> initialize() async {
     try {
-      // Request notification permission
-      final settings = await FirebaseMessaging.instance.requestPermission(
+      final messaging = FirebaseMessaging.instance;
+
+      // Request permission (iOS requires this, Android auto-grants)
+      final settings = await messaging.requestPermission(
         alert: true,
         badge: true,
         sound: true,
-        criticalAlert: false,
-        provisional: false,
       );
 
-      debugPrint('FCM: Permission status: ${settings.authorizationStatus}');
-
       if (settings.authorizationStatus == AuthorizationStatus.denied) {
-        debugPrint('FCM: Permission denied');
+        debugPrint('FCM: User denied notification permissions');
         return;
       }
 
-      // Get FCM token
-      final token = await FirebaseMessaging.instance.getToken();
+      // Get the current token
+      final token = await messaging.getToken();
       if (token != null) {
-        debugPrint('FCM: Token obtained');
         await _sendTokenToBackend(token);
       }
 
-      // Listen for token refresh
-      FirebaseMessaging.instance.onTokenRefresh.listen(_sendTokenToBackend);
+      // Listen for token refreshes (happens when app reinstalled, token invalidated, etc.)
+      messaging.onTokenRefresh.listen((newToken) {
+        _sendTokenToBackend(newToken);
+      });
+
+      debugPrint('FCM: Initialized successfully');
     } catch (e) {
-      debugPrint('FCM: Initialization failed: $e');
+      debugPrint('FCM: Init error: $e');
     }
   }
 
-  /// Send the FCM device token to the backend.
+  /// Send the FCM token to backend. Skips if same token already sent.
   Future<void> _sendTokenToBackend(String token) async {
+    if (token == _currentToken) return;
+
     try {
       await _api.post('/device-token', data: {'token': token});
-      debugPrint('FCM: Token sent to backend');
+      _currentToken = token;
+      debugPrint('FCM: Token registered with backend');
     } catch (e) {
-      debugPrint('FCM: Failed to send token: $e');
+      debugPrint('FCM: Failed to send token to backend: $e');
     }
+  }
+
+  /// Clear cached token (call on logout).
+  static void clearToken() {
+    _currentToken = null;
   }
 }

@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Services\FcmService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class OrderStatusChanged extends Notification
 {
@@ -30,23 +31,61 @@ class OrderStatusChanged extends Notification
             'order_number' => $this->order->order_id,
             'old_status' => $this->oldStatus->value,
             'new_status' => $this->newStatus->value,
-            'title' => "Order {$this->order->order_id} Updated",
-            'message' => "Your order {$this->order->order_id} status changed from {$this->oldStatus->label()} to {$this->newStatus->label()}.",
+            'title' => $this->getTitle(),
+            'message' => $this->getMessage(),
         ];
 
-        // Send FCM push notification if user has a token
-        if ($notifiable->fcm_token) {
-            FcmService::sendToDevice(
+        // Send FCM push notification after building the data
+        $this->sendFcmPush($notifiable, $data);
+
+        return $data;
+    }
+
+    protected function sendFcmPush(object $notifiable, array $data): void
+    {
+        if (empty($notifiable->fcm_token)) {
+            Log::info("FCM: No token for user {$notifiable->id}, skipping push for order {$this->order->order_id}");
+            return;
+        }
+
+        try {
+            $sent = FcmService::sendToDevice(
                 $notifiable->fcm_token,
                 $data['title'],
                 $data['message'],
                 [
                     'type' => 'order_status_changed',
                     'order_number' => $this->order->order_id,
+                    'new_status' => $this->newStatus->value,
                 ],
+                'order_notifications',
             );
-        }
 
-        return $data;
+            Log::info("FCM: Order {$this->order->order_id} push " . ($sent ? 'sent' : 'failed') . " to user {$notifiable->id}");
+        } catch (\Throwable $e) {
+            Log::warning("FCM: Exception sending order push to user {$notifiable->id}: " . $e->getMessage());
+        }
+    }
+
+    protected function getTitle(): string
+    {
+        return match ($this->newStatus) {
+            OrderStatus::Confirmed  => '✅ Order Confirmed',
+            OrderStatus::Dispatched => '🚚 Order On The Way',
+            OrderStatus::Delivered  => '📦 Order Delivered',
+            OrderStatus::Cancelled  => '❌ Order Cancelled',
+            default                 => "Order {$this->order->order_id} Updated",
+        };
+    }
+
+    protected function getMessage(): string
+    {
+        return match ($this->newStatus) {
+            OrderStatus::Confirmed  => "Your order #{$this->order->order_id} has been confirmed and is being prepared.",
+            OrderStatus::Dispatched => "Your order #{$this->order->order_id} is on the way! The rider is heading to your location.",
+            OrderStatus::Delivered  => "Your order #{$this->order->order_id} has been delivered. Enjoy!",
+            OrderStatus::Cancelled  => "Your order #{$this->order->order_id} has been cancelled.",
+            default                 => "Your order #{$this->order->order_id} status changed to {$this->newStatus->label()}.",
+        };
     }
 }
