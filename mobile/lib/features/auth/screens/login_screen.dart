@@ -69,14 +69,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 56),
+                const SizedBox(height: 24),
 
-                // AG Logo — large, transparent bg
+                // AG Logo
                 Center(
                   child: Image.asset(
                     'assets/images/ag-logo.png',
-                    width: 200,
-                    height: 200,
+                    width: 120,
+                    height: 120,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => const Icon(
                       Icons.storefront_rounded,
@@ -90,14 +90,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Text(
                     'Asif Groceries',
                     style: GoogleFonts.dmSans(
-                      fontSize: 32,
+                      fontSize: 24,
                       fontWeight: FontWeight.w700,
                       color: AppColors.primary,
-                      letterSpacing: -0.5,
+                      letterSpacing: -0.3,
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
                 Text(
                   'Welcome',
                   style: Theme.of(context).textTheme.headlineMedium,
