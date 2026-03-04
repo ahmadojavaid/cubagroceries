@@ -120,13 +120,8 @@ class AuthController extends Controller
             'phone' => 'required|string',
         ]);
 
-        // Verify the Firebase ID token
-        $response = Http::get('https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo', [
-            'key' => config('services.firebase.api_key'),
-        ]);
-
-        // Use Google's secure token endpoint to verify
-        $tokenResponse = Http::asForm()->post('https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' . config('services.firebase.api_key'), [
+        // Verify the Firebase ID token via Identity Toolkit
+        $tokenResponse = Http::post('https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' . config('services.firebase.api_key'), [
             'idToken' => $request->id_token,
         ]);
 
