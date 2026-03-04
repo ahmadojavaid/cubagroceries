@@ -10,6 +10,8 @@ class SurveySeeder extends Seeder
 {
     public function run(): void
     {
+        if (Survey::count() > 0) return;
+
         // Survey 1: Customer Satisfaction
         $s1 = Survey::create([
             'title' => 'How are we doing?',
@@ -47,7 +49,7 @@ class SurveySeeder extends Seeder
             'sort_order' => 3,
         ]);
 
-        // Survey 2: Delivery Feedback (inactive — for admin to activate later)
+        // Survey 2: Delivery Feedback (inactive)
         $s2 = Survey::create([
             'title' => 'Delivery Experience',
             'description' => 'Quick 2-question survey about our delivery service.',

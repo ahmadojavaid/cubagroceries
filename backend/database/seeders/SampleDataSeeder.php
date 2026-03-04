@@ -18,7 +18,6 @@ use App\Models\AppSetting;
 use App\Models\Faq;
 use App\Models\SearchHistory;
 use App\Models\StoreSchedule;
-use App\Models\Survey;
 use App\Models\User;
 use App\Notifications\OrderStatusChanged;
 use Illuminate\Database\Seeder;
@@ -44,6 +43,12 @@ class SampleDataSeeder extends Seeder
         $this->seedOrders($customers);
         $this->command->info('  ✓ Orders with items & addresses');
 
+        $this->seedOrderStatusHistory();
+        $this->command->info('  ✓ Order status history');
+
+        $this->seedWalletTransactions($customers);
+        $this->command->info('  ✓ Wallet transactions');
+
         $this->seedComplaints($customers);
         $this->command->info('  ✓ Complaints');
 
@@ -53,7 +58,7 @@ class SampleDataSeeder extends Seeder
         $this->seedStoreSchedules();
         $this->command->info('  ✓ Store schedules');
 
-        $this->seedCoupons();
+        $this->seedCoupons($customers);
         $this->command->info('  ✓ Coupons');
 
         $this->seedReviews($customers);
@@ -61,9 +66,6 @@ class SampleDataSeeder extends Seeder
 
         $this->seedFaqs();
         $this->command->info('  ✓ FAQs');
-
-        $this->seedSurveys($customers);
-        $this->command->info('  ✓ Surveys');
 
         $this->seedSearchHistory($customers);
         $this->command->info('  ✓ Search history');
@@ -77,9 +79,9 @@ class SampleDataSeeder extends Seeder
     private function seedShippingCharges(): void
     {
         $charges = [
-            ['title' => 'Standard Delivery', 'amount' => 100.00],
-            ['title' => 'Express Delivery', 'amount' => 200.00],
-            ['title' => 'Free Delivery (Rs 2000+)', 'amount' => 0.00],
+            ['title' => 'Standard Delivery', 'amount' => 100.00, 'min_order_amount' => null],
+            ['title' => 'Express Delivery', 'amount' => 200.00, 'min_order_amount' => null],
+            ['title' => 'Free Delivery (Rs 2000+)', 'amount' => 0.00, 'min_order_amount' => 2000.00],
         ];
 
         foreach ($charges as $charge) {
@@ -114,6 +116,7 @@ class SampleDataSeeder extends Seeder
                 'password' => 'password',
                 'date_of_birth' => '1995-06-15',
                 'wallet_amount' => 500.00,
+                'role' => 'customer',
             ],
             [
                 'identity' => '03004445566',
@@ -123,6 +126,7 @@ class SampleDataSeeder extends Seeder
                 'password' => 'password',
                 'date_of_birth' => now()->format('Y-m-d'), // birthday today!
                 'wallet_amount' => 1200.00,
+                'role' => 'customer',
             ],
             [
                 'identity' => '03007778899',
@@ -132,6 +136,7 @@ class SampleDataSeeder extends Seeder
                 'password' => 'password',
                 'date_of_birth' => '1990-03-22',
                 'wallet_amount' => 0.00,
+                'role' => 'customer',
             ],
             [
                 'identity' => '03212223344',
@@ -141,6 +146,7 @@ class SampleDataSeeder extends Seeder
                 'password' => 'password',
                 'date_of_birth' => '1998-11-08',
                 'wallet_amount' => 350.00,
+                'role' => 'customer',
             ],
             [
                 'identity' => '03335556677',
@@ -150,6 +156,7 @@ class SampleDataSeeder extends Seeder
                 'password' => 'password',
                 'date_of_birth' => '1992-01-30',
                 'wallet_amount' => 2000.00,
+                'role' => 'customer',
             ],
         ];
 
@@ -160,6 +167,26 @@ class SampleDataSeeder extends Seeder
                 $data
             );
         }
+
+        // Rider user — linked to delivery boy Ahmed Raza
+        $riderUser = User::firstOrCreate(
+            ['email' => 'rider@cubagroceries.test'],
+            [
+                'identity' => '03451234567',
+                'firstname' => 'Ahmed',
+                'lastname' => 'Rider',
+                'password' => 'password',
+                'wallet_amount' => 0,
+                'role' => 'rider',
+            ]
+        );
+
+        // Link rider to delivery boy
+        $ahmed = DeliveryBoy::where('phone', '03001234567')->first();
+        if ($ahmed && !$ahmed->user_id) {
+            $ahmed->update(['user_id' => $riderUser->id]);
+        }
+
         return $result;
     }
 
@@ -212,27 +239,32 @@ class SampleDataSeeder extends Seeder
         }
 
         $ordersConfig = [
-            // Ali Khan — 3 orders (various statuses)
-            ['customer' => 0, 'status' => OrderStatus::Delivered, 'rider' => 0, 'items' => 3, 'days_ago' => 15],
-            ['customer' => 0, 'status' => OrderStatus::Dispatched, 'rider' => 1, 'items' => 2, 'days_ago' => 2],
-            ['customer' => 0, 'status' => OrderStatus::Pending, 'rider' => null, 'items' => 4, 'days_ago' => 0],
+            // Ali Khan — 4 orders (various statuses)
+            ['customer' => 0, 'status' => OrderStatus::Delivered, 'rider' => 0, 'items' => 3, 'days_ago' => 15, 'wallet_used' => 0],
+            ['customer' => 0, 'status' => OrderStatus::Dispatched, 'rider' => 1, 'items' => 2, 'days_ago' => 2, 'wallet_used' => 0],
+            ['customer' => 0, 'status' => OrderStatus::Pending, 'rider' => null, 'items' => 4, 'days_ago' => 0, 'wallet_used' => 0],
+            ['customer' => 0, 'status' => OrderStatus::Delivered, 'rider' => 0, 'items' => 2, 'days_ago' => 25, 'wallet_used' => 200],
 
-            // Sara Ahmed — 2 orders
-            ['customer' => 1, 'status' => OrderStatus::Delivered, 'rider' => 0, 'items' => 2, 'days_ago' => 10],
-            ['customer' => 1, 'status' => OrderStatus::Confirmed, 'rider' => null, 'items' => 3, 'days_ago' => 1],
+            // Sara Ahmed — 3 orders
+            ['customer' => 1, 'status' => OrderStatus::Delivered, 'rider' => 0, 'items' => 2, 'days_ago' => 10, 'wallet_used' => 0],
+            ['customer' => 1, 'status' => OrderStatus::Confirmed, 'rider' => null, 'items' => 3, 'days_ago' => 1, 'wallet_used' => 500],
+            ['customer' => 1, 'status' => OrderStatus::Delivered, 'rider' => 2, 'items' => 2, 'days_ago' => 18, 'wallet_used' => 0],
 
-            // Usman Malik — 2 orders
-            ['customer' => 2, 'status' => OrderStatus::Delivered, 'rider' => 2, 'items' => 5, 'days_ago' => 20],
-            ['customer' => 2, 'status' => OrderStatus::Cancelled, 'rider' => null, 'items' => 1, 'days_ago' => 5],
+            // Usman Malik — 3 orders
+            ['customer' => 2, 'status' => OrderStatus::Delivered, 'rider' => 2, 'items' => 5, 'days_ago' => 20, 'wallet_used' => 0],
+            ['customer' => 2, 'status' => OrderStatus::Cancelled, 'rider' => null, 'items' => 1, 'days_ago' => 5, 'wallet_used' => 0],
+            ['customer' => 2, 'status' => OrderStatus::Pending, 'rider' => null, 'items' => 3, 'days_ago' => 0, 'wallet_used' => 0],
 
-            // Fatima Noor — 2 orders
-            ['customer' => 3, 'status' => OrderStatus::Pending, 'rider' => null, 'items' => 2, 'days_ago' => 0],
-            ['customer' => 3, 'status' => OrderStatus::Delivered, 'rider' => 1, 'items' => 3, 'days_ago' => 8],
+            // Fatima Noor — 3 orders
+            ['customer' => 3, 'status' => OrderStatus::Pending, 'rider' => null, 'items' => 2, 'days_ago' => 0, 'wallet_used' => 0],
+            ['customer' => 3, 'status' => OrderStatus::Delivered, 'rider' => 1, 'items' => 3, 'days_ago' => 8, 'wallet_used' => 150],
+            ['customer' => 3, 'status' => OrderStatus::Dispatched, 'rider' => 0, 'items' => 2, 'days_ago' => 1, 'wallet_used' => 0],
 
-            // Hassan Raza — 3 orders
-            ['customer' => 4, 'status' => OrderStatus::Delivered, 'rider' => 0, 'items' => 4, 'days_ago' => 12],
-            ['customer' => 4, 'status' => OrderStatus::Dispatched, 'rider' => 2, 'items' => 2, 'days_ago' => 1],
-            ['customer' => 4, 'status' => OrderStatus::Pending, 'rider' => null, 'items' => 3, 'days_ago' => 0],
+            // Hassan Raza — 4 orders
+            ['customer' => 4, 'status' => OrderStatus::Delivered, 'rider' => 0, 'items' => 4, 'days_ago' => 12, 'wallet_used' => 300],
+            ['customer' => 4, 'status' => OrderStatus::Dispatched, 'rider' => 2, 'items' => 2, 'days_ago' => 1, 'wallet_used' => 0],
+            ['customer' => 4, 'status' => OrderStatus::Pending, 'rider' => null, 'items' => 3, 'days_ago' => 0, 'wallet_used' => 0],
+            ['customer' => 4, 'status' => OrderStatus::Delivered, 'rider' => 1, 'items' => 5, 'days_ago' => 30, 'wallet_used' => 1000],
         ];
 
         foreach ($ordersConfig as $config) {
@@ -262,14 +294,11 @@ class SampleDataSeeder extends Seeder
 
             if (empty($lineItems)) continue;
 
+            $walletUsed = min($config['wallet_used'], $totalAmount);
             $orderNumber = 'CUBA' . str_pad(rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
             $createdAt = now()->subDays($config['days_ago'])->subHours(rand(0, 12));
 
-            // Check if this customer already has enough orders
-            $existingCount = Order::where('user_id', $customer->id)->count();
-            if ($existingCount >= 5) continue;
-
-            $order = Order::create([
+            $orderData = [
                 'order_id' => $orderNumber,
                 'user_id' => $customer->id,
                 'status' => $config['status'],
@@ -277,7 +306,20 @@ class SampleDataSeeder extends Seeder
                 'delivery_boy_id' => $config['rider'] !== null ? $deliveryBoys[$config['rider']]->id : null,
                 'created_at' => $createdAt,
                 'updated_at' => $createdAt,
-            ]);
+            ];
+
+            // Add wallet_amount_used if column exists
+            if (\Schema::hasColumn('orderdetails', 'wallet_amount_used')) {
+                $orderData['wallet_amount_used'] = $walletUsed;
+            }
+
+            // Add estimated delivery if column exists and order is active
+            if (\Schema::hasColumn('orderdetails', 'est_delivery_minutes') && !in_array($config['status'], [OrderStatus::Delivered, OrderStatus::Cancelled])) {
+                $orderData['est_delivery_minutes'] = rand(30, 90);
+                $orderData['est_delivery_set_at'] = $createdAt;
+            }
+
+            $order = Order::create($orderData);
 
             // Order address snapshot
             OrderAddress::create([
@@ -292,6 +334,101 @@ class SampleDataSeeder extends Seeder
             // Order line items
             foreach ($lineItems as $item) {
                 Orderproduct::create(array_merge($item, ['order_id' => $order->id]));
+            }
+        }
+    }
+
+    private function seedOrderStatusHistory(): void
+    {
+        if (!\Schema::hasTable('order_status_history')) return;
+
+        $orders = Order::all();
+
+        foreach ($orders as $order) {
+            $statuses = $this->getStatusTrail($order->status);
+            $time = $order->created_at->copy();
+
+            foreach ($statuses as $i => $status) {
+                \DB::table('order_status_history')->insert([
+                    'order_id' => $order->id,
+                    'status' => $status,
+                    'changed_by' => $i === 0 ? 'system' : 'admin',
+                    'created_at' => $time,
+                    'updated_at' => $time,
+                ]);
+                $time = $time->copy()->addMinutes(rand(10, 120));
+            }
+        }
+    }
+
+    private function getStatusTrail(OrderStatus $currentStatus): array
+    {
+        return match ($currentStatus) {
+            OrderStatus::Pending => [OrderStatus::Pending],
+            OrderStatus::Confirmed => [OrderStatus::Pending, OrderStatus::Confirmed],
+            OrderStatus::Dispatched => [OrderStatus::Pending, OrderStatus::Confirmed, OrderStatus::Dispatched],
+            OrderStatus::Delivered => [OrderStatus::Pending, OrderStatus::Confirmed, OrderStatus::Dispatched, OrderStatus::Delivered],
+            OrderStatus::Cancelled => [OrderStatus::Pending, OrderStatus::Cancelled],
+        };
+    }
+
+    private function seedWalletTransactions(array $customers): void
+    {
+        if (!\Schema::hasTable('wallet_transactions')) return;
+
+        $txnData = [
+            // Ali: Rs 500 balance — topped up Rs 1000, used Rs 200 on order, used Rs 300 on another
+            [
+                'customer' => 0,
+                'transactions' => [
+                    ['type' => 'credit', 'amount' => 1000, 'balance_after' => 1000, 'source' => 'admin_topup', 'note' => 'Welcome bonus', 'days_ago' => 30],
+                    ['type' => 'debit', 'amount' => 200, 'balance_after' => 800, 'source' => 'order_payment', 'note' => 'Order payment', 'days_ago' => 25],
+                    ['type' => 'debit', 'amount' => 300, 'balance_after' => 500, 'source' => 'order_payment', 'note' => 'Order payment', 'days_ago' => 10],
+                ],
+            ],
+            // Sara: Rs 1200 balance — topped up Rs 2000, used Rs 500, got Rs 200 refund, used Rs 500
+            [
+                'customer' => 1,
+                'transactions' => [
+                    ['type' => 'credit', 'amount' => 2000, 'balance_after' => 2000, 'source' => 'admin_topup', 'note' => 'Loyalty bonus', 'days_ago' => 25],
+                    ['type' => 'debit', 'amount' => 500, 'balance_after' => 1500, 'source' => 'order_payment', 'note' => 'Order payment', 'days_ago' => 18],
+                    ['type' => 'credit', 'amount' => 200, 'balance_after' => 1700, 'source' => 'order_refund', 'note' => 'Refund for damaged items', 'days_ago' => 15],
+                    ['type' => 'debit', 'amount' => 500, 'balance_after' => 1200, 'source' => 'order_payment', 'note' => 'Order payment', 'days_ago' => 1],
+                ],
+            ],
+            // Fatima: Rs 350 balance — topped up Rs 500, used Rs 150
+            [
+                'customer' => 3,
+                'transactions' => [
+                    ['type' => 'credit', 'amount' => 500, 'balance_after' => 500, 'source' => 'admin_topup', 'note' => 'Wallet top-up', 'days_ago' => 20],
+                    ['type' => 'debit', 'amount' => 150, 'balance_after' => 350, 'source' => 'order_payment', 'note' => 'Order payment', 'days_ago' => 8],
+                ],
+            ],
+            // Hassan: Rs 2000 balance — topped up Rs 3300, used Rs 1300
+            [
+                'customer' => 4,
+                'transactions' => [
+                    ['type' => 'credit', 'amount' => 3000, 'balance_after' => 3000, 'source' => 'admin_topup', 'note' => 'Bulk top-up', 'days_ago' => 35],
+                    ['type' => 'debit', 'amount' => 1000, 'balance_after' => 2000, 'source' => 'order_payment', 'note' => 'Order payment', 'days_ago' => 30],
+                    ['type' => 'credit', 'amount' => 300, 'balance_after' => 2300, 'source' => 'order_refund', 'note' => 'Partial refund', 'days_ago' => 20],
+                    ['type' => 'debit', 'amount' => 300, 'balance_after' => 2000, 'source' => 'order_payment', 'note' => 'Order payment', 'days_ago' => 12],
+                ],
+            ],
+        ];
+
+        foreach ($txnData as $data) {
+            $customer = $customers[$data['customer']];
+            foreach ($data['transactions'] as $txn) {
+                \DB::table('wallet_transactions')->insert([
+                    'user_id' => $customer->id,
+                    'type' => $txn['type'],
+                    'amount' => $txn['amount'],
+                    'balance_after' => $txn['balance_after'],
+                    'source' => $txn['source'],
+                    'note' => $txn['note'],
+                    'created_at' => now()->subDays($txn['days_ago']),
+                    'updated_at' => now()->subDays($txn['days_ago']),
+                ]);
             }
         }
     }
@@ -365,7 +502,7 @@ class SampleDataSeeder extends Seeder
         }
     }
 
-    private function seedCoupons(): void
+    private function seedCoupons(array $customers): void
     {
         $coupons = [
             [
@@ -409,16 +546,30 @@ class SampleDataSeeder extends Seeder
             ],
             [
                 'code' => 'FREEDEL',
-                'description' => 'Free delivery on any order',
-                'type' => 'fixed',
+                'description' => 'Free delivery on orders above Rs 300',
+                'type' => 'free_delivery',
                 'value' => 200,
-                'min_order_amount' => null,
+                'min_order_amount' => 300,
                 'max_discount' => null,
                 'usage_limit' => 200,
                 'used_count' => 78,
                 'start_date' => now()->subDays(10),
                 'end_date' => now()->addDays(90),
                 'is_active' => true,
+            ],
+            [
+                'code' => 'VIP100',
+                'description' => 'Rs 100 off — exclusive for Hassan',
+                'type' => 'fixed',
+                'value' => 100,
+                'min_order_amount' => 500,
+                'max_discount' => null,
+                'usage_limit' => 5,
+                'used_count' => 0,
+                'start_date' => now()->subDays(5),
+                'end_date' => now()->addDays(30),
+                'is_active' => true,
+                'user_id' => $customers[4]->id, // Hassan
             ],
         ];
 
@@ -469,7 +620,6 @@ class SampleDataSeeder extends Seeder
 
     private function seedNotifications(array $customers): void
     {
-        // Create sample notifications for delivered/dispatched orders
         $orders = Order::whereIn('status', [
             OrderStatus::Delivered,
             OrderStatus::Dispatched,
@@ -477,7 +627,6 @@ class SampleDataSeeder extends Seeder
         ])->with('user')->get();
 
         foreach ($orders as $order) {
-            // Simulate a status change notification
             $previousStatus = match ($order->status) {
                 OrderStatus::Confirmed => OrderStatus::Pending,
                 OrderStatus::Dispatched => OrderStatus::Confirmed,
@@ -485,14 +634,13 @@ class SampleDataSeeder extends Seeder
                 default => OrderStatus::Pending,
             };
 
-            // Only create if user doesn't already have too many notifications
             $existingCount = $order->user->notifications()->count();
             if ($existingCount >= 6) continue;
 
             $order->user->notify(new OrderStatusChanged($order, $previousStatus, $order->status));
         }
 
-        // Mark some as read for realism
+        // Mark some as read
         foreach ($customers as $customer) {
             $customer->notifications()->limit(2)->update(['read_at' => now()]);
         }
@@ -538,13 +686,6 @@ class SampleDataSeeder extends Seeder
         }
     }
 
-    private function seedSurveys(array $customers): void
-    {
-        // Surveys are seeded by SurveySeeder with multi-question format
-        // Just call it here to keep sample data complete
-        $this->call(SurveySeeder::class);
-    }
-
     private function seedSearchHistory(array $customers): void
     {
         $searches = [
@@ -576,16 +717,17 @@ class SampleDataSeeder extends Seeder
     private function seedAppSettings(): void
     {
         $settings = [
-            'app_name' => 'Asif Groceries',
-            'contact_email' => 'support@asifgroceries.pk',
+            'app_name' => 'Cuba Groceries',
+            'contact_email' => 'support@cubagroceries.pk',
             'contact_phone' => '03001234567',
             'whatsapp_number' => '03001234567',
             'min_order_amount' => '0',
             'currency_symbol' => 'Rs',
             'delivery_time_text' => '30-60 minutes',
-            'about_us' => '<p>Asif Groceries is your trusted online grocery store in Lahore, delivering fresh produce and daily essentials to your doorstep.</p>',
-            'terms_and_conditions' => '<p>By using Asif Groceries, you agree to our terms of service. All orders are subject to availability.</p>',
+            'about_us' => '<p>Cuba Groceries is your trusted online grocery store in Lahore, delivering fresh produce and daily essentials to your doorstep.</p>',
+            'terms_and_conditions' => '<p>By using Cuba Groceries, you agree to our terms of service. All orders are subject to availability.</p>',
             'privacy_policy' => '<p>We respect your privacy. Your personal data is used only for order processing and delivery.</p>',
+            'cancellation_pin' => '1234',
         ];
 
         foreach ($settings as $key => $value) {
