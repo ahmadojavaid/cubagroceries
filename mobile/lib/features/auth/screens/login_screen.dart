@@ -236,6 +236,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 12),
+
+                // Phone OTP
+                SizedBox(
+                  height: 52,
+                  child: OutlinedButton.icon(
+                    onPressed: auth.isLoading ? null : () => context.go('/phone-login'),
+                    icon: const Icon(Icons.phone_android_rounded, size: 20),
+                    label: const Text('Sign in with Phone'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textPrimary,
+                      side: const BorderSide(color: AppColors.border),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 20),
 
                 // Register link

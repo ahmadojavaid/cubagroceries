@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart' as fb;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../core/api/api_client.dart';
@@ -197,6 +199,103 @@ class AuthNotifier extends StateNotifier<AuthState> {
         );
         _fcm.initialize();
         _fcmHandler.initialize();
+        return true;
+      }
+
+      state = state.copyWith(isLoading: false, error: data['message']);
+      return false;
+    } catch (e) {
+      final message = _extractError(e);
+      state = state.copyWith(isLoading: false, error: message);
+      return false;
+    }
+  }
+
+  /// Phone OTP — Step 1: Send verification code
+  Future<bool> sendPhoneOtp({
+    required String phoneNumber,
+    required Function(String verificationId) onCodeSent,
+    required Function(String error) onError,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await fb.FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        timeout: const Duration(seconds: 60),
+        verificationCompleted: (fb.PhoneAuthCredential credential) async {
+          // Auto-retrieval on Android
+          await _completePhoneAuth(credential, phoneNumber);
+        },
+        verificationFailed: (fb.FirebaseAuthException e) {
+          state = state.copyWith(isLoading: false, error: e.message);
+          onError(e.message ?? 'Verification failed');
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          state = state.copyWith(isLoading: false);
+          onCodeSent(verificationId);
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          debugPrint('Phone OTP auto-retrieval timeout: $verificationId');
+        },
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: 'Failed to send OTP');
+      onError('Failed to send OTP');
+      return false;
+    }
+  }
+
+  /// Phone OTP — Step 2: Verify code and authenticate
+  Future<bool> verifyPhoneOtp({
+    required String verificationId,
+    required String smsCode,
+    required String phoneNumber,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final credential = fb.PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+      return await _completePhoneAuth(credential, phoneNumber);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: 'Invalid OTP code');
+      return false;
+    }
+  }
+
+  /// Complete phone auth: sign in with Firebase, send token to backend
+  Future<bool> _completePhoneAuth(fb.PhoneAuthCredential credential, String phoneNumber) async {
+    try {
+      final userCredential = await fb.FirebaseAuth.instance.signInWithCredential(credential);
+      final idToken = await userCredential.user?.getIdToken();
+
+      if (idToken == null) {
+        state = state.copyWith(isLoading: false, error: 'Could not get verification token');
+        return false;
+      }
+
+      // Send to our backend
+      final response = await _api.post('/auth/phone-verify', data: {
+        'id_token': idToken,
+        'phone': phoneNumber,
+      });
+
+      final data = response.data;
+      if (data['success'] == true) {
+        await _api.saveToken(data['data']['token']);
+        final userData = Map<String, dynamic>.from(data['data']['user']);
+        state = AuthState(
+          isAuthenticated: true,
+          user: userData,
+          role: userData['role'] as String? ?? 'customer',
+        );
+        _fcm.initialize();
+        _fcmHandler.initialize();
+
+        // Sign out of Firebase (we use our own Sanctum tokens)
+        await fb.FirebaseAuth.instance.signOut();
         return true;
       }
 
