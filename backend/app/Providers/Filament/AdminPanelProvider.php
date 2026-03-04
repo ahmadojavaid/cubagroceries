@@ -28,7 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->authGuard('portal')
-            ->brandName('Cuba Groceries')
+            ->brandName('Asif Groceries')
             ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Orange,

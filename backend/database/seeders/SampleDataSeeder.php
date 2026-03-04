@@ -576,15 +576,15 @@ class SampleDataSeeder extends Seeder
     private function seedAppSettings(): void
     {
         $settings = [
-            'app_name' => 'Cuba Groceries',
-            'contact_email' => 'support@cubagroceries.pk',
+            'app_name' => 'Asif Groceries',
+            'contact_email' => 'support@asifgroceries.pk',
             'contact_phone' => '03001234567',
             'whatsapp_number' => '03001234567',
             'min_order_amount' => '0',
             'currency_symbol' => 'Rs',
             'delivery_time_text' => '30-60 minutes',
-            'about_us' => '<p>Cuba Groceries is your trusted online grocery store in Lahore, delivering fresh produce and daily essentials to your doorstep.</p>',
-            'terms_and_conditions' => '<p>By using Cuba Groceries, you agree to our terms of service. All orders are subject to availability.</p>',
+            'about_us' => '<p>Asif Groceries is your trusted online grocery store in Lahore, delivering fresh produce and daily essentials to your doorstep.</p>',
+            'terms_and_conditions' => '<p>By using Asif Groceries, you agree to our terms of service. All orders are subject to availability.</p>',
             'privacy_policy' => '<p>We respect your privacy. Your personal data is used only for order processing and delivery.</p>',
         ];
 

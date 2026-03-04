@@ -31,7 +31,7 @@ void main() async {
   runZonedGuarded(() {
     runApp(
       const ProviderScope(
-        child: CubaGroceriesApp(),
+        child: AsifGroceriesApp(),
       ),
     );
   }, (error, stack) {
@@ -49,15 +49,15 @@ class _DevHttpOverrides extends HttpOverrides {
   }
 }
 
-class CubaGroceriesApp extends ConsumerWidget {
-  const CubaGroceriesApp({super.key});
+class AsifGroceriesApp extends ConsumerWidget {
+  const AsifGroceriesApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      title: 'Cuba Groceries',
+      title: 'Asif Groceries',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       routerConfig: router,
