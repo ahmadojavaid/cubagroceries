@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "970803843908",
+    "project_id": "asif-groceries",
+    "storage_bucket": "asif-groceries.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970803843908:android:b20abf45e2b2061eefbd11",
+        "android_client_info": {
+          "package_name": "com.asifgroceries.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZ-ugQ5DOkYH7tIFtkbu1c0Y1slCAoMEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package com.cubagroceries.app
+package com.asifgroceries.app
 
 import io.flutter.embedding.android.FlutterActivity
 
