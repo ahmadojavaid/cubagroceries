@@ -3,17 +3,20 @@ import '../../../core/api/api_client.dart';
 import '../../../core/providers/api_provider.dart';
 import '../data/banner_model.dart';
 import '../data/featured_section_model.dart';
+import '../data/holiday_model.dart';
 
 /// Home screen state
 class HomeState {
   final List<BannerModel> banners;
   final List<FeaturedSection> featuredSections;
+  final HolidayModel? holiday;
   final bool isLoading;
   final String? error;
 
   const HomeState({
     this.banners = const [],
     this.featuredSections = const [],
+    this.holiday,
     this.isLoading = false,
     this.error,
   });
@@ -21,18 +24,22 @@ class HomeState {
   HomeState copyWith({
     List<BannerModel>? banners,
     List<FeaturedSection>? featuredSections,
+    HolidayModel? holiday,
+    bool clearHoliday = false,
     bool? isLoading,
     String? error,
   }) {
     return HomeState(
       banners: banners ?? this.banners,
       featuredSections: featuredSections ?? this.featuredSections,
+      holiday: clearHoliday ? null : (holiday ?? this.holiday),
       isLoading: isLoading ?? this.isLoading,
       error: error,
     );
   }
 
   bool get hasData => banners.isNotEmpty || featuredSections.isNotEmpty;
+  bool get isStoreOffline => holiday != null && holiday!.isOffline;
 }
 
 /// Home notifier — fetches combined /home data
@@ -62,9 +69,15 @@ class HomeNotifier extends StateNotifier<HomeState> {
                 FeaturedSection.fromJson(Map<String, dynamic>.from(s)))
             .toList();
 
+        final holiday = homeData['holiday'] != null
+            ? HolidayModel.fromJson(
+                Map<String, dynamic>.from(homeData['holiday']))
+            : null;
+
         state = HomeState(
           banners: banners,
           featuredSections: sections,
+          holiday: holiday,
         );
       } else {
         state = state.copyWith(

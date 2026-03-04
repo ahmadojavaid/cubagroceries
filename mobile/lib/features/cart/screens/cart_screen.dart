@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../data/cart_item_model.dart';
+import '../../home/providers/home_provider.dart';
 import '../providers/cart_provider.dart';
 import '../providers/shipping_provider.dart';
 import '../widgets/free_delivery_milestone.dart';
@@ -135,23 +136,90 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             const SizedBox(height: AppDimens.md),
 
             // Checkout button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => context.push('/checkout'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text('Proceed to Checkout',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              ),
+            _buildCheckoutButton(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCheckoutButton(BuildContext context) {
+    final homeState = ref.watch(homeProvider);
+    final isOffline = homeState.isStoreOffline;
+    final allowAdvance = homeState.holiday?.allowAdvanceOrders ?? true;
+
+    // Store offline and advance orders disabled → block checkout
+    if (isOffline && !allowAdvance) {
+      return Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.warning.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+              border: Border.all(color: AppColors.warning.withOpacity(0.3)),
             ),
+            child: Row(
+              children: [
+                const Icon(Icons.event_busy_rounded,
+                    size: 20, color: AppColors.warning),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    homeState.holiday?.title ?? 'Store is currently closed',
+                    style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSecondary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppDimens.sm),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: null,
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                ),
+              ),
+              child: const Text('Checkout Unavailable'),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Store offline but advance orders allowed → show "Order for Later"
+    final label = isOffline ? 'Order for Later' : 'Proceed to Checkout';
+    final icon = isOffline ? Icons.schedule_rounded : null;
+
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () => context.push('/checkout'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+          ),
+          elevation: 0,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 18),
+              const SizedBox(width: 8),
+            ],
+            Text(label,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           ],
         ),
       ),

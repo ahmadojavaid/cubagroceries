@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Filament\Pages\StoreHolidayMode;
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\Category;
@@ -102,6 +103,7 @@ class HomeController extends Controller
         return $this->success([
             'banners' => $banners,
             'featured_sections' => $sections,
+            'holiday' => StoreHolidayMode::getHolidayData(),
         ]);
     }
 }

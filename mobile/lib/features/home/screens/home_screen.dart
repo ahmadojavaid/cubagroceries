@@ -12,6 +12,7 @@ import '../providers/home_provider.dart';
 import '../widgets/banner_slider.dart';
 import '../widgets/category_slider.dart';
 import '../widgets/featured_section_widget.dart';
+import '../widgets/holiday_banner.dart';
 import '../widgets/survey_prompt_card.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -294,6 +295,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return ListView(
       children: [
         const SizedBox(height: AppDimens.sm),
+
+        // 0. Holiday banner (if store is offline)
+        if (homeState.isStoreOffline)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppDimens.md),
+            child: HolidayBanner(
+              holiday: homeState.holiday!,
+              onOrderForLater: homeState.holiday!.allowAdvanceOrders
+                  ? () {} // Continue browsing — banner is informational
+                  : null,
+            ),
+          ),
 
         // 1. Banner slider
         if (homeState.banners.isNotEmpty)
