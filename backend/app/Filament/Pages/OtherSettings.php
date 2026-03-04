@@ -76,9 +76,11 @@ class OtherSettings extends Page
                     ->schema([
                         Forms\Components\TextInput::make('cancellation_pin')
                             ->label('Order Cancellation PIN')
-                            ->helperText('Staff must enter this PIN to cancel an order. Leave empty to disable PIN protection.')
+                            ->helperText('Staff must enter this PIN to cancel any order. This cannot be left empty.')
                             ->password()
                             ->revealable()
+                            ->required()
+                            ->minLength(4)
                             ->maxLength(20)
                             ->placeholder('e.g. 1234'),
                     ])

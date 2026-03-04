@@ -109,11 +109,7 @@ class OrderResource extends Resource
                             ->revealable()
                             ->required()
                             ->helperText('Enter the cancellation PIN to proceed.')
-                            ->visible(function (Forms\Get $get) {
-                                if ($get('status') !== 'cancelled') return false;
-                                $pin = AppSetting::getValue('cancellation_pin', '');
-                                return !empty($pin);
-                            }),
+                            ->visible(fn (Forms\Get $get) => $get('status') === 'cancelled'),
                     ])
                     ->action(function (Order $record, array $data): void {
                         $newStatus = OrderStatus::from($data['status']);
@@ -130,11 +126,11 @@ class OrderResource extends Resource
                         // Verify cancellation PIN
                         if ($newStatus === OrderStatus::Cancelled) {
                             $pin = AppSetting::getValue('cancellation_pin', '');
-                            if (!empty($pin) && ($data['cancellation_pin'] ?? '') !== $pin) {
+                            if (empty($pin) || ($data['cancellation_pin'] ?? '') !== $pin) {
                                 Notification::make()
                                     ->danger()
                                     ->title('Incorrect PIN')
-                                    ->body('The cancellation PIN you entered is incorrect.')
+                                    ->body('The cancellation PIN is incorrect.')
                                     ->send();
                                 return;
                             }
