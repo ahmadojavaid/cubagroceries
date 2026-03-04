@@ -345,31 +345,54 @@ class SampleDataSeeder extends Seeder
         $orders = Order::all();
 
         foreach ($orders as $order) {
-            $statuses = $this->getStatusTrail($order->status);
+            $trail = $this->getStatusTrail($order->status);
             $time = $order->created_at->copy();
 
-            foreach ($statuses as $i => $status) {
+            foreach ($trail as $step) {
                 \DB::table('order_status_history')->insert([
                     'order_id' => $order->id,
-                    'status' => $status,
-                    'changed_by' => $i === 0 ? 'system' : 'admin',
+                    'from_status' => $step['from'],
+                    'to_status' => $step['to'],
+                    'changed_by' => $step['by'],
+                    'note' => null,
                     'created_at' => $time,
-                    'updated_at' => $time,
                 ]);
                 $time = $time->copy()->addMinutes(rand(10, 120));
             }
         }
     }
 
+    /**
+     * Returns array of [from, to, by] transitions for a given final status.
+     */
     private function getStatusTrail(OrderStatus $currentStatus): array
     {
-        return match ($currentStatus) {
-            OrderStatus::Pending => [OrderStatus::Pending],
-            OrderStatus::Confirmed => [OrderStatus::Pending, OrderStatus::Confirmed],
-            OrderStatus::Dispatched => [OrderStatus::Pending, OrderStatus::Confirmed, OrderStatus::Dispatched],
-            OrderStatus::Delivered => [OrderStatus::Pending, OrderStatus::Confirmed, OrderStatus::Dispatched, OrderStatus::Delivered],
-            OrderStatus::Cancelled => [OrderStatus::Pending, OrderStatus::Cancelled],
+        $steps = match ($currentStatus) {
+            OrderStatus::Pending => [
+                ['from' => null, 'to' => 'pending', 'by' => 'system'],
+            ],
+            OrderStatus::Confirmed => [
+                ['from' => null, 'to' => 'pending', 'by' => 'system'],
+                ['from' => 'pending', 'to' => 'confirmed', 'by' => 'admin'],
+            ],
+            OrderStatus::Dispatched => [
+                ['from' => null, 'to' => 'pending', 'by' => 'system'],
+                ['from' => 'pending', 'to' => 'confirmed', 'by' => 'admin'],
+                ['from' => 'confirmed', 'to' => 'dispatched', 'by' => 'admin'],
+            ],
+            OrderStatus::Delivered => [
+                ['from' => null, 'to' => 'pending', 'by' => 'system'],
+                ['from' => 'pending', 'to' => 'confirmed', 'by' => 'admin'],
+                ['from' => 'confirmed', 'to' => 'dispatched', 'by' => 'admin'],
+                ['from' => 'dispatched', 'to' => 'delivered', 'by' => 'rider'],
+            ],
+            OrderStatus::Cancelled => [
+                ['from' => null, 'to' => 'pending', 'by' => 'system'],
+                ['from' => 'pending', 'to' => 'cancelled', 'by' => 'admin'],
+            ],
         };
+
+        return $steps;
     }
 
     private function seedWalletTransactions(array $customers): void
