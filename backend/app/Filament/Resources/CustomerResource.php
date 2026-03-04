@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerResource\Pages;
+use App\Filament\Resources\CustomerResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Infolists;
@@ -153,14 +154,25 @@ class CustomerResource extends Resource
                         Infolists\Components\TextEntry::make('identity')
                             ->label('Phone'),
 
+                        Infolists\Components\TextEntry::make('role')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'rider' => 'warning',
+                                default => 'info',
+                            }),
+
                         Infolists\Components\TextEntry::make('date_of_birth')
                             ->label('Date of Birth')
                             ->date('M d, Y')
                             ->placeholder('—'),
-                    ])
-                    ->columns(2),
 
-                Infolists\Components\Section::make('Stats')
+                        Infolists\Components\TextEntry::make('created_at')
+                            ->label('Joined')
+                            ->dateTime('M d, Y H:i'),
+                    ])
+                    ->columns(3),
+
+                Infolists\Components\Section::make('Wallet & Activity')
                     ->schema([
                         Infolists\Components\TextEntry::make('wallet_amount')
                             ->label('Wallet Balance')
@@ -173,9 +185,30 @@ class CustomerResource extends Resource
                         Infolists\Components\TextEntry::make('orders_count')
                             ->label('Total Orders')
                             ->state(fn (User $record): int => $record->orders()->count()),
+
+                        Infolists\Components\TextEntry::make('total_spent')
+                            ->label('Total Spent')
+                            ->state(fn (User $record): string => 'Rs ' . number_format((float) $record->orders()->where('status', 'delivered')->sum('total_amount'), 2)),
+
+                        Infolists\Components\TextEntry::make('complaints_count')
+                            ->label('Complaints')
+                            ->state(fn (User $record): int => $record->complaints()->count()),
+
+                        Infolists\Components\TextEntry::make('last_order_at')
+                            ->label('Last Order')
+                            ->state(fn (User $record): ?string => $record->orders()->latest()->first()?->created_at?->format('M d, Y H:i'))
+                            ->placeholder('No orders yet'),
                     ])
                     ->columns(3),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\AddressesRelationManager::class,
+            RelationManagers\OrdersRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
