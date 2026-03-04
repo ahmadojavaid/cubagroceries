@@ -5,6 +5,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+import 'core/config/app_config.dart';
 import 'core/router/app_router.dart';
 import 'core/services/fcm_notification_handler.dart';
 import 'core/theme/app_theme.dart';
@@ -30,22 +32,22 @@ void main() async {
     debugPrint('Firebase init failed: $e');
   }
 
-  // Catch all uncaught errors
-  FlutterError.onError = (details) {
-    debugPrint('FlutterError: ${details.exception}');
-    debugPrint('${details.stack}');
-  };
-
-  runZonedGuarded(() {
-    runApp(
-      const ProviderScope(
-        child: AsifGroceriesApp(),
-      ),
-    );
-  }, (error, stack) {
-    debugPrint('Uncaught error: $error');
-    debugPrint('$stack');
-  });
+  // Initialize Sentry / GlitchTip
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = AppConfig.glitchtipDsn;
+      options.environment = AppConfig.environment;
+      options.tracesSampleRate = 0.3;
+      options.sendDefaultPii = false;
+    },
+    appRunner: () {
+      runApp(
+        const ProviderScope(
+          child: AsifGroceriesApp(),
+        ),
+      );
+    },
+  );
 }
 
 /// Accept self-signed certificates in development

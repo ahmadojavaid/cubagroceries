@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sentry_dio/sentry_dio.dart';
 import '../config/app_config.dart';
 import 'api_exception.dart';
 
@@ -37,6 +38,9 @@ class ApiClient {
       _authInterceptor(),
       _errorInterceptor(),
     ]);
+
+    // Sentry / GlitchTip: capture HTTP breadcrumbs and errors
+    _dio.addSentry();
   }
 
   // -- Interceptors --

@@ -10,4 +10,10 @@ class AppConfig {
   static String get baseUrl => isProduction ? _prodBaseUrl : _devBaseUrl;
   static String? get hostHeader => isProduction ? null : 'cubagroceries.test';
   static bool get trustSelfSigned => !isProduction;
+
+  // GlitchTip / Sentry DSN
+  static const String glitchtipDsn =
+      'https://887bb9ba1d004606b06272f250f2b914@errors.zegobyte.com/3';
+
+  static String get environment => isProduction ? 'production' : 'development';
 }
