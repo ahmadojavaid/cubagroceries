@@ -5,7 +5,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../data/cart_item_model.dart';
 import '../../home/providers/home_provider.dart';
+import '../../products/data/product_model.dart';
+import '../../products/widgets/product_card.dart';
 import '../providers/cart_provider.dart';
+import '../providers/cart_suggestions_provider.dart';
 import '../providers/shipping_provider.dart';
 import '../widgets/free_delivery_milestone.dart';
 
@@ -88,7 +91,57 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               padding: const EdgeInsets.only(bottom: AppDimens.sm),
               child: _CartItemCard(item: item),
             )),
+
+        // You might also like
+        const SizedBox(height: AppDimens.lg),
+        _buildSuggestions(),
       ],
+    );
+  }
+
+  Widget _buildSuggestions() {
+    final suggestionsAsync = ref.watch(cartSuggestionsProvider);
+
+    return suggestionsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (products) {
+        if (products.isEmpty) return const SizedBox.shrink();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'You might also like',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: AppDimens.sm + 2),
+            SizedBox(
+              height: 230,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: products.length,
+                separatorBuilder: (_, __) =>
+                    const SizedBox(width: AppDimens.sm),
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return SizedBox(
+                    width: 155,
+                    child: ProductCard(
+                      product: product,
+                      onTap: () => context.push('/products/${product.id}'),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

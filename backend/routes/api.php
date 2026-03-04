@@ -51,6 +51,7 @@ Route::prefix('v1')->group(function () {
         // Products
         Route::get('/products', [ProductsController::class, 'index']);
         Route::get('/products/search', [ProductsController::class, 'search']);
+        Route::get('/products/suggestions', [ProductsController::class, 'suggestions']);
         Route::get('/products/{id}', [ProductsController::class, 'show']);
         Route::get('/products/{id}/related', [ProductsController::class, 'related']);
 

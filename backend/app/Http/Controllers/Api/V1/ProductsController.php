@@ -171,6 +171,53 @@ class ProductsController extends Controller
     }
 
     /**
+     * Suggestions based on cart items (same categories, excluding given product IDs).
+     * GET /api/v1/products/suggestions?ids=1,2,3
+     */
+    public function suggestions(Request $request): JsonResponse
+    {
+        $request->validate([
+            'ids' => 'required|string',
+        ]);
+
+        $productIds = collect(explode(',', $request->string('ids')))
+            ->map(fn ($id) => (int) trim($id))
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->values();
+
+        if ($productIds->isEmpty()) {
+            return $this->success([]);
+        }
+
+        // Get categories of cart products
+        $cartProducts = Product::whereIn('id', $productIds)->get(['id', 'category_id', 'sub_category_id']);
+        $categoryIds = $cartProducts->pluck('category_id')->unique()->filter();
+        $subCategoryIds = $cartProducts->pluck('sub_category_id')->unique()->filter();
+
+        $suggestions = Product::whereNotIn('id', $productIds)
+            ->where('stock', '>', 0)
+            ->where(function ($q) use ($categoryIds, $subCategoryIds) {
+                $q->whereIn('category_id', $categoryIds);
+                if ($subCategoryIds->isNotEmpty()) {
+                    $q->orWhereIn('sub_category_id', $subCategoryIds);
+                }
+            })
+            ->with([
+                'category:id,title',
+                'subCategory:id,title',
+                'prices.unit:id,name,abbreviation',
+            ])
+            ->inRandomOrder()
+            ->limit(10)
+            ->get();
+
+        $formatted = $suggestions->map(fn ($p) => $this->formatProduct($p))->values();
+
+        return $this->success($formatted);
+    }
+
+    /**
      * Format a product for API response.
      */
     private function formatProduct(Product $product): array
