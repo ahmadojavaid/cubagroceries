@@ -88,11 +88,23 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               Container(
                 width: 160,
                 height: 160,
+                clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.primarySurface.withOpacity(0.5),
+                  color: Colors.white,
+                  border: Border.all(
+                    color: AppColors.primarySurface,
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadow,
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(28),
                 child: Image.asset(
                   'assets/images/ag-logo.jpg',
                   fit: BoxFit.contain,
