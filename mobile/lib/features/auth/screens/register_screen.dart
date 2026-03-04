@@ -259,6 +259,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ?.copyWith(color: AppColors.textSecondary),
                     ),
                     TextButton(
+                      style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                       onPressed: () => context.go('/login'),
                       child: const Text('Sign In'),
                     ),
