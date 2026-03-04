@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages;
+use App\Models\AppSetting;
 use App\Models\DeliveryBoy;
 use App\Models\Order;
 use App\Models\Orderproduct;
@@ -100,7 +101,19 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('status')
                             ->label('New Status')
                             ->options($record->status->allowedTransitionOptions())
-                            ->required(),
+                            ->required()
+                            ->live(),
+                        Forms\Components\TextInput::make('cancellation_pin')
+                            ->label('Cancellation PIN')
+                            ->password()
+                            ->revealable()
+                            ->required()
+                            ->helperText('Enter the cancellation PIN to proceed.')
+                            ->visible(function (Forms\Get $get) {
+                                if ($get('status') !== 'cancelled') return false;
+                                $pin = AppSetting::getValue('cancellation_pin', '');
+                                return !empty($pin);
+                            }),
                     ])
                     ->action(function (Order $record, array $data): void {
                         $newStatus = OrderStatus::from($data['status']);
@@ -112,6 +125,19 @@ class OrderResource extends Resource
                                 ->body("Cannot change from {$record->status->label()} to {$newStatus->label()}.")
                                 ->send();
                             return;
+                        }
+
+                        // Verify cancellation PIN
+                        if ($newStatus === OrderStatus::Cancelled) {
+                            $pin = AppSetting::getValue('cancellation_pin', '');
+                            if (!empty($pin) && ($data['cancellation_pin'] ?? '') !== $pin) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('Incorrect PIN')
+                                    ->body('The cancellation PIN you entered is incorrect.')
+                                    ->send();
+                                return;
+                            }
                         }
 
                         $oldStatus = $record->status;

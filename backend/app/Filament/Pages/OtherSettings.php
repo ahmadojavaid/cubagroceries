@@ -39,6 +39,7 @@ class OtherSettings extends Page
             'min_order_amount' => AppSetting::getValue('min_order_amount', '0'),
             'currency_symbol' => AppSetting::getValue('currency_symbol', 'Rs'),
             'delivery_time_text' => AppSetting::getValue('delivery_time_text', '30-60 minutes'),
+            'cancellation_pin' => AppSetting::getValue('cancellation_pin', ''),
             'about_us' => AppSetting::getValue('about_us', ''),
             'terms_and_conditions' => AppSetting::getValue('terms_and_conditions', ''),
             'privacy_policy' => AppSetting::getValue('privacy_policy', ''),
@@ -70,6 +71,18 @@ class OtherSettings extends Page
                             ->placeholder('e.g. 30-60 minutes'),
                     ])
                     ->columns(2),
+
+                Forms\Components\Section::make('Security')
+                    ->schema([
+                        Forms\Components\TextInput::make('cancellation_pin')
+                            ->label('Order Cancellation PIN')
+                            ->helperText('Staff must enter this PIN to cancel an order. Leave empty to disable PIN protection.')
+                            ->password()
+                            ->revealable()
+                            ->maxLength(20)
+                            ->placeholder('e.g. 1234'),
+                    ])
+                    ->columns(1),
 
                 Forms\Components\Section::make('Contact Information')
                     ->schema([
