@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../core/providers/api_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../data/order_model.dart';
 import '../providers/order_provider.dart';
+import '../widgets/order_review_popup.dart';
 import '../widgets/order_review_section.dart';
 import '../widgets/order_status_timeline.dart';
 
@@ -20,12 +22,59 @@ class OrderDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
+  bool _reviewPromptShown = false;
+
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref
-        .read(orderActionProvider.notifier)
-        .fetchOrderDetail(widget.orderNumber));
+    Future.microtask(() async {
+      final order = await ref
+          .read(orderActionProvider.notifier)
+          .fetchOrderDetail(widget.orderNumber);
+
+      if (order != null &&
+          order.status == 'delivered' &&
+          !_reviewPromptShown &&
+          mounted) {
+        _maybeShowReviewPopup(order);
+      }
+    });
+  }
+
+  /// Check if the user already reviewed this order; if not, show popup.
+  Future<void> _maybeShowReviewPopup(OrderDetailModel order) async {
+    _reviewPromptShown = true;
+
+    try {
+      final api = ref.read(apiClientProvider);
+      final response = await api.get('/orders/${order.id}/review');
+      final data = response.data;
+
+      // Already reviewed — skip
+      if (data['success'] == true && data['data'] != null) return;
+    } catch (_) {
+      // If the check fails, don't block — just skip the popup
+      return;
+    }
+
+    if (!mounted) return;
+
+    // Small delay so the screen fully renders first
+    await Future.delayed(const Duration(milliseconds: 600));
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => OrderReviewPopup(
+        orderId: order.id,
+        orderNumber: order.orderId,
+        onSubmitted: () {
+          // Refresh the review section
+          ref.invalidate(orderReviewProvider(order.id));
+        },
+      ),
+    );
   }
 
   @override

@@ -55,6 +55,7 @@ class OrderStatusChanged extends Notification
                 $data['message'],
                 [
                     'type' => 'order_status_changed',
+                    'order_id' => $this->order->id,
                     'order_number' => $this->order->order_id,
                     'new_status' => $this->newStatus->value,
                 ],

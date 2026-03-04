@@ -2,7 +2,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/theme/app_colors.dart';
+import '../../features/orders/widgets/order_review_popup.dart';
+import '../theme/app_colors.dart';
 
 /// Top-level handler for background messages.
 @pragma('vm:entry-point')
@@ -15,7 +16,6 @@ class FcmNotificationHandler {
   final GlobalKey<NavigatorState> navigatorKey;
   final void Function(String? orderNumber) onNotificationTap;
 
-  /// Platform channel for playing native alert sounds
   static const _channel = MethodChannel('com.asifgroceries.app/alert');
 
   FcmNotificationHandler({
@@ -23,17 +23,10 @@ class FcmNotificationHandler {
     required this.onNotificationTap,
   });
 
-  /// Set up all FCM message listeners.
   void initialize() {
-    // Foreground messages
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-
-    // User tapped notification while app was in background
     FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
-
-    // Check if app was opened from a terminated state via notification
     _checkInitialMessage();
-
     debugPrint('FCM Handler: Initialized');
   }
 
@@ -44,10 +37,16 @@ class FcmNotificationHandler {
     }
   }
 
+  // ── Notification tap (background/terminated) ──────────────
+
   void _handleNotificationTap(RemoteMessage message) {
     final orderNumber = message.data['order_number'] as String?;
+    // Always navigate to the order detail — the screen itself will
+    // show the review popup for delivered orders.
     onNotificationTap(orderNumber);
   }
+
+  // ── Foreground messages ───────────────────────────────────
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     debugPrint('FCM Foreground: ${message.data}');
@@ -56,15 +55,125 @@ class FcmNotificationHandler {
 
     if (type == 'rider_job_assigned') {
       await _showRiderJobAlert(message);
+    } else if (type == 'order_status_changed' &&
+        message.data['new_status'] == 'delivered') {
+      _showDeliveredDialog(message);
     } else {
-      // Show a subtle snackbar for other notifications
       _showNotificationSnackbar(message);
     }
   }
 
-  /// Play alert sound via native platform channel and show a prominent dialog.
+  // ── Delivered: confirmation → review ──────────────────────
+
+  void _showDeliveredDialog(RemoteMessage message) {
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+
+    final title = message.notification?.title ?? '📦 Order Delivered';
+    final body = message.notification?.body ?? '';
+    final orderNumber = message.data['order_number'] as String?;
+    final orderIdStr = message.data['order_id'] as String?;
+    final orderId = orderIdStr != null ? int.tryParse(orderIdStr) : null;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.success.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.check_circle_rounded,
+                  color: AppColors.success, size: 28),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(title,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w700)),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(body,
+                style: const TextStyle(
+                    fontSize: 14, color: AppColors.textSecondary, height: 1.4)),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.star_rounded, size: 20, color: AppColors.warning),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text('Would you like to rate your experience?',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textPrimary)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Maybe Later'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(ctx);
+              if (orderId != null && orderNumber != null) {
+                _showReviewPopup(orderNumber, orderId);
+              }
+            },
+            icon: const Icon(Icons.star_rounded, size: 18),
+            label: const Text('Rate Now'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              elevation: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showReviewPopup(String orderNumber, int orderId) {
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => OrderReviewPopup(
+        orderId: orderId,
+        orderNumber: orderNumber,
+        onSubmitted: () => onNotificationTap(orderNumber),
+      ),
+    );
+  }
+
+  // ── Rider job alert ───────────────────────────────────────
+
   Future<void> _showRiderJobAlert(RemoteMessage message) async {
-    // Play alert sound via platform channel
     try {
       await _channel.invokeMethod('playAlert');
     } catch (e) {
@@ -82,9 +191,7 @@ class FcmNotificationHandler {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             Container(
@@ -93,21 +200,14 @@ class FcmNotificationHandler {
                 color: AppColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.delivery_dining,
-                color: AppColors.primary,
-                size: 28,
-              ),
+              child: const Icon(Icons.delivery_dining,
+                  color: AppColors.primary, size: 28),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              child: Text(title,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w700)),
             ),
           ],
         ),
@@ -115,14 +215,9 @@ class FcmNotificationHandler {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              body,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-                height: 1.4,
-              ),
-            ),
+            Text(body,
+                style: const TextStyle(
+                    fontSize: 14, color: AppColors.textSecondary, height: 1.4)),
             if (orderNumber != null) ...[
               const SizedBox(height: 12),
               Container(
@@ -138,13 +233,9 @@ class FcmNotificationHandler {
                     const Icon(Icons.receipt_long,
                         size: 16, color: AppColors.textHint),
                     const SizedBox(width: 8),
-                    Text(
-                      '#$orderNumber',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
+                    Text('#$orderNumber',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 14)),
                   ],
                 ),
               ),
@@ -163,16 +254,13 @@ class FcmNotificationHandler {
             onPressed: () {
               _stopAlert();
               Navigator.pop(ctx);
-              if (orderNumber != null) {
-                onNotificationTap(orderNumber);
-              }
+              if (orderNumber != null) onNotificationTap(orderNumber);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+                  borderRadius: BorderRadius.circular(12)),
               elevation: 0,
             ),
             child: const Text('View Order'),
@@ -187,6 +275,8 @@ class FcmNotificationHandler {
       await _channel.invokeMethod('stopAlert');
     } catch (_) {}
   }
+
+  // ── Generic snackbar ──────────────────────────────────────
 
   void _showNotificationSnackbar(RemoteMessage message) {
     final context = navigatorKey.currentContext;
@@ -213,8 +303,8 @@ class FcmNotificationHandler {
         action: message.data['order_number'] != null
             ? SnackBarAction(
                 label: 'View',
-                onPressed: () => onNotificationTap(
-                    message.data['order_number'] as String?),
+                onPressed: () =>
+                    onNotificationTap(message.data['order_number'] as String?),
               )
             : null,
       ),
