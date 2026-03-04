@@ -26,6 +26,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    // Clear any lingering auth errors from other screens
+    Future.microtask(() => ref.read(authProvider.notifier).clearError());
+  }
+
   Future<void> _onGoogleSignIn() async {
     final success = await ref.read(authProvider.notifier).signInWithGoogle();
     if (success && mounted) {
