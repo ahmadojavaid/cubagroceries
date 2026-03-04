@@ -23,10 +23,10 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] as int,
-      identity: json['identity'] as String,
-      email: json['email'] as String,
-      firstname: json['firstname'] as String,
-      lastname: json['lastname'] as String,
+      identity: (json['identity'] as String?) ?? '',
+      email: (json['email'] as String?) ?? '',
+      firstname: (json['firstname'] as String?) ?? '',
+      lastname: (json['lastname'] as String?) ?? '',
       dateOfBirth: json['date_of_birth'] as String?,
       walletAmount: (json['wallet_amount'] ?? '0.00').toString(),
     );
