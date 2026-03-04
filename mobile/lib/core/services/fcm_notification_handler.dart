@@ -1,7 +1,7 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../core/theme/app_colors.dart';
 
 /// Top-level handler for background messages.
@@ -14,7 +14,9 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 class FcmNotificationHandler {
   final GlobalKey<NavigatorState> navigatorKey;
   final void Function(String? orderNumber) onNotificationTap;
-  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  /// Platform channel for playing native alert sounds
+  static const _channel = MethodChannel('com.asifgroceries.app/alert');
 
   FcmNotificationHandler({
     required this.navigatorKey,
@@ -60,15 +62,11 @@ class FcmNotificationHandler {
     }
   }
 
-  /// Play alert sound and show a prominent dialog for rider job assignment.
+  /// Play alert sound via native platform channel and show a prominent dialog.
   Future<void> _showRiderJobAlert(RemoteMessage message) async {
-    // Play alert sound — using the device alarm ringtone via system
+    // Play alert sound via platform channel
     try {
-      await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-      await _audioPlayer.play(
-        AssetSource('sounds/rider_alert.mp3'),
-        volume: 1.0,
-      );
+      await _channel.invokeMethod('playAlert');
     } catch (e) {
       debugPrint('FCM: Could not play alert sound: $e');
     }
@@ -128,8 +126,8 @@ class FcmNotificationHandler {
             if (orderNumber != null) ...[
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceBg,
                   borderRadius: BorderRadius.circular(10),
@@ -156,14 +154,14 @@ class FcmNotificationHandler {
         actions: [
           TextButton(
             onPressed: () {
-              _stopAlertSound();
+              _stopAlert();
               Navigator.pop(ctx);
             },
             child: const Text('Dismiss'),
           ),
           ElevatedButton(
             onPressed: () {
-              _stopAlertSound();
+              _stopAlert();
               Navigator.pop(ctx);
               if (orderNumber != null) {
                 onNotificationTap(orderNumber);
@@ -184,10 +182,9 @@ class FcmNotificationHandler {
     );
   }
 
-  Future<void> _stopAlertSound() async {
+  Future<void> _stopAlert() async {
     try {
-      await _audioPlayer.stop();
-      await _audioPlayer.setReleaseMode(ReleaseMode.release);
+      await _channel.invokeMethod('stopAlert');
     } catch (_) {}
   }
 
@@ -222,9 +219,5 @@ class FcmNotificationHandler {
             : null,
       ),
     );
-  }
-
-  void dispose() {
-    _audioPlayer.dispose();
   }
 }
