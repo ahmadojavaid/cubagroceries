@@ -110,6 +110,68 @@ class AuthController extends Controller
         ], 'Google sign-in successful');
     }
 
+    /**
+     * Firebase Phone OTP: verify Firebase ID token from phone auth, find or create user.
+     */
+    public function phoneVerify(Request $request): JsonResponse
+    {
+        $request->validate([
+            'id_token' => 'required|string',
+            'phone' => 'required|string',
+        ]);
+
+        // Verify the Firebase ID token
+        $response = Http::get('https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo', [
+            'key' => config('services.firebase.api_key'),
+        ]);
+
+        // Use Google's secure token endpoint to verify
+        $tokenResponse = Http::asForm()->post('https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' . config('services.firebase.api_key'), [
+            'idToken' => $request->id_token,
+        ]);
+
+        if ($tokenResponse->failed()) {
+            return $this->error('Invalid phone verification token.', 401);
+        }
+
+        $users = $tokenResponse->json('users', []);
+        if (empty($users)) {
+            return $this->error('Could not verify phone number.', 422);
+        }
+
+        $firebaseUser = $users[0];
+        $phoneNumber = $firebaseUser['phoneNumber'] ?? $request->phone;
+
+        // Normalize phone: remove +92 prefix, ensure 0 prefix
+        $normalizedPhone = $phoneNumber;
+        if (str_starts_with($normalizedPhone, '+92')) {
+            $normalizedPhone = '0' . substr($normalizedPhone, 3);
+        } elseif (str_starts_with($normalizedPhone, '92')) {
+            $normalizedPhone = '0' . substr($normalizedPhone, 2);
+        }
+
+        // Find existing user by phone (identity field) or create new one
+        $user = User::where('identity', $normalizedPhone)->first();
+
+        if (!$user) {
+            $user = User::create([
+                'identity' => $normalizedPhone,
+                'email' => $normalizedPhone . '@phone.asifgroceries.local',
+                'firstname' => 'User',
+                'lastname' => '',
+                'password' => Hash::make(Str::random(32)),
+                'role' => 'customer',
+            ]);
+        }
+
+        $token = $user->createToken('mobile-app')->plainTextToken;
+
+        return $this->success([
+            'user' => $user,
+            'token' => $token,
+        ], 'Phone verification successful');
+    }
+
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
