@@ -28,6 +28,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('auth')->middleware('throttle:5,1')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/google', [AuthController::class, 'google']);
     });
 
     // Auth — Protected
