@@ -151,7 +151,7 @@ class AuthController extends Controller
         if (!$user) {
             $user = User::create([
                 'identity' => $normalizedPhone,
-                'email' => $normalizedPhone . '@phone.asifgroceries.local',
+                'email' => null,
                 'firstname' => 'User',
                 'lastname' => '',
                 'password' => Hash::make(Str::random(32)),

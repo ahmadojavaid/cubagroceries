@@ -195,7 +195,8 @@ class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
                   decoration: const InputDecoration(
                     labelText: 'OTP Code',
                     hintText: '000000',
-                    prefixIcon: Icon(Icons.lock_outline_rounded, size: 20),
+                    prefixIcon: SizedBox(width: 20),
+                    prefixIconConstraints: BoxConstraints(minWidth: 20),
                   ),
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
