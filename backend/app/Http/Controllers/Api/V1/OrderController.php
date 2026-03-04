@@ -46,7 +46,13 @@ class OrderController extends Controller
             return $this->error('Order not found', 404);
         }
 
-        return $this->success($order);
+        $data = $order->toArray();
+
+        // Add est delivery info
+        $data['est_delivery_minutes'] = $order->est_delivery_minutes;
+        $data['est_delivery_set_at'] = $order->est_delivery_set_at?->toIso8601String();
+
+        return $this->success($data);
     }
 
     /**

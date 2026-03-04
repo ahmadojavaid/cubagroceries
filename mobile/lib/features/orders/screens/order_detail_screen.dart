@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../data/order_model.dart';
 import '../providers/order_provider.dart';
+import '../widgets/delivery_estimate_card.dart';
 import '../widgets/order_review_popup.dart';
 import '../widgets/order_review_section.dart';
 import '../widgets/order_status_timeline.dart';
@@ -130,6 +131,14 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
           OrderStatusTimeline(currentStatus: order.status),
 
           const SizedBox(height: AppDimens.md),
+
+          // Delivery estimate countdown
+          DeliveryEstimateCard(order: order),
+
+          if (order.hasDeliveryEstimate &&
+              order.status != 'delivered' &&
+              order.status != 'cancelled')
+            const SizedBox(height: AppDimens.md),
 
           // Order info card
           _SectionCard(

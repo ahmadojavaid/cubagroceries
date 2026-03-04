@@ -16,6 +16,8 @@ class Order extends Model
         'total_amount',
         'wallet_amount_used',
         'delivery_boy_id',
+        'est_delivery_minutes',
+        'est_delivery_set_at',
     ];
 
     protected function casts(): array
@@ -24,6 +26,8 @@ class Order extends Model
             'total_amount' => 'decimal:2',
             'wallet_amount_used' => 'decimal:2',
             'status' => OrderStatus::class,
+            'est_delivery_minutes' => 'integer',
+            'est_delivery_set_at' => 'datetime',
         ];
     }
 

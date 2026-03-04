@@ -147,12 +147,25 @@ class OrderResource extends Resource
                             ->options(DeliveryBoy::pluck('name', 'id'))
                             ->searchable()
                             ->required(),
+                        Forms\Components\TextInput::make('est_delivery_minutes')
+                            ->label('Est. Delivery Time (minutes)')
+                            ->helperText('Leave empty or 0 to hide the timer from the customer.')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(999)
+                            ->suffix('min'),
                     ])
                     ->fillForm(fn (Order $record) => [
                         'delivery_boy_id' => $record->delivery_boy_id,
+                        'est_delivery_minutes' => $record->est_delivery_minutes,
                     ])
                     ->action(function (Order $record, array $data): void {
-                        $record->update(['delivery_boy_id' => $data['delivery_boy_id']]);
+                        $estMinutes = (int) ($data['est_delivery_minutes'] ?? 0);
+                        $record->update([
+                            'delivery_boy_id' => $data['delivery_boy_id'],
+                            'est_delivery_minutes' => $estMinutes > 0 ? $estMinutes : null,
+                            'est_delivery_set_at' => $estMinutes > 0 ? now() : null,
+                        ]);
 
                         $deliveryBoy = DeliveryBoy::find($data['delivery_boy_id']);
 

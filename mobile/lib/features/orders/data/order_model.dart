@@ -44,6 +44,8 @@ class OrderDetailModel {
   final OrderAddressModel? address;
   final List<OrderItemModel> items;
   final DateTime createdAt;
+  final int? estDeliveryMinutes;
+  final DateTime? estDeliverySetAt;
 
   const OrderDetailModel({
     required this.id,
@@ -53,6 +55,8 @@ class OrderDetailModel {
     this.address,
     this.items = const [],
     required this.createdAt,
+    this.estDeliveryMinutes,
+    this.estDeliverySetAt,
   });
 
   factory OrderDetailModel.fromJson(Map<String, dynamic> json) {
@@ -72,7 +76,29 @@ class OrderDetailModel {
               .toList()
           : [],
       createdAt: DateTime.parse(json['created_at']),
+      estDeliveryMinutes: json['est_delivery_minutes'] as int?,
+      estDeliverySetAt: json['est_delivery_set_at'] != null
+          ? DateTime.parse(json['est_delivery_set_at'])
+          : null,
     );
+  }
+
+  /// Whether this order has an active delivery estimate to show
+  bool get hasDeliveryEstimate =>
+      estDeliveryMinutes != null &&
+      estDeliveryMinutes! > 0 &&
+      estDeliverySetAt != null;
+
+  /// The estimated delivery time as a DateTime
+  DateTime? get estDeliveryTime => hasDeliveryEstimate
+      ? estDeliverySetAt!.add(Duration(minutes: estDeliveryMinutes!))
+      : null;
+
+  /// Remaining minutes until estimated delivery (can be negative if overdue)
+  int? get estRemainingMinutes {
+    final target = estDeliveryTime;
+    if (target == null) return null;
+    return target.difference(DateTime.now()).inMinutes;
   }
 
   double get totalAmountValue => double.tryParse(totalAmount) ?? 0.0;
