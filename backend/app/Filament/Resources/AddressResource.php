@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AddressResource\Pages;
 use App\Models\Address;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -25,6 +27,48 @@ class AddressResource extends Resource
     public static function canCreate(): bool
     {
         return false;
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make()
+                    ->schema([
+                        Infolists\Components\TextEntry::make('user.firstname')
+                            ->label('Customer')
+                            ->formatStateUsing(fn ($state, Address $record) =>
+                                "{$record->user->firstname} {$record->user->lastname}"),
+
+                        Infolists\Components\TextEntry::make('label')
+                            ->badge()
+                            ->color('info')
+                            ->placeholder('—'),
+
+                        Infolists\Components\TextEntry::make('address')
+                            ->columnSpanFull(),
+
+                        Infolists\Components\TextEntry::make('city')
+                            ->placeholder('—'),
+
+                        Infolists\Components\TextEntry::make('phone')
+                            ->placeholder('—'),
+
+                        Infolists\Components\IconEntry::make('is_default')
+                            ->label('Default')
+                            ->boolean(),
+
+                        Infolists\Components\TextEntry::make('latitude')
+                            ->placeholder('—'),
+
+                        Infolists\Components\TextEntry::make('longitude')
+                            ->placeholder('—'),
+
+                        Infolists\Components\TextEntry::make('created_at')
+                            ->dateTime('M d, Y H:i'),
+                    ])
+                    ->columns(2),
+            ]);
     }
 
     public static function table(Table $table): Table
