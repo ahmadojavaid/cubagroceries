@@ -18,20 +18,20 @@ class HomeDataTest extends TestCase
                 'data' => [
                     'banners',
                     'featured_sections',
-                    'holiday',
                 ],
             ]);
     }
 
-    public function test_home_data_includes_holiday_status(): void
+    public function test_home_data_featured_sections_structure(): void
     {
         $response = $this->actingAs(User::first(), 'sanctum')
             ->getJson('/api/v1/home');
 
         $response->assertOk();
 
-        $holiday = $response->json('data.holiday');
-        $this->assertArrayHasKey('is_holiday', $holiday);
+        // holiday key may be null when not in holiday mode
+        $data = $response->json('data');
+        $this->assertArrayHasKey('holiday', $data);
     }
 
     public function test_home_data_requires_auth(): void

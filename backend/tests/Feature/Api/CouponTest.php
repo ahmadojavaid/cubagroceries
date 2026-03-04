@@ -44,9 +44,9 @@ class CouponTest extends TestCase
             'type' => 'fixed',
             'value' => 50,
             'is_active' => true,
-            'max_uses' => 100,
+            'usage_limit' => 100,
             'used_count' => 0,
-            'expires_at' => now()->subDay(),
+            'end_date' => now()->subDay(),
         ]);
 
         $response = $this->actingAs($this->authUser(), 'sanctum')
