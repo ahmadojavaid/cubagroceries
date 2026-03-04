@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ComplaintResource\Pages;
 use App\Models\Complaint;
+use App\Notifications\ComplaintStatusChanged;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
@@ -99,12 +100,29 @@ class ComplaintResource extends Resource
                     ])
                     ->fillForm(fn (Complaint $record) => ['status' => $record->status])
                     ->action(function (Complaint $record, array $data): void {
-                        $record->update(['status' => $data['status']]);
+                        $oldStatus = $record->status;
+                        $newStatus = $data['status'];
+
+                        $record->update(['status' => $newStatus]);
+
+                        // Send push notification to customer
+                        if ($oldStatus !== $newStatus) {
+                            try {
+                                $record->load('user');
+                                $record->user->notify(
+                                    new ComplaintStatusChanged($record, $oldStatus, $newStatus)
+                                );
+                            } catch (\Throwable $e) {
+                                \Illuminate\Support\Facades\Log::warning(
+                                    "Failed to notify user for complaint #{$record->id}: " . $e->getMessage()
+                                );
+                            }
+                        }
 
                         Notification::make()
                             ->success()
                             ->title('Status Updated')
-                            ->body("Complaint #{$record->id} is now " . ucfirst(str_replace('_', ' ', $data['status'])) . '.')
+                            ->body("Complaint #{$record->id} is now " . ucfirst(str_replace('_', ' ', $newStatus)) . '.')
                             ->send();
                     })
                     ->requiresConfirmation(),
