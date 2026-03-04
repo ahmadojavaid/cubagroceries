@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 /// Asif Groceries — AG Logo-Derived Palette
-/// Deep forest green (A/G letters), lime green (basket/leaf),
-/// mango orange (fruits), warm neutral backgrounds.
+/// Deep emerald green (#03613D) as dominant primary,
+/// lime green (basket/leaf), mango orange (fruits).
 class AppColors {
   AppColors._();
 
-  // ── Primary — Deep forest green (from "A" & "G" letterforms) ──
-  static const Color primary = Color(0xFF1B6B2A);
-  static const Color primaryDark = Color(0xFF0D4F1A);
-  static const Color primaryLight = Color(0xFF3D9B4F);
-  static const Color primarySurface = Color(0xFFE6F4EA);
+  // ── Primary — Deep emerald green (dominant brand color) ──
+  static const Color primary = Color(0xFF03613D);
+  static const Color primaryDark = Color(0xFF024A2E);
+  static const Color primaryLight = Color(0xFF1A8B5A);
+  static const Color primarySurface = Color(0xFFE3F5ED);
 
   // ── Accent — Mango orange (from logo fruits) ──
   static const Color accent = Color(0xFFF5A623);
@@ -25,7 +25,7 @@ class AppColors {
   // ── Background — Warm, natural whites ──
   static const Color scaffoldBg = Color(0xFFF7F9F5);
   static const Color cardBg = Color(0xFFFFFFFF);
-  static const Color surfaceBg = Color(0xFFEFF3EB);
+  static const Color surfaceBg = Color(0xFFEDF3EB);
 
   // ── Text — Green-tinted neutrals for hierarchy ──
   static const Color textPrimary = Color(0xFF1A2E1A);
