@@ -7,6 +7,7 @@ use App\Models\Address;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
+use App\Models\OrderStatusHistory;
 use App\Models\WalletTransaction;
 use App\Services\OrderIdGenerator;
 use App\Traits\ApiResponse;
@@ -186,6 +187,9 @@ class OrderController extends Controller
                 'total_amount' => $totalAmount,
                 'wallet_amount_used' => $walletUsed,
             ]);
+
+            // Record initial status
+            OrderStatusHistory::record($order->id, null, 'pending', 'customer', 'Order placed');
 
             // Deduct wallet balance
             if ($walletUsed > 0) {

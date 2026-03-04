@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\DeliveryBoy;
 use App\Models\Order;
+use App\Models\OrderStatusHistory;
 use App\Notifications\OrderStatusChanged;
 use App\Notifications\RiderJobAssigned;
 use Filament\Forms;
@@ -112,6 +113,14 @@ class OrderResource extends Resource
 
                         $oldStatus = $record->status;
                         $record->update(['status' => $newStatus]);
+
+                        // Record status history
+                        OrderStatusHistory::record(
+                            $record->id,
+                            $oldStatus->value,
+                            $newStatus->value,
+                            auth('portal')->user()?->name ?? 'admin',
+                        );
 
                         // Send database notification to customer
                         $record->user->notify(new OrderStatusChanged($record, $oldStatus, $newStatus));
@@ -262,6 +271,13 @@ class OrderResource extends Resource
                                     ->prefix('PKR '),
                             ])
                             ->columns(5),
+                    ]),
+
+                Infolists\Components\Section::make('Fulfilment Trail')
+                    ->schema([
+                        Infolists\Components\ViewEntry::make('fulfilment_trail')
+                            ->label('')
+                            ->view('filament.infolists.order-fulfilment-trail'),
                     ]),
             ]);
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
+use App\Models\OrderStatusHistory;
 use App\Notifications\OrderStatusChanged;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -146,6 +147,14 @@ class RiderController extends Controller
 
         $oldStatus = $currentStatus;
         $order->update(['status' => $newStatus]);
+
+        // Record status history
+        OrderStatusHistory::record(
+            $order->id,
+            $oldStatus->value,
+            $newStatus->value,
+            'rider:' . ($deliveryBoy->name ?? 'unknown'),
+        );
 
         // Notify customer
         try {
