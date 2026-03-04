@@ -59,7 +59,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 // AG Logo — large, transparent bg
                 Center(
                   child: Image.asset(
-                    'assets/images/ag-logo.jpg',
+                    'assets/images/ag-logo.png',
                     width: 200,
                     height: 200,
                     fit: BoxFit.contain,
