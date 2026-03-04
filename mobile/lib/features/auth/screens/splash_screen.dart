@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,6 +22,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   void initState() {
     super.initState();
+
+    // Light status bar icons on white background
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -58,7 +63,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       context.go(isRider ? '/rider-home' : '/home');
     } else {
       final box = await Hive.openBox('app_prefs');
-      final hasSeenOnboarding = box.get('hasSeenOnboarding', defaultValue: false);
+      final hasSeenOnboarding =
+          box.get('hasSeenOnboarding', defaultValue: false);
       if (!mounted) return;
       if (hasSeenOnboarding) {
         context.go('/login');
@@ -71,46 +77,39 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryDark,
+      backgroundColor: Colors.white,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // AG Logo
+              // AG Logo inside circle
               Container(
-                width: 130,
-                height: 130,
+                width: 160,
+                height: 160,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.18),
-                      blurRadius: 24,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
+                  shape: BoxShape.circle,
+                  color: AppColors.primarySurface.withOpacity(0.5),
                 ),
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(24),
                 child: Image.asset(
-                  'assets/images/ag-logo.png',
+                  'assets/images/ag-logo.jpg',
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Icon(
+                  errorBuilder: (_, __, ___) => Icon(
                     Icons.storefront_rounded,
-                    size: 52,
+                    size: 56,
                     color: AppColors.primary,
                   ),
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
               Text(
                 'Asif Groceries',
                 style: GoogleFonts.dmSans(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: AppColors.primary,
                   letterSpacing: -0.5,
                 ),
               ),
@@ -119,16 +118,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 'Fresh groceries delivered',
                 style: GoogleFonts.inter(
                   fontSize: 14,
-                  color: Colors.white60,
+                  color: AppColors.textSecondary,
                   letterSpacing: 0.2,
                 ),
               ),
               const SizedBox(height: 48),
-              const SizedBox(
+              SizedBox(
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
-                  color: Colors.white38,
+                  color: AppColors.primary.withOpacity(0.4),
                   strokeWidth: 2,
                 ),
               ),

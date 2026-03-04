@@ -2,10 +2,10 @@
 # Run: dart run flutter_native_splash:create
 
 flutter_native_splash:
-  color: "#024A2E"
+  color: "#FFFFFF"
   image: "assets/splash/ag-splash.png"
   android: true
   ios: false
   android_12:
-    color: "#024A2E"
+    color: "#FFFFFF"
     image: "assets/splash/ag-splash.png"
