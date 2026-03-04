@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Filament\Resources\CustomerResource\RelationManagers;
 use App\Models\User;
+use App\Models\WalletTransaction;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
@@ -95,6 +96,13 @@ class CustomerResource extends Resource
                     ->action(function (User $record, array $data): void {
                         $record->increment('wallet_amount', $data['amount']);
 
+                        WalletTransaction::recordCredit(
+                            $record->id,
+                            $data['amount'],
+                            'admin_topup',
+                            note: $data['note'] ?? null,
+                        );
+
                         Notification::make()
                             ->success()
                             ->title('Wallet Topped Up')
@@ -131,6 +139,13 @@ class CustomerResource extends Resource
                         }
 
                         $record->decrement('wallet_amount', $data['amount']);
+
+                        WalletTransaction::recordDebit(
+                            $record->id,
+                            $data['amount'],
+                            'admin_deduct',
+                            note: $data['note'] ?? null,
+                        );
 
                         Notification::make()
                             ->success()

@@ -7,6 +7,7 @@ use App\Models\Address;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
+use App\Models\WalletTransaction;
 use App\Services\OrderIdGenerator;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -189,6 +190,14 @@ class OrderController extends Controller
             // Deduct wallet balance
             if ($walletUsed > 0) {
                 $user->decrement('wallet_amount', $walletUsed);
+
+                WalletTransaction::recordDebit(
+                    $user->id,
+                    $walletUsed,
+                    'order_payment',
+                    $order->id,
+                    'Payment for order ' . $order->order_id,
+                );
             }
 
             // Snapshot address

@@ -73,6 +73,7 @@ Route::prefix('v1')->group(function () {
 
         // Wallet
         Route::get('/wallet', [WalletController::class, 'balance']);
+        Route::get('/wallet/transactions', [WalletController::class, 'transactions']);
 
         // Shipping
         Route::get('/shipping-charges', [ShippingController::class, 'index']);

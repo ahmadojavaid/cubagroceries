@@ -71,6 +71,11 @@ class User extends Authenticatable
         return $this->hasOne(DeliveryBoy::class);
     }
 
+    public function walletTransactions()
+    {
+        return $this->hasMany(WalletTransaction::class);
+    }
+
     // Accessors
 
     public function getFullNameAttribute(): string

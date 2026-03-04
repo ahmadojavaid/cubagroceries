@@ -29,6 +29,7 @@ import '../../features/settings/screens/store_hours_screen.dart';
 import '../../features/settings/screens/legal_page_screen.dart';
 import '../../features/rider/screens/rider_navigation_shell.dart';
 import '../../features/rider/screens/rider_order_detail_screen.dart';
+import '../../features/wallet/screens/wallet_transactions_screen.dart';
 import '../../main.dart' show navigatorKey;
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -217,6 +218,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           title: 'Privacy Policy',
           settingsKey: 'privacy_policy',
         ),
+      ),
+
+      // Wallet
+      GoRoute(
+        path: '/wallet',
+        builder: (context, state) => const WalletTransactionsScreen(),
       ),
 
       // Complaints
