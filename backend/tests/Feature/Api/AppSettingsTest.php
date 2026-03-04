@@ -3,13 +3,20 @@
 namespace Tests\Feature\Api;
 
 use App\Models\AppSetting;
+use App\Models\User;
 use Tests\TestCase;
 
 class AppSettingsTest extends TestCase
 {
+    private function authUser(): User
+    {
+        return User::first();
+    }
+
     public function test_get_app_settings(): void
     {
-        $response = $this->getJson('/api/v1/settings');
+        $response = $this->actingAs($this->authUser(), 'sanctum')
+            ->getJson('/api/v1/settings');
 
         $response->assertOk()
             ->assertJson(['success' => true]);
@@ -17,19 +24,22 @@ class AppSettingsTest extends TestCase
 
     public function test_app_settings_include_required_keys(): void
     {
-        $response = $this->getJson('/api/v1/settings');
+        $response = $this->actingAs($this->authUser(), 'sanctum')
+            ->getJson('/api/v1/settings');
+
         $response->assertOk();
 
         $data = $response->json('data');
 
-        // These keys should exist
         $this->assertArrayHasKey('app_name', $data);
         $this->assertArrayHasKey('currency_symbol', $data);
     }
 
-    public function test_cancellation_pin_not_exposed_in_public_settings(): void
+    public function test_cancellation_pin_not_exposed_in_settings(): void
     {
-        $response = $this->getJson('/api/v1/settings');
+        $response = $this->actingAs($this->authUser(), 'sanctum')
+            ->getJson('/api/v1/settings');
+
         $response->assertOk();
 
         $data = $response->json('data');

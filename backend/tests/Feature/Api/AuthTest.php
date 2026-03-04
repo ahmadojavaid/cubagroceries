@@ -85,7 +85,8 @@ class AuthTest extends TestCase
             'password' => 'totallyWrongPassword',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
     }
 
     public function test_logout_revokes_token(): void

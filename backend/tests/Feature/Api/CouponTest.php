@@ -15,7 +15,6 @@ class CouponTest extends TestCase
 
     public function test_apply_valid_coupon(): void
     {
-        // Create a test coupon
         $coupon = Coupon::create([
             'code' => 'TEST' . strtoupper(uniqid()),
             'type' => 'percentage',
@@ -28,11 +27,14 @@ class CouponTest extends TestCase
         $response = $this->actingAs($this->authUser(), 'sanctum')
             ->postJson('/api/v1/coupons/apply', [
                 'code' => $coupon->code,
-                'subtotal' => 500,
+                'order_total' => 500,
             ]);
 
         $response->assertOk()
-            ->assertJson(['success' => true]);
+            ->assertJson(['success' => true])
+            ->assertJsonStructure([
+                'data' => ['code', 'type', 'discount'],
+            ]);
     }
 
     public function test_apply_expired_coupon_fails(): void
@@ -50,7 +52,7 @@ class CouponTest extends TestCase
         $response = $this->actingAs($this->authUser(), 'sanctum')
             ->postJson('/api/v1/coupons/apply', [
                 'code' => $coupon->code,
-                'subtotal' => 500,
+                'order_total' => 500,
             ]);
 
         $response->assertStatus(422);
@@ -61,10 +63,31 @@ class CouponTest extends TestCase
         $response = $this->actingAs($this->authUser(), 'sanctum')
             ->postJson('/api/v1/coupons/apply', [
                 'code' => 'TOTALLYINVALIDXYZ',
-                'subtotal' => 500,
+                'order_total' => 500,
             ]);
 
         $response->assertStatus(422);
+    }
+
+    public function test_percentage_coupon_calculates_correctly(): void
+    {
+        $coupon = Coupon::create([
+            'code' => 'PCT' . strtoupper(uniqid()),
+            'type' => 'percentage',
+            'value' => 20,
+            'is_active' => true,
+            'max_uses' => 100,
+            'used_count' => 0,
+        ]);
+
+        $response = $this->actingAs($this->authUser(), 'sanctum')
+            ->postJson('/api/v1/coupons/apply', [
+                'code' => $coupon->code,
+                'order_total' => 1000,
+            ]);
+
+        $response->assertOk();
+        $this->assertEquals(200, $response->json('data.discount'));
     }
 
     public function test_user_specific_coupon_works_for_correct_user(): void
@@ -84,7 +107,7 @@ class CouponTest extends TestCase
         $response = $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/coupons/apply', [
                 'code' => $coupon->code,
-                'subtotal' => 500,
+                'order_total' => 500,
             ]);
 
         $response->assertOk()
@@ -113,7 +136,7 @@ class CouponTest extends TestCase
         $response = $this->actingAs($user2, 'sanctum')
             ->postJson('/api/v1/coupons/apply', [
                 'code' => $coupon->code,
-                'subtotal' => 500,
+                'order_total' => 500,
             ]);
 
         $response->assertStatus(422);
@@ -123,7 +146,7 @@ class CouponTest extends TestCase
     {
         $response = $this->postJson('/api/v1/coupons/apply', [
             'code' => 'TEST',
-            'subtotal' => 100,
+            'order_total' => 100,
         ]);
 
         $response->assertStatus(401);

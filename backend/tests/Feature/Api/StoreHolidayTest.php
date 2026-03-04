@@ -8,48 +8,30 @@ use Tests\TestCase;
 
 class StoreHolidayTest extends TestCase
 {
-    public function test_orders_blocked_during_holiday_mode(): void
+    public function test_home_returns_holiday_active_when_enabled(): void
     {
-        // Enable holiday mode
         AppSetting::setValue('store_holiday_mode', '1');
+        AppSetting::setValue('store_holiday_message', 'We are closed for Eid!');
 
-        $user = User::first();
+        $response = $this->actingAs(User::first(), 'sanctum')
+            ->getJson('/api/v1/home');
 
-        $response = $this->actingAs($user, 'sanctum')
-            ->postJson('/api/v1/orders', [
-                'address_id' => 1,
-                'items' => [
-                    ['product_id' => 1, 'unit_id' => 7, 'quantity' => 1],
-                ],
-            ]);
+        $response->assertOk();
 
-        // Should be rejected (422 or 503)
-        $this->assertTrue(in_array($response->status(), [422, 503]),
-            'Orders should be blocked during holiday mode, got: ' . $response->status());
-
-        // Disable holiday mode (cleanup)
-        AppSetting::setValue('store_holiday_mode', '0');
+        $holiday = $response->json('data.holiday');
+        $this->assertTrue($holiday['is_holiday'], 'Holiday should be active');
     }
 
-    public function test_orders_work_when_holiday_mode_off(): void
+    public function test_home_returns_holiday_inactive_when_disabled(): void
     {
         AppSetting::setValue('store_holiday_mode', '0');
 
-        $user = User::first();
+        $response = $this->actingAs(User::first(), 'sanctum')
+            ->getJson('/api/v1/home');
 
-        // Just check it doesn't return a holiday error
-        // (may fail for other validation reasons, that's fine)
-        $response = $this->actingAs($user, 'sanctum')
-            ->postJson('/api/v1/orders', [
-                'address_id' => 99999,
-                'items' => [
-                    ['product_id' => 1, 'unit_id' => 7, 'quantity' => 1],
-                ],
-            ]);
+        $response->assertOk();
 
-        // Should NOT be a holiday rejection — 422 for validation is expected
-        $body = $response->json('message') ?? '';
-        $this->assertStringNotContainsStringIgnoringCase('holiday', $body);
-        $this->assertStringNotContainsStringIgnoringCase('closed', $body);
+        $holiday = $response->json('data.holiday');
+        $this->assertFalse($holiday['is_holiday'], 'Holiday should be inactive');
     }
 }

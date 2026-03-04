@@ -20,8 +20,17 @@ class WalletTest extends TestCase
         $response->assertOk()
             ->assertJson(['success' => true])
             ->assertJsonStructure([
-                'data' => ['balance'],
+                'data' => ['wallet_amount'],
             ]);
+    }
+
+    public function test_wallet_balance_is_numeric(): void
+    {
+        $response = $this->actingAs($this->authUser(), 'sanctum')
+            ->getJson('/api/v1/wallet');
+
+        $response->assertOk();
+        $this->assertIsNumeric($response->json('data.wallet_amount'));
     }
 
     public function test_get_wallet_transactions(): void
