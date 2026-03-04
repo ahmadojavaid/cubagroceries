@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'core/router/app_router.dart';
+import 'core/services/fcm_notification_handler.dart';
 import 'core/theme/app_theme.dart';
 
 void main() async {
@@ -18,9 +21,14 @@ void main() async {
     debugPrint('Hive init failed: $e');
   }
 
-  // TODO: Initialize Firebase when google-services.json is configured
-  // await Firebase.initializeApp();
-  // FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  // Initialize Firebase
+  try {
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    debugPrint('Firebase: Initialized');
+  } catch (e) {
+    debugPrint('Firebase init failed: $e');
+  }
 
   // Catch all uncaught errors
   FlutterError.onError = (details) {
@@ -48,6 +56,9 @@ class _DevHttpOverrides extends HttpOverrides {
       ..badCertificateCallback = (cert, host, port) => true;
   }
 }
+
+/// Global navigator key for showing dialogs from FCM handler
+final navigatorKey = GlobalKey<NavigatorState>();
 
 class AsifGroceriesApp extends ConsumerWidget {
   const AsifGroceriesApp({super.key});

@@ -29,9 +29,11 @@ import '../../features/settings/screens/store_hours_screen.dart';
 import '../../features/settings/screens/legal_page_screen.dart';
 import '../../features/rider/screens/rider_navigation_shell.dart';
 import '../../features/rider/screens/rider_order_detail_screen.dart';
+import '../../main.dart' show navigatorKey;
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
+    navigatorKey: navigatorKey,
     initialLocation: '/splash',
     debugLogDiagnostics: true,
     routes: [

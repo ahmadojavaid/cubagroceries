@@ -3,6 +3,7 @@ import '../../../core/api/api_client.dart';
 import '../../../core/api/api_exception.dart';
 import '../../../core/providers/api_provider.dart';
 import '../../../core/services/fcm_service.dart';
+import '../../../core/services/fcm_notification_handler.dart';
 import '../../../core/providers/fcm_provider.dart';
 
 /// Represents the current auth state
@@ -45,8 +46,9 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final ApiClient _api;
   final FcmService _fcm;
+  final FcmNotificationHandler _fcmHandler;
 
-  AuthNotifier(this._api, this._fcm) : super(const AuthState());
+  AuthNotifier(this._api, this._fcm, this._fcmHandler) : super(const AuthState());
 
   /// Check if user has a stored token on app start
   Future<void> checkAuth() async {
@@ -64,6 +66,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           );
           // Send FCM token after auth verification
           _fcm.initialize();
+          _fcmHandler.initialize();
           return;
         }
       } catch (_) {
@@ -105,6 +108,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           role: userData['role'] as String? ?? 'customer',
         );
         _fcm.initialize();
+        _fcmHandler.initialize();
         return true;
       }
 
@@ -139,6 +143,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           role: userData['role'] as String? ?? 'customer',
         );
         _fcm.initialize();
+        _fcmHandler.initialize();
         return true;
       }
 
@@ -182,7 +187,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final api = ref.watch(apiClientProvider);
   final fcm = ref.watch(fcmServiceProvider);
-  return AuthNotifier(api, fcm);
+  final fcmHandler = ref.watch(fcmNotificationHandlerProvider);
+  return AuthNotifier(api, fcm, fcmHandler);
 });
 
 /// Derived provider: current user role

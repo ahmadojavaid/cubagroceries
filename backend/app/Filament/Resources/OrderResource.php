@@ -7,6 +7,7 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Models\DeliveryBoy;
 use App\Models\Order;
 use App\Notifications\OrderStatusChanged;
+use App\Notifications\RiderJobAssigned;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
@@ -145,6 +146,12 @@ class OrderResource extends Resource
                         $record->update(['delivery_boy_id' => $data['delivery_boy_id']]);
 
                         $deliveryBoy = DeliveryBoy::find($data['delivery_boy_id']);
+
+                        // Send push notification to rider's linked user account
+                        if ($deliveryBoy->user) {
+                            $record->load(['user', 'address']);
+                            $deliveryBoy->user->notify(new RiderJobAssigned($record));
+                        }
 
                         Notification::make()
                             ->success()

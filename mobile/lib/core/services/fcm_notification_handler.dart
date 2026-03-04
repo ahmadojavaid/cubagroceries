@@ -1,28 +1,230 @@
+import 'package:audioplayers/audioplayers.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 
 /// Top-level handler for background messages.
-/// No-op until Firebase is configured.
-Future<void> firebaseMessagingBackgroundHandler(dynamic message) async {
-  debugPrint('FCM Background: message received');
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  debugPrint('FCM Background: ${message.messageId}');
 }
 
 /// Handles foreground and tap-based notification events.
-/// No-op until Firebase is configured.
 class FcmNotificationHandler {
+  final GlobalKey<NavigatorState> navigatorKey;
   final void Function(String? orderNumber) onNotificationTap;
-  final void Function(dynamic message)? onForegroundMessage;
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   FcmNotificationHandler({
+    required this.navigatorKey,
     required this.onNotificationTap,
-    this.onForegroundMessage,
   });
 
   /// Set up all FCM message listeners.
-  /// No-op until Firebase is configured.
   void initialize() {
-    // TODO: Uncomment when Firebase is configured
-    // FirebaseMessaging.onMessage.listen(...)
-    // FirebaseMessaging.onMessageOpenedApp.listen(...)
-    debugPrint('FCM Handler: Skipped — Firebase not configured yet');
+    // Foreground messages
+    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+
+    // User tapped notification while app was in background
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
+
+    // Check if app was opened from a terminated state via notification
+    _checkInitialMessage();
+
+    debugPrint('FCM Handler: Initialized');
+  }
+
+  Future<void> _checkInitialMessage() async {
+    final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      _handleNotificationTap(initialMessage);
+    }
+  }
+
+  void _handleNotificationTap(RemoteMessage message) {
+    final orderNumber = message.data['order_number'] as String?;
+    onNotificationTap(orderNumber);
+  }
+
+  Future<void> _handleForegroundMessage(RemoteMessage message) async {
+    debugPrint('FCM Foreground: ${message.data}');
+
+    final type = message.data['type'] as String?;
+
+    if (type == 'rider_job_assigned') {
+      await _showRiderJobAlert(message);
+    } else {
+      // Show a subtle snackbar for other notifications
+      _showNotificationSnackbar(message);
+    }
+  }
+
+  /// Play alert sound and show a prominent dialog for rider job assignment.
+  Future<void> _showRiderJobAlert(RemoteMessage message) async {
+    // Play alert sound — using the device alarm ringtone via system
+    try {
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+      await _audioPlayer.play(
+        AssetSource('sounds/rider_alert.mp3'),
+        volume: 1.0,
+      );
+    } catch (e) {
+      debugPrint('FCM: Could not play alert sound: $e');
+    }
+
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+
+    final title = message.notification?.title ?? 'New Delivery Job!';
+    final body = message.notification?.body ?? '';
+    final orderNumber = message.data['order_number'] as String?;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.delivery_dining,
+                color: AppColors.primary,
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              body,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+                height: 1.4,
+              ),
+            ),
+            if (orderNumber != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.receipt_long,
+                        size: 16, color: AppColors.textHint),
+                    const SizedBox(width: 8),
+                    Text(
+                      '#$orderNumber',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              _stopAlertSound();
+              Navigator.pop(ctx);
+            },
+            child: const Text('Dismiss'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              _stopAlertSound();
+              Navigator.pop(ctx);
+              if (orderNumber != null) {
+                onNotificationTap(orderNumber);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
+            ),
+            child: const Text('View Order'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _stopAlertSound() async {
+    try {
+      await _audioPlayer.stop();
+      await _audioPlayer.setReleaseMode(ReleaseMode.release);
+    } catch (_) {}
+  }
+
+  void _showNotificationSnackbar(RemoteMessage message) {
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+
+    final title = message.notification?.title ?? '';
+    final body = message.notification?.body ?? '';
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (title.isNotEmpty)
+              Text(title,
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
+            if (body.isNotEmpty)
+              Text(body, style: const TextStyle(fontSize: 13)),
+          ],
+        ),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+        action: message.data['order_number'] != null
+            ? SnackBarAction(
+                label: 'View',
+                onPressed: () => onNotificationTap(
+                    message.data['order_number'] as String?),
+              )
+            : null,
+      ),
+    );
+  }
+
+  void dispose() {
+    _audioPlayer.dispose();
   }
 }
