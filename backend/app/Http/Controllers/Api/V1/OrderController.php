@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Models\Order;
@@ -53,6 +54,62 @@ class OrderController extends Controller
         $data['est_delivery_set_at'] = $order->est_delivery_set_at?->toIso8601String();
 
         return $this->success($data);
+    }
+
+    /**
+     * Cancel a pending order.
+     * PUT /api/v1/orders/{order_number}/cancel
+     */
+    public function cancel(Request $request, string $orderNumber): JsonResponse
+    {
+        $order = Order::where('order_id', $orderNumber)
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if (!$order) {
+            return $this->error('Order not found', 404);
+        }
+
+        if ($order->status !== OrderStatus::Pending) {
+            return $this->error('Only pending orders can be cancelled.', 422);
+        }
+
+        $oldStatus = $order->status;
+        $order->update(['status' => OrderStatus::Cancelled]);
+
+        // Record status history
+        OrderStatusHistory::record(
+            $order->id,
+            $oldStatus->value,
+            OrderStatus::Cancelled->value,
+            'customer',
+            'Cancelled by customer',
+        );
+
+        // Refund wallet if wallet was used
+        if ($order->wallet_amount_used > 0) {
+            $user = $request->user();
+            $user->increment('wallet_amount', $order->wallet_amount_used);
+
+            WalletTransaction::recordCredit(
+                userId: $user->id,
+                amount: (float) $order->wallet_amount_used,
+                source: 'order_refund',
+                referenceId: $order->id,
+                note: "Refund for cancelled order {$order->order_id}",
+            );
+        }
+
+        // Restore stock
+        foreach ($order->products as $item) {
+            Product::where('id', $item->product_id)
+                ->increment('stock', $item->quantity);
+        }
+
+        return $this->success([
+            'order_id' => $order->order_id,
+            'status' => OrderStatus::Cancelled->value,
+        ], 'Order cancelled successfully.');
     }
 
     /**

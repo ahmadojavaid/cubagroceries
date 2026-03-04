@@ -226,6 +226,34 @@ class OrderActionNotifier extends StateNotifier<PlaceOrderState> {
     }
   }
 
+  /// Cancel a pending order
+  Future<bool> cancelOrder(String orderNumber) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final response = await _api.put('/orders/$orderNumber/cancel');
+      final data = response.data;
+
+      if (data['success'] == true) {
+        // Re-fetch the order detail to get updated status
+        await fetchOrderDetail(orderNumber);
+        return true;
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: data['message'] ?? 'Failed to cancel order',
+        );
+        return false;
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: _extractError(e),
+      );
+      return false;
+    }
+  }
+
   /// Reset state
   void reset() {
     state = const PlaceOrderState();

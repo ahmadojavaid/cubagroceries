@@ -42,6 +42,60 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
     });
   }
 
+  void _confirmCancel(String orderNumber) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancel Order'),
+        content: const Text(
+          'Are you sure you want to cancel this order? If you paid with wallet credit, it will be refunded.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Keep Order'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _doCancel(orderNumber);
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Cancel Order'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _doCancel(String orderNumber) async {
+    final success = await ref
+        .read(orderActionProvider.notifier)
+        .cancelOrder(orderNumber);
+
+    if (!mounted) return;
+
+    if (success) {
+      // Refresh order list
+      ref.read(orderListProvider.notifier).fetchOrders(forceRefresh: true);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Order cancelled successfully'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    } else {
+      final error = ref.read(orderActionProvider).error;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error ?? 'Failed to cancel order'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
   /// Check if the user already reviewed this order; if not, show popup.
   Future<void> _maybeShowReviewPopup(OrderDetailModel order) async {
     _reviewPromptShown = true;
@@ -270,6 +324,28 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
           ),
 
           const SizedBox(height: AppDimens.lg),
+
+          // Cancel order button (only for pending orders)
+          if (order.status == 'pending') ...[            
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => _confirmCancel(order.orderId),
+                icon: const Icon(Icons.cancel_outlined, size: 18),
+                label: const Text('Cancel Order'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                  ),
+                  elevation: 0,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppDimens.sm),
+          ],
 
           // File complaint button
           SizedBox(

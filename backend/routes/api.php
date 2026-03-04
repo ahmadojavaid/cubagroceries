@@ -83,6 +83,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/orders', [OrderController::class, 'index']);
         Route::post('/orders', [OrderController::class, 'store']);
         Route::get('/orders/{orderNumber}', [OrderController::class, 'show']);
+        Route::put('/orders/{orderNumber}/cancel', [OrderController::class, 'cancel']);
 
         // Complaints
         Route::get('/complaints', [ComplaintController::class, 'index']);
