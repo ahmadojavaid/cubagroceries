@@ -96,7 +96,7 @@ class AuthController extends Controller
                 'email' => $email,
                 'firstname' => $nameParts[0] ?? 'User',
                 'lastname' => $nameParts[1] ?? '',
-                'identity' => $email,
+                'identity' => '',
                 'password' => Hash::make(Str::random(32)),
                 'role' => 'customer',
             ]);
