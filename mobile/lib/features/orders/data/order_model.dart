@@ -46,6 +46,7 @@ class OrderDetailModel {
   final DateTime createdAt;
   final int? estDeliveryMinutes;
   final DateTime? estDeliverySetAt;
+  final RiderModel? rider;
 
   const OrderDetailModel({
     required this.id,
@@ -57,6 +58,7 @@ class OrderDetailModel {
     required this.createdAt,
     this.estDeliveryMinutes,
     this.estDeliverySetAt,
+    this.rider,
   });
 
   factory OrderDetailModel.fromJson(Map<String, dynamic> json) {
@@ -79,6 +81,10 @@ class OrderDetailModel {
       estDeliveryMinutes: json['est_delivery_minutes'] as int?,
       estDeliverySetAt: json['est_delivery_set_at'] != null
           ? DateTime.parse(json['est_delivery_set_at'])
+          : null,
+      rider: json['delivery_boy'] != null
+          ? RiderModel.fromJson(
+              Map<String, dynamic>.from(json['delivery_boy']))
           : null,
     );
   }
@@ -167,4 +173,25 @@ class OrderItemModel {
   String get displayPrice => 'Rs $price';
 
   String get displayLineTotal => 'Rs ${lineTotal.toStringAsFixed(2)}';
+}
+
+/// Delivery rider info
+class RiderModel {
+  final int id;
+  final String name;
+  final String? phone;
+
+  const RiderModel({
+    required this.id,
+    required this.name,
+    this.phone,
+  });
+
+  factory RiderModel.fromJson(Map<String, dynamic> json) {
+    return RiderModel(
+      id: json['id'],
+      name: json['name'] ?? '',
+      phone: json['phone'] as String?,
+    );
+  }
 }

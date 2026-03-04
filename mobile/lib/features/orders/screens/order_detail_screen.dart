@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/providers/api_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
@@ -172,6 +173,101 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
     );
   }
 
+  Widget _buildRiderCard(RiderModel rider) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppDimens.md),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.15),
+          width: 0.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Rider avatar
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.delivery_dining_rounded,
+              color: AppColors.primary,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          // Name and phone
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Your Rider',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textHint,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  rider.name,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                if (rider.phone != null)
+                  Text(
+                    rider.phone!,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          // Call button
+          if (rider.phone != null)
+            Material(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                onTap: () => _callRider(rider.phone!),
+                child: const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Icon(
+                    Icons.phone,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _callRider(String phone) async {
+    final uri = Uri(scheme: 'tel', path: phone);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
   Widget _buildDetail(OrderDetailModel order) {
     final dateStr =
         DateFormat('MMM d, yyyy • h:mm a').format(order.createdAt);
@@ -193,6 +289,13 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
               order.status != 'delivered' &&
               order.status != 'cancelled')
             const SizedBox(height: AppDimens.md),
+
+          // Rider details card
+          if (order.rider != null &&
+              order.status != 'cancelled') ...[
+            _buildRiderCard(order.rider!),
+            const SizedBox(height: AppDimens.md),
+          ],
 
           // Order info card
           _SectionCard(
