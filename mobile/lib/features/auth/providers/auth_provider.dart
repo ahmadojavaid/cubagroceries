@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_exception.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/providers/api_provider.dart';
 import '../../../core/services/fcm_service.dart';
 import '../../../core/services/fcm_notification_handler.dart';
@@ -131,6 +133,57 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final response = await _api.post('/auth/login', data: {
         'email': email,
         'password': password,
+      });
+
+      final data = response.data;
+      if (data['success'] == true) {
+        await _api.saveToken(data['data']['token']);
+        final userData = Map<String, dynamic>.from(data['data']['user']);
+        state = AuthState(
+          isAuthenticated: true,
+          user: userData,
+          role: userData['role'] as String? ?? 'customer',
+        );
+        _fcm.initialize();
+        _fcmHandler.initialize();
+        return true;
+      }
+
+      state = state.copyWith(isLoading: false, error: data['message']);
+      return false;
+    } catch (e) {
+      final message = _extractError(e);
+      state = state.copyWith(isLoading: false, error: message);
+      return false;
+    }
+  }
+
+  /// Google Sign-In
+  Future<bool> signInWithGoogle() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final googleSignIn = GoogleSignIn(
+        serverClientId: AppConfig.googleWebClientId,
+      );
+
+      final account = await googleSignIn.signIn();
+      if (account == null) {
+        // User cancelled
+        state = state.copyWith(isLoading: false);
+        return false;
+      }
+
+      final auth = await account.authentication;
+      final idToken = auth.idToken;
+
+      if (idToken == null) {
+        state = state.copyWith(isLoading: false, error: 'Could not get Google token.');
+        return false;
+      }
+
+      // Send token to our backend
+      final response = await _api.post('/auth/google', data: {
+        'id_token': idToken,
       });
 
       final data = response.data;

@@ -26,6 +26,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> _onGoogleSignIn() async {
+    final success = await ref.read(authProvider.notifier).signInWithGoogle();
+    if (success && mounted) {
+      final isRider = ref.read(authProvider).isRider;
+      context.go(isRider ? '/rider-home' : '/home');
+    }
+  }
+
   Future<void> _onLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -184,6 +192,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           )
                         : const Text('Sign In'),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Divider
+                Row(
+                  children: [
+                    const Expanded(child: Divider(color: AppColors.border)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'or',
+                        style: TextStyle(
+                          color: AppColors.textHint,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                    const Expanded(child: Divider(color: AppColors.border)),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Google Sign-In
+                SizedBox(
+                  height: 52,
+                  child: OutlinedButton.icon(
+                    onPressed: auth.isLoading ? null : _onGoogleSignIn,
+                    icon: Image.asset(
+                      'assets/images/google_logo.png',
+                      width: 20,
+                      height: 20,
+                      errorBuilder: (_, __, ___) => const Icon(Icons.g_mobiledata, size: 24),
+                    ),
+                    label: const Text('Continue with Google'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textPrimary,
+                      side: const BorderSide(color: AppColors.border),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
