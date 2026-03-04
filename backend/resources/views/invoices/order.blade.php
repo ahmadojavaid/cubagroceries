@@ -298,7 +298,7 @@
         <!-- Header -->
         <div class="invoice-header">
             <div class="brand">
-                <h1>{{ $settings['app_name'] ?? 'Cuba Groceries' }}</h1>
+                <h1>{{ $settings['app_name'] ?? 'Asif Groceries' }}</h1>
                 <p>{{ $settings['contact_email'] ?? '' }}</p>
                 <p>{{ $settings['contact_phone'] ?? '' }}</p>
             </div>
