@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 
@@ -41,6 +42,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
+  Future<void> _completeOnboarding() async {
+    final box = await Hive.openBox('app_prefs');
+    await box.put('hasSeenOnboarding', true);
+    if (mounted) context.go('/login');
+  }
+
   void _onNext() {
     if (_currentPage < _pages.length - 1) {
       _controller.nextPage(
@@ -48,7 +55,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      context.go('/login');
+      _completeOnboarding();
     }
   }
 
@@ -65,7 +72,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(AppDimens.md),
                 child: TextButton(
-                  onPressed: () => context.go('/login'),
+                  onPressed: _completeOnboarding,
                   child: const Text('Skip'),
                 ),
               ),

@@ -5,12 +5,27 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../data/cart_item_model.dart';
 import '../providers/cart_provider.dart';
+import '../providers/shipping_provider.dart';
+import '../widgets/free_delivery_milestone.dart';
 
-class CartScreen extends ConsumerWidget {
+class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends ConsumerState<CartScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(shippingProvider.notifier).fetchCharges();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final cart = ref.watch(cartProvider);
 
     return Scaffold(
@@ -27,7 +42,7 @@ class CartScreen extends ConsumerWidget {
       ),
       body: cart.isEmpty ? _buildEmpty(context) : _buildCartList(context, ref, cart),
       bottomNavigationBar:
-          cart.isEmpty ? null : _buildBottomBar(context, ref, cart),
+          cart.isEmpty ? null : _buildBottomBar(context, cart),
     );
   }
 
@@ -61,17 +76,32 @@ class CartScreen extends ConsumerWidget {
   }
 
   Widget _buildCartList(BuildContext context, WidgetRef ref, CartState cart) {
-    return ListView.separated(
+    return ListView(
       padding: const EdgeInsets.all(AppDimens.pagePadding),
-      itemCount: cart.items.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppDimens.sm),
-      itemBuilder: (context, index) {
-        return _CartItemCard(item: cart.items[index]);
-      },
+      children: [
+        // Free delivery milestone
+        _buildDeliveryMilestone(cart.subtotal),
+        const SizedBox(height: AppDimens.md),
+        // Cart items
+        ...cart.items.map((item) => Padding(
+              padding: const EdgeInsets.only(bottom: AppDimens.sm),
+              child: _CartItemCard(item: item),
+            )),
+      ],
     );
   }
 
-  Widget _buildBottomBar(BuildContext context, WidgetRef ref, CartState cart) {
+  Widget _buildDeliveryMilestone(double subtotal) {
+    final threshold = ref.watch(freeDeliveryThresholdProvider);
+    if (threshold == null) return const SizedBox.shrink();
+
+    if (subtotal >= threshold) {
+      return const FreeDeliveryUnlocked();
+    }
+    return FreeDeliveryMilestone(subtotal: subtotal, threshold: threshold);
+  }
+
+  Widget _buildBottomBar(BuildContext context, CartState cart) {
     return Container(
       padding: const EdgeInsets.fromLTRB(
           AppDimens.pagePadding, AppDimens.md, AppDimens.pagePadding, AppDimens.lg),
@@ -128,7 +158,7 @@ class CartScreen extends ConsumerWidget {
     );
   }
 
-  void _confirmClear(BuildContext context, WidgetRef ref) {
+  void _confirmClear(BuildContext context, WidgetRef ref_) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -142,7 +172,7 @@ class CartScreen extends ConsumerWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              ref.read(cartProvider.notifier).clearCart();
+              ref_.read(cartProvider.notifier).clearCart();
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Clear'),

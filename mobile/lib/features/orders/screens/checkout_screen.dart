@@ -6,6 +6,7 @@ import '../../../core/theme/app_dimens.dart';
 import '../../cart/data/shipping_charge_model.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../../cart/providers/shipping_provider.dart';
+import '../../cart/widgets/free_delivery_milestone.dart';
 import '../../profile/data/address_model.dart';
 import '../../profile/providers/address_provider.dart';
 import '../../cart/widgets/coupon_input_widget.dart';
@@ -192,6 +193,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final state = ref.watch(shippingProvider);
     final cart = ref.watch(cartProvider);
     final subtotal = cart.subtotal;
+    final threshold = ref.watch(freeDeliveryThresholdProvider);
+    final freeOption = ref.watch(freeDeliveryOptionProvider);
+    final qualifiesForFree = threshold != null && subtotal >= threshold && freeOption != null;
 
     if (state.isLoading && state.charges.isEmpty) {
       return const Padding(
@@ -208,41 +212,44 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       );
     }
 
-    // Pre-select first eligible option
-    if (_selectedShippingId == null && state.charges.isNotEmpty) {
-      final firstEligible = state.charges
-          .where((c) => c.isAvailableFor(subtotal))
-          .firstOrNull;
-      _selectedShippingId = firstEligible?.id ?? state.charges.first.id;
+    // Auto-select free delivery when eligible
+    if (qualifiesForFree) {
+      _selectedShippingId = freeOption!.id;
+      return const Column(
+        children: [
+          FreeDeliveryUnlocked(),
+        ],
+      );
     }
 
-    // If selected option became ineligible, switch to first eligible
-    final selectedCharge = state.charges
-        .where((c) => c.id == _selectedShippingId)
-        .firstOrNull;
-    if (selectedCharge != null && !selectedCharge.isAvailableFor(subtotal)) {
-      final firstEligible = state.charges
-          .where((c) => c.isAvailableFor(subtotal))
-          .firstOrNull;
-      if (firstEligible != null) {
-        _selectedShippingId = firstEligible.id;
-      }
+    // Below threshold — show paid options + milestone
+    final paidCharges = state.charges.where((c) => c.amountValue > 0).toList();
+
+    // Pre-select first paid option
+    if (_selectedShippingId == null && paidCharges.isNotEmpty) {
+      _selectedShippingId = paidCharges.first.id;
+    }
+
+    // If current selection is the free option but not eligible, switch
+    if (freeOption != null && _selectedShippingId == freeOption.id) {
+      _selectedShippingId = paidCharges.isNotEmpty ? paidCharges.first.id : null;
     }
 
     return Column(
-      children: state.charges
-          .map((charge) {
-            final eligible = charge.isAvailableFor(subtotal);
-            return _ShippingRadioCard(
+      children: [
+        // Milestone bar
+        if (threshold != null) ...[
+          FreeDeliveryMilestone(subtotal: subtotal, threshold: threshold),
+          const SizedBox(height: AppDimens.md),
+        ],
+        // Paid shipping options only
+        ...paidCharges.map((charge) => _ShippingRadioCard(
               charge: charge,
               isSelected: _selectedShippingId == charge.id,
-              enabled: eligible,
-              onTap: eligible
-                  ? () => setState(() => _selectedShippingId = charge.id)
-                  : null,
-            );
-          })
-          .toList(),
+              enabled: true,
+              onTap: () => setState(() => _selectedShippingId = charge.id),
+            )),
+      ],
     );
   }
 

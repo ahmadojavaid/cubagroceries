@@ -72,3 +72,17 @@ final shippingProvider =
   final api = ref.watch(apiClientProvider);
   return ShippingNotifier(api);
 });
+
+/// Free delivery threshold — derived from the free (amount=0) shipping option's min_order_amount.
+/// Returns null if no free delivery option exists.
+final freeDeliveryThresholdProvider = Provider<double?>((ref) {
+  final charges = ref.watch(shippingProvider).charges;
+  final freeOption = charges.where((c) => c.amountValue == 0).firstOrNull;
+  return freeOption?.minOrderAmount;
+});
+
+/// The free delivery shipping charge model (if any)
+final freeDeliveryOptionProvider = Provider<ShippingChargeModel?>((ref) {
+  final charges = ref.watch(shippingProvider).charges;
+  return charges.where((c) => c.amountValue == 0).firstOrNull;
+});

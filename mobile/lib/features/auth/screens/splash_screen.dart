@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../providers/auth_provider.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -56,7 +57,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       final isRider = ref.read(authProvider).isRider;
       context.go(isRider ? '/rider-home' : '/home');
     } else {
-      context.go('/login');
+      // Show onboarding only on first install
+      final box = await Hive.openBox('app_prefs');
+      final hasSeenOnboarding = box.get('hasSeenOnboarding', defaultValue: false);
+      if (!mounted) return;
+      if (hasSeenOnboarding) {
+        context.go('/login');
+      } else {
+        context.go('/onboarding');
+      }
     }
   }
 
