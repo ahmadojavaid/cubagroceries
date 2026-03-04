@@ -24,6 +24,7 @@ class ManualPush extends Notification
         return [
             'title' => $this->title,
             'message' => $this->message,
+            'type' => 'manual_push',
         ];
     }
 }
