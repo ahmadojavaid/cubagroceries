@@ -70,15 +70,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Center(
                   child: Text(
                     'Asif Groceries',
                     style: GoogleFonts.dmSans(
-                      fontSize: 22,
+                      fontSize: 32,
                       fontWeight: FontWeight.w700,
                       color: AppColors.primary,
-                      letterSpacing: -0.3,
+                      letterSpacing: -0.5,
                     ),
                   ),
                 ),
@@ -200,6 +200,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ?.copyWith(color: AppColors.textSecondary),
                     ),
                     TextButton(
+                      style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                       onPressed: () => context.go('/register'),
                       child: const Text('Sign Up'),
                     ),
