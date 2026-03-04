@@ -12,6 +12,11 @@ use Filament\Tables\Table;
 
 class SurveyResource extends Resource
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $model = Survey::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';

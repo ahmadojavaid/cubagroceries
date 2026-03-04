@@ -9,6 +9,11 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class TodaysBirthdaysWidget extends BaseWidget
 {
+    public static function canView(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?int $sort = 3;
 
     protected int|string|array $columnSpan = 'full';

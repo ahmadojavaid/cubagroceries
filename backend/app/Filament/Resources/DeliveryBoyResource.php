@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\Hash;
 
 class DeliveryBoyResource extends Resource
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $model = DeliveryBoy::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';

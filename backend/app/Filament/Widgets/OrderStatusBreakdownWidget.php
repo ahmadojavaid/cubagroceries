@@ -9,6 +9,11 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class OrderStatusBreakdownWidget extends BaseWidget
 {
+    public static function canView(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?int $sort = 2;
 
     protected ?string $heading = 'Order Status Breakdown';

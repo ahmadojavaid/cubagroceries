@@ -12,6 +12,11 @@ use Filament\Tables\Table;
 
 class UnitResource extends Resource
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $model = Unit::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-scale';

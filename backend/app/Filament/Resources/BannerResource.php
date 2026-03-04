@@ -13,6 +13,11 @@ use Filament\Tables\Table;
 
 class BannerResource extends Resource
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $model = Banner::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';

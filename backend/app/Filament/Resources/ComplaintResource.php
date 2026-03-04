@@ -14,6 +14,11 @@ use Filament\Tables\Table;
 
 class ComplaintResource extends Resource
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $model = Complaint::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';

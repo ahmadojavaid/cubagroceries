@@ -14,6 +14,11 @@ use Illuminate\Support\Number;
 
 class StatsOverviewWidget extends BaseWidget
 {
+    public static function canView(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?int $sort = 1;
 
     protected function getStats(): array

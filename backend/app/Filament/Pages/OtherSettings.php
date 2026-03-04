@@ -10,6 +10,11 @@ use Filament\Pages\Page;
 
 class OtherSettings extends Page
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?string $navigationGroup = 'System';

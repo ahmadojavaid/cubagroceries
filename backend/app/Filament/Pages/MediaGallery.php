@@ -13,6 +13,11 @@ use Livewire\WithFileUploads;
 
 class MediaGallery extends Page implements HasForms
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     use InteractsWithForms;
     use WithFileUploads;
 

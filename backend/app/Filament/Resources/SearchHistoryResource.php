@@ -10,6 +10,11 @@ use Filament\Tables\Table;
 
 class SearchHistoryResource extends Resource
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $model = SearchHistory::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-magnifying-glass';

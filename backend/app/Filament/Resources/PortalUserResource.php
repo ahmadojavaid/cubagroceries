@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Auth;
 
 class PortalUserResource extends Resource
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $model = PortalUser::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';

@@ -10,6 +10,11 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class PendingComplaintsWidget extends BaseWidget
 {
+    public static function canView(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?int $sort = 5;
 
     protected int|string|array $columnSpan = 'full';

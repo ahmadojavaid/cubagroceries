@@ -12,6 +12,11 @@ use Filament\Tables\Table;
 
 class OrderReviewResource extends Resource
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $model = OrderReview::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-star';

@@ -12,6 +12,11 @@ use Filament\Pages\Page;
 
 class SendPushNotification extends Page
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $navigationIcon = 'heroicon-o-paper-airplane';
 
     protected static ?string $navigationGroup = 'System';

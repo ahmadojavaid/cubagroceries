@@ -15,6 +15,11 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Birthdays extends Page implements HasTable
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-cake';

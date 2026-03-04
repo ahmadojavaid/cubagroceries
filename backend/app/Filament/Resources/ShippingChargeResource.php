@@ -12,6 +12,11 @@ use Filament\Tables\Table;
 
 class ShippingChargeResource extends Resource
 {
+    public static function canAccess(): bool
+    {
+        return auth('portal')->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $model = ShippingCharge::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-truck';
