@@ -108,7 +108,7 @@ class ComplaintResource extends Resource
                         // Send push notification to customer
                         if ($oldStatus !== $newStatus) {
                             try {
-                                $record->load('user');
+                                $record->load(['user', 'order']);
                                 $record->user->notify(
                                     new ComplaintStatusChanged($record, $oldStatus, $newStatus)
                                 );

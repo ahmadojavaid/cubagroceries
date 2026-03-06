@@ -28,6 +28,7 @@ class ComplaintStatusChanged extends Notification
         $data = [
             'complaint_id' => $this->complaint->id,
             'subject' => $this->complaint->subject,
+            'order_number' => $this->complaint->order?->order_id,
             'old_status' => $this->oldStatus,
             'new_status' => $this->newStatus,
             'title' => $this->getTitle(),
@@ -43,21 +44,19 @@ class ComplaintStatusChanged extends Notification
     {
         return match ($this->newStatus) {
             'in_progress' => '🔍 Complaint Under Review',
-            'resolved' => '✅ Complaint Resolved',
-            'closed' => '📋 Complaint Closed',
-            default => '📋 Complaint Updated',
+            'resolved'    => '✅ Complaint Resolved',
+            'closed'      => '📋 Complaint Closed',
+            default       => '📋 Complaint Updated',
         };
     }
 
     protected function getMessage(): string
     {
-        $subject = str()->limit($this->complaint->subject, 40);
-
         return match ($this->newStatus) {
-            'in_progress' => "Your complaint \"{$subject}\" is now being reviewed by our team.",
-            'resolved' => "Your complaint \"{$subject}\" has been successfully resolved!",
-            'closed' => "Your complaint \"{$subject}\" has been closed.",
-            default => "Your complaint \"{$subject}\" status has been updated.",
+            'in_progress' => "Your complaint #{$this->complaint->id} is now being reviewed by our team.",
+            'resolved'    => "Your complaint #{$this->complaint->id} has been successfully resolved!",
+            'closed'      => "Your complaint #{$this->complaint->id} has been closed.",
+            default       => "Your complaint #{$this->complaint->id} status has been updated.",
         };
     }
 
@@ -69,15 +68,22 @@ class ComplaintStatusChanged extends Notification
         }
 
         try {
+            $fcmData = [
+                'type' => 'complaint_status_changed',
+                'complaint_id' => (string) $this->complaint->id,
+                'new_status' => $this->newStatus,
+            ];
+
+            // Include order_number if complaint is linked to an order
+            if ($this->complaint->order?->order_id) {
+                $fcmData['order_number'] = $this->complaint->order->order_id;
+            }
+
             $sent = FcmService::sendToDevice(
                 $notifiable->fcm_token,
                 $data['title'],
                 $data['message'],
-                [
-                    'type' => 'complaint_status_changed',
-                    'complaint_id' => (string) $this->complaint->id,
-                    'new_status' => $this->newStatus,
-                ],
+                $fcmData,
                 'order_notifications',
             );
 

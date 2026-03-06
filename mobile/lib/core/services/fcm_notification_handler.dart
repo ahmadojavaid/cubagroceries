@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import '../../features/orders/widgets/order_review_popup.dart';
 import '../theme/app_colors.dart';
 
@@ -40,8 +41,19 @@ class FcmNotificationHandler {
   // ── Notification tap (background/terminated) ──────────────
 
   void _handleNotificationTap(RemoteMessage message) {
+    final type = message.data['type'] as String?;
+
+    if (type == 'complaint_status_changed') {
+      // Navigate to complaints list
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        GoRouter.of(context).push('/complaints');
+      }
+      return;
+    }
+
     final orderNumber = message.data['order_number'] as String?;
-    // Always navigate to the order detail — the screen itself will
+    // Navigate to the order detail — the screen itself will
     // show the review popup for delivered orders.
     onNotificationTap(orderNumber);
   }
@@ -58,6 +70,8 @@ class FcmNotificationHandler {
     } else if (type == 'order_status_changed' &&
         message.data['new_status'] == 'delivered') {
       _showDeliveredDialog(message);
+    } else if (type == 'complaint_status_changed') {
+      _showComplaintSnackbar(message);
     } else {
       _showNotificationSnackbar(message);
     }
@@ -274,6 +288,43 @@ class FcmNotificationHandler {
     try {
       await _channel.invokeMethod('stopAlert');
     } catch (_) {}
+  }
+
+  // ── Complaint notification ─────────────────────────────────
+
+  void _showComplaintSnackbar(RemoteMessage message) {
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+
+    final title = message.notification?.title ?? '📋 Complaint Updated';
+    final body = message.notification?.body ?? '';
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (title.isNotEmpty)
+              Text(title,
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
+            if (body.isNotEmpty)
+              Text(body, style: const TextStyle(fontSize: 13)),
+          ],
+        ),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 5),
+        action: SnackBarAction(
+          label: 'View',
+          onPressed: () {
+            final nav = navigatorKey.currentContext;
+            if (nav != null) {
+              GoRouter.of(nav).push('/complaints');
+            }
+          },
+        ),
+      ),
+    );
   }
 
   // ── Generic snackbar ──────────────────────────────────────
