@@ -158,12 +158,7 @@ class ProductCard extends ConsumerWidget {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  duration: const Duration(seconds: 2),
-                                  action: SnackBarAction(
-                                    label: 'VIEW CART',
-                                    textColor: Colors.white,
-                                    onPressed: () => context.push('/cart'),
-                                  ),
+                                  duration: const Duration(milliseconds: 1500),
                                 ),
                               );
                             },
