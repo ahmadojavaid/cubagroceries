@@ -23,12 +23,16 @@ class OrderDetailScreen extends ConsumerStatefulWidget {
       _OrderDetailScreenState();
 }
 
-class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
+class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen>
+    with WidgetsBindingObserver {
   bool _reviewPromptShown = false;
+  int _lastTrigger = 0;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _lastTrigger = ref.read(orderRefreshTrigger);
     Future.microtask(() async {
       final order = await ref
           .read(orderActionProvider.notifier)
@@ -41,6 +45,22 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
         _maybeShowReviewPopup(order);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Re-fetch when app resumes (e.g. from push notification tap)
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref
+          .read(orderActionProvider.notifier)
+          .fetchOrderDetail(widget.orderNumber);
+    }
   }
 
   void _confirmCancel(String orderNumber) {
@@ -135,6 +155,16 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Re-fetch order detail when FCM bumps the refresh trigger
+    ref.listen<int>(orderRefreshTrigger, (prev, next) {
+      if (next != _lastTrigger) {
+        _lastTrigger = next;
+        ref
+            .read(orderActionProvider.notifier)
+            .fetchOrderDetail(widget.orderNumber);
+      }
+    });
+
     final state = ref.watch(orderActionProvider);
 
     return Scaffold(

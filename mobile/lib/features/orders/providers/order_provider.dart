@@ -287,3 +287,7 @@ final orderActionProvider =
   final api = ref.watch(apiClientProvider);
   return OrderActionNotifier(api);
 });
+
+/// Incremented by FCM when an order status changes.
+/// Order detail screen watches this to trigger a re-fetch.
+final orderRefreshTrigger = StateProvider<int>((ref) => 0);

@@ -30,6 +30,8 @@ final fcmNotificationHandlerProvider = Provider<FcmNotificationHandler>((ref) {
       ref.read(riderOrdersProvider.notifier).refresh();
       ref.read(notificationListProvider.notifier)
           .fetchNotifications(forceRefresh: true);
+      // Bump trigger so order detail screen re-fetches if open
+      ref.read(orderRefreshTrigger.notifier).state++;
     },
   );
   return handler;
