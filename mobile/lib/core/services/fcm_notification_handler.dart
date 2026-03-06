@@ -17,11 +17,16 @@ class FcmNotificationHandler {
   final GlobalKey<NavigatorState> navigatorKey;
   final void Function(String? orderNumber) onNotificationTap;
 
+  /// Called when any order/complaint status change notification arrives in foreground.
+  /// Use this to refresh order lists, badge counts, etc.
+  final VoidCallback? onDataChanged;
+
   static const _channel = MethodChannel('com.asifgroceries.app/alert');
 
   FcmNotificationHandler({
     required this.navigatorKey,
     required this.onNotificationTap,
+    this.onDataChanged,
   });
 
   void initialize() {
@@ -64,6 +69,13 @@ class FcmNotificationHandler {
     debugPrint('FCM Foreground: ${message.data}');
 
     final type = message.data['type'] as String?;
+
+    // Trigger data refresh for status-change notifications
+    if (type == 'order_status_changed' ||
+        type == 'complaint_status_changed' ||
+        type == 'rider_job_assigned') {
+      onDataChanged?.call();
+    }
 
     if (type == 'rider_job_assigned') {
       await _showRiderJobAlert(message);

@@ -16,12 +16,14 @@ class OrderHistoryScreen extends ConsumerStatefulWidget {
       _OrderHistoryScreenState();
 }
 
-class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
+class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen>
+    with WidgetsBindingObserver {
   final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Future.microtask(
       () => ref.read(orderListProvider.notifier).fetchOrders(forceRefresh: true),
     );
@@ -30,8 +32,17 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Refresh when app resumes (e.g. user tapped a push notification, came back)
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(orderListProvider.notifier).fetchOrders(forceRefresh: true);
+    }
   }
 
   void _onScroll() {
@@ -86,8 +97,15 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
                       }
                       return _OrderCard(
                         order: state.orders[index],
-                        onTap: () => context
-                            .push('/orders/${state.orders[index].orderId}'),
+                        onTap: () async {
+                          await context
+                              .push('/orders/${state.orders[index].orderId}');
+                          // Refresh list when returning from detail
+                          if (mounted) {
+                            ref.read(orderListProvider.notifier)
+                                .fetchOrders(forceRefresh: true);
+                          }
+                        },
                       );
                     },
                   ),
