@@ -61,12 +61,15 @@
         toastMessage: '',
         muted: localStorage.getItem('admin_alert_muted') === 'true',
         audio: null,
+        audioReady: false,
         pollInterval: null,
 
         startPolling() {
-            // Pre-load audio
+            // Try to pre-load WAV file
             this.audio = new Audio('/sounds/admin_alert.wav');
             this.audio.volume = 0.7;
+            this.audio.addEventListener('canplaythrough', () => { this.audioReady = true; });
+            this.audio.addEventListener('error', () => { this.audioReady = false; });
 
             // Poll every 15 seconds
             this.pollInterval = setInterval(() => this.poll(), 15000);
@@ -92,10 +95,50 @@
         },
 
         playSound() {
+            // Try WAV file first, fallback to Web Audio API tone
+            if (this.audioReady) {
+                try {
+                    this.audio.currentTime = 0;
+                    this.audio.play().catch(() => this.playFallbackTone());
+                    return;
+                } catch (e) {}
+            }
+            this.playFallbackTone();
+        },
+
+        playFallbackTone() {
+            // Generate a pleasant two-tone chime using Web Audio API
             try {
-                this.audio.currentTime = 0;
-                this.audio.play().catch(() => {});
-            } catch (e) {}
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+
+                // Tone 1: A5 (880 Hz)
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.value = 880;
+                gain1.gain.setValueAtTime(0.4, now);
+                gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc1.connect(gain1).connect(ctx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.25);
+
+                // Tone 2: C#6 (1108 Hz) — slightly delayed
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.value = 1108;
+                gain2.gain.setValueAtTime(0.35, now + 0.2);
+                gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
+                osc2.connect(gain2).connect(ctx.destination);
+                osc2.start(now + 0.2);
+                osc2.stop(now + 0.55);
+
+                // Clean up context after sounds finish
+                setTimeout(() => ctx.close(), 1000);
+            } catch (e) {
+                // Web Audio not available — silent
+            }
         },
 
         toggleMute() {

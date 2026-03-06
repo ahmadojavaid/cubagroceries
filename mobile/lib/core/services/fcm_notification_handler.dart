@@ -203,7 +203,12 @@ class FcmNotificationHandler {
     try {
       await _channel.invokeMethod('playAlert');
     } catch (e) {
-      debugPrint('FCM: Could not play alert sound: $e');
+      debugPrint('FCM: Could not play native alert sound: $e');
+      // Fallback: system sound
+      try {
+        await SystemSound.play(SystemSoundType.alert);
+        await HapticFeedback.vibrate();
+      } catch (_) {}
     }
 
     final context = navigatorKey.currentContext;
