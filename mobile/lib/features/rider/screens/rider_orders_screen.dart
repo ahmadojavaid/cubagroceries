@@ -14,8 +14,29 @@ class RiderOrdersScreen extends ConsumerStatefulWidget {
   ConsumerState<RiderOrdersScreen> createState() => _RiderOrdersScreenState();
 }
 
-class _RiderOrdersScreenState extends ConsumerState<RiderOrdersScreen> {
+class _RiderOrdersScreenState extends ConsumerState<RiderOrdersScreen>
+    with WidgetsBindingObserver {
   String? _activeFilter; // null = All
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Refresh when app resumes (e.g. after tapping a push notification)
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(riderOrdersProvider.notifier).refresh();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
