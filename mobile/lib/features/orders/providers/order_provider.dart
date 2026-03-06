@@ -74,10 +74,15 @@ class OrderListNotifier extends StateNotifier<OrderListState> {
 
   OrderListNotifier(this._api) : super(const OrderListState());
 
-  /// Fetch first page of orders
+  /// Fetch first page of orders.
+  /// When [forceRefresh] is true, always re-fetches even if data exists.
   Future<void> fetchOrders({bool forceRefresh = false}) async {
-    if (state.isLoading) return;
-    if (state.orders.isNotEmpty && !forceRefresh) return;
+    // Skip only if not forcing AND we already have data
+    if (!forceRefresh && state.orders.isNotEmpty) return;
+
+    // If already loading a forced refresh, don't block — let it overlap.
+    // The last write wins, which is fine for a list refresh.
+    if (state.isLoading && !forceRefresh) return;
 
     state = state.copyWith(isLoading: true, error: null);
 

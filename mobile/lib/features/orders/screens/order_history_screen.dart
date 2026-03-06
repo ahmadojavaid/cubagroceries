@@ -19,11 +19,13 @@ class OrderHistoryScreen extends ConsumerStatefulWidget {
 class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen>
     with WidgetsBindingObserver {
   final _scrollController = ScrollController();
+  int _lastTrigger = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _lastTrigger = ref.read(orderRefreshTrigger);
     Future.microtask(
       () => ref.read(orderListProvider.notifier).fetchOrders(forceRefresh: true),
     );
@@ -54,6 +56,14 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Re-fetch when FCM bumps the refresh trigger
+    ref.listen<int>(orderRefreshTrigger, (prev, next) {
+      if (next != _lastTrigger) {
+        _lastTrigger = next;
+        ref.read(orderListProvider.notifier).fetchOrders(forceRefresh: true);
+      }
+    });
+
     final state = ref.watch(orderListProvider);
 
     return Scaffold(
