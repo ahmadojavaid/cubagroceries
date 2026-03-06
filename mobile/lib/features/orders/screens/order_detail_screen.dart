@@ -282,12 +282,10 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
 
           const SizedBox(height: AppDimens.md),
 
-          // Delivery estimate countdown
+          // Delivery estimate countdown (only visible when dispatched)
           DeliveryEstimateCard(order: order),
 
-          if (order.hasDeliveryEstimate &&
-              order.status != 'delivered' &&
-              order.status != 'cancelled')
+          if (order.hasDeliveryEstimate && order.status == 'dispatched')
             const SizedBox(height: AppDimens.md),
 
           // Rider details card

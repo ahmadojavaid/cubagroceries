@@ -137,7 +137,20 @@ class OrderResource extends Resource
                         }
 
                         $oldStatus = $record->status;
-                        $record->update(['status' => $newStatus]);
+
+                        $updateData = ['status' => $newStatus];
+
+                        // Start delivery countdown timer when dispatched
+                        if ($newStatus === OrderStatus::Dispatched && $record->est_delivery_minutes) {
+                            $updateData['est_delivery_set_at'] = now();
+                        }
+
+                        // Clear delivery estimate on cancellation
+                        if ($newStatus === OrderStatus::Cancelled) {
+                            $updateData['est_delivery_set_at'] = null;
+                        }
+
+                        $record->update($updateData);
 
                         // Record status history
                         OrderStatusHistory::record(
@@ -189,7 +202,7 @@ class OrderResource extends Resource
                         $record->update([
                             'delivery_boy_id' => $data['delivery_boy_id'],
                             'est_delivery_minutes' => $estMinutes > 0 ? $estMinutes : null,
-                            'est_delivery_set_at' => $estMinutes > 0 ? now() : null,
+                            // Don't set est_delivery_set_at here — it starts when dispatched
                         ]);
 
                         $deliveryBoy = DeliveryBoy::find($data['delivery_boy_id']);
