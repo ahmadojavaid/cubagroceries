@@ -67,11 +67,29 @@ class DeliveryBoyResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('user_id')
                             ->label('Linked User Account')
-                            ->relationship('user', 'email')
-                            ->searchable(['email', 'firstname', 'lastname'])
-                            ->preload()
+                            ->searchable()
+                            ->getSearchResultsUsing(fn (string $search) =>
+                                User::where('role', 'rider')
+                                    ->where(fn ($q) => $q
+                                        ->where('firstname', 'ilike', "%{$search}%")
+                                        ->orWhere('lastname', 'ilike', "%{$search}%")
+                                        ->orWhere('email', 'ilike', "%{$search}%")
+                                        ->orWhere('identity', 'like', "%{$search}%")
+                                    )
+                                    ->limit(20)
+                                    ->get()
+                                    ->mapWithKeys(fn (User $u) => [
+                                        $u->id => "{$u->firstname} {$u->lastname} — " . ($u->email ?? $u->identity),
+                                    ])
+                                    ->toArray()
+                            )
+                            ->getOptionLabelUsing(function ($value): ?string {
+                                $user = User::find($value);
+                                if (! $user) return null;
+                                return "{$user->firstname} {$user->lastname} — " . ($user->email ?? $user->identity);
+                            })
                             ->placeholder('No account linked')
-                            ->helperText('Only rider-role accounts are shown. Use the "Create Login" action to create one.'),
+                            ->helperText('Search by name, email, or phone. Only rider-role accounts are shown.'),
                     ])
                     ->collapsible(),
             ]);
