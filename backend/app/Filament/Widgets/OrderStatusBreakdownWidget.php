@@ -9,6 +9,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class OrderStatusBreakdownWidget extends BaseWidget
 {
+    protected static ?string $pollingInterval = '15s';
+
     public static function canView(): bool
     {
         return auth('portal')->user()?->isAdmin() ?? false;

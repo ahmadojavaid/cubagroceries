@@ -10,6 +10,8 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class PendingComplaintsWidget extends BaseWidget
 {
+    protected static ?string $pollingInterval = '30s';
+
     public static function canView(): bool
     {
         return auth('portal')->user()?->isAdmin() ?? false;

@@ -128,7 +128,8 @@ class ComplaintResource extends Resource
                     ->requiresConfirmation(),
             ])
             ->bulkActions([])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('created_at', 'desc')
+            ->poll('30s');
     }
 
     public static function infolist(Infolist $infolist): Infolist

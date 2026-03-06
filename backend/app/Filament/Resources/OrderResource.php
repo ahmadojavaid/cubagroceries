@@ -222,7 +222,8 @@ class OrderResource extends Resource
                     ->requiresConfirmation(),
             ])
             ->bulkActions([])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('created_at', 'desc')
+            ->poll('15s');
     }
 
     public static function infolist(Infolist $infolist): Infolist

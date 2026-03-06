@@ -17,6 +17,8 @@ class RecentOrdersWidget extends BaseWidget
 
     protected static ?string $heading = 'Recent Orders';
 
+    protected static ?string $pollingInterval = '15s';
+
     public function table(Table $table): Table
     {
         return $table
