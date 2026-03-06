@@ -2,17 +2,28 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 
-/// Visual order status timeline.
+/// Visual order status timeline with a pulsing animation on the active step.
 ///
 /// Shows the progression: Pending → Confirmed → Dispatched → Delivered.
+/// The current (active) step icon pulses to indicate an in-progress task.
 /// Cancelled is rendered as a special terminal state with red styling.
-class OrderStatusTimeline extends StatelessWidget {
+class OrderStatusTimeline extends StatefulWidget {
   final String currentStatus;
 
   const OrderStatusTimeline({
     super.key,
     required this.currentStatus,
   });
+
+  @override
+  State<OrderStatusTimeline> createState() => _OrderStatusTimelineState();
+}
+
+class _OrderStatusTimelineState extends State<OrderStatusTimeline>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _glowAnimation;
 
   static const _steps = [
     _TimelineStep('pending', 'Pending', Icons.hourglass_empty_rounded),
@@ -22,18 +33,62 @@ class OrderStatusTimeline extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    final isCancelled = currentStatus == 'cancelled';
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
 
-    if (isCancelled) {
-      return _buildCancelledTimeline(context);
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    _glowAnimation = Tween<double>(begin: 0.3, end: 0.7).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    // Only pulse for non-terminal states
+    if (widget.currentStatus != 'delivered' &&
+        widget.currentStatus != 'cancelled') {
+      _pulseController.repeat(reverse: true);
     }
-
-    return _buildNormalTimeline(context);
   }
 
-  Widget _buildNormalTimeline(BuildContext context) {
-    final currentIndex = _steps.indexWhere((s) => s.key == currentStatus);
+  @override
+  void didUpdateWidget(OrderStatusTimeline oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentStatus != widget.currentStatus) {
+      if (widget.currentStatus == 'delivered' ||
+          widget.currentStatus == 'cancelled') {
+        _pulseController.stop();
+        _pulseController.reset();
+      } else if (!_pulseController.isAnimating) {
+        _pulseController.repeat(reverse: true);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isCancelled = widget.currentStatus == 'cancelled';
+
+    if (isCancelled) {
+      return _buildCancelledTimeline();
+    }
+
+    return _buildNormalTimeline();
+  }
+
+  Widget _buildNormalTimeline() {
+    final currentIndex =
+        _steps.indexWhere((s) => s.key == widget.currentStatus);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -47,7 +102,6 @@ class OrderStatusTimeline extends StatelessWidget {
       ),
       child: Row(
         children: List.generate(_steps.length * 2 - 1, (index) {
-          // Even indices = step circles, odd indices = connectors
           if (index.isEven) {
             final stepIndex = index ~/ 2;
             final step = _steps[stepIndex];
@@ -64,7 +118,7 @@ class OrderStatusTimeline extends StatelessWidget {
     );
   }
 
-  Widget _buildCancelledTimeline(BuildContext context) {
+  Widget _buildCancelledTimeline() {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimens.lg,
@@ -81,7 +135,7 @@ class OrderStatusTimeline extends StatelessWidget {
           Container(
             width: 40,
             height: 40,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.error,
               shape: BoxShape.circle,
             ),
@@ -92,7 +146,7 @@ class OrderStatusTimeline extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppDimens.md),
-          Text(
+          const Text(
             'Order Cancelled',
             style: TextStyle(
               color: AppColors.error,
@@ -111,37 +165,85 @@ class OrderStatusTimeline extends StatelessWidget {
     bool isCurrent,
   ) {
     final color = isCompleted ? _colorForStatus(step.key) : AppColors.border;
+    final isTerminal = widget.currentStatus == 'delivered';
+    final shouldPulse = isCurrent && !isTerminal;
+
+    Widget circle = Container(
+      width: isCurrent ? 40 : 32,
+      height: isCurrent ? 40 : 32,
+      decoration: BoxDecoration(
+        color: isCompleted ? color : Colors.transparent,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: color,
+          width: isCompleted ? 0 : 2,
+        ),
+      ),
+      child: Icon(
+        step.icon,
+        color: isCompleted ? Colors.white : AppColors.textHint,
+        size: isCurrent ? 20 : 16,
+      ),
+    );
+
+    if (shouldPulse) {
+      circle = AnimatedBuilder(
+        animation: _pulseController,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(_glowAnimation.value),
+                    blurRadius: 12,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Icon(
+                step.icon,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          );
+        },
+      );
+    } else if (isCurrent && isTerminal) {
+      // Delivered — static glow, no pulse
+      circle = Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.3),
+              blurRadius: 8,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: Icon(
+          step.icon,
+          color: Colors.white,
+          size: 20,
+        ),
+      );
+    }
 
     return Expanded(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: isCurrent ? 40 : 32,
-            height: isCurrent ? 40 : 32,
-            decoration: BoxDecoration(
-              color: isCompleted ? color : Colors.transparent,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: color,
-                width: isCompleted ? 0 : 2,
-              ),
-              boxShadow: isCurrent
-                  ? [
-                      BoxShadow(
-                        color: color.withOpacity(0.3),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Icon(
-              isCompleted ? step.icon : step.icon,
-              color: isCompleted ? Colors.white : AppColors.textHint,
-              size: isCurrent ? 20 : 16,
-            ),
-          ),
+          circle,
           const SizedBox(height: AppDimens.xs),
           Text(
             step.label,
