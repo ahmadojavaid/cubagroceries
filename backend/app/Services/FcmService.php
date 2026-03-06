@@ -13,7 +13,7 @@ class FcmService
      *
      * Uses service account credentials with OAuth2 for authentication.
      */
-    public static function sendToDevice(string $fcmToken, string $title, string $body, array $data = [], ?string $channelId = null): bool
+    public static function sendToDevice(string $fcmToken, string $title, string $body, array $data = [], ?string $channelId = null, ?string $imageUrl = null): bool
     {
         $projectId = config('services.firebase.project_id');
         $credentialsPath = config('services.firebase.credentials_path');
@@ -30,20 +30,27 @@ class FcmService
                 return false;
             }
 
+            $notification = [
+                'title' => $title,
+                'body' => $body,
+            ];
+
+            if ($imageUrl) {
+                $notification['image'] = $imageUrl;
+            }
+
             $message = [
                 'message' => [
                     'token' => $fcmToken,
-                    'notification' => [
-                        'title' => $title,
-                        'body' => $body,
-                    ],
+                    'notification' => $notification,
                     'data' => collect($data)->map(fn ($v) => (string) $v)->toArray(),
                     'android' => [
                         'priority' => 'high',
-                        'notification' => [
+                        'notification' => array_filter([
                             'sound' => 'default',
                             'channel_id' => $channelId ?? 'default',
-                        ],
+                            'image' => $imageUrl,
+                        ]),
                     ],
                 ],
             ];

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -74,7 +75,8 @@ class _NotificationInboxScreenState
               : state.notifications.isEmpty
                   ? const EmptyStateWidget(
                       icon: Icons.notifications_none_rounded,
-                      message: 'No notifications yet\nYou\'ll be notified about order updates here',
+                      message:
+                          'No notifications yet\nYou\'ll be notified about order updates here',
                     )
                   : RefreshIndicator(
                       color: AppColors.primary,
@@ -91,8 +93,8 @@ class _NotificationInboxScreenState
                           if (index == state.notifications.length) {
                             return const Padding(
                               padding: EdgeInsets.all(AppDimens.md),
-                              child: Center(
-                                  child: CircularProgressIndicator()),
+                              child:
+                                  Center(child: CircularProgressIndicator()),
                             );
                           }
                           return _NotificationTile(
@@ -114,13 +116,15 @@ class _NotificationInboxScreenState
           .markAsRead(notification.id);
     }
 
-    // Navigate to order detail if it's an order notification
+    // Navigate based on notification type
     if (notification.isOrderStatusChange &&
         notification.orderNumber != null) {
       context.push('/orders/${notification.orderNumber}');
+    } else if (notification.isComplaintStatusChange) {
+      context.push('/complaints');
     }
+    // Manual push notifications don't navigate anywhere — just mark as read
   }
-
 }
 
 class _NotificationTile extends StatelessWidget {
@@ -144,69 +148,103 @@ class _NotificationTile extends StatelessWidget {
           horizontal: AppDimens.pagePadding,
           vertical: AppDimens.md,
         ),
-        child: Row(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: _iconBgColor,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(_icon, size: 20, color: _iconColor),
-            ),
-            const SizedBox(width: AppDimens.md),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Icon
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: _iconBgColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(_icon, size: 20, color: _iconColor),
+                ),
+                const SizedBox(width: AppDimens.md),
 
-            // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    notification.title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: notification.isRead
-                          ? FontWeight.w400
-                          : FontWeight.w600,
-                      color: AppColors.textPrimary,
+                // Content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        notification.title,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: notification.isRead
+                              ? FontWeight.w400
+                              : FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        notification.message,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        _formatTimeAgo(notification.createdAt),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textHint,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Unread dot
+                if (!notification.isRead)
+                  Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.only(top: 6, left: 8),
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    notification.message,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    _formatTimeAgo(notification.createdAt),
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textHint,
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
 
-            // Unread dot
-            if (!notification.isRead)
-              Container(
-                width: 8,
-                height: 8,
-                margin: const EdgeInsets.only(top: 6, left: 8),
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
+            // Campaign image (if present)
+            if (notification.imageUrl != null) ...[
+              const SizedBox(height: AppDimens.sm),
+              Padding(
+                padding: const EdgeInsets.only(left: 52), // align with text
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: CachedNetworkImage(
+                    imageUrl: notification.imageUrl!,
+                    height: 140,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Container(
+                      height: 140,
+                      color: AppColors.surfaceBg,
+                      child: const Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    ),
+                    errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                  ),
                 ),
               ),
+            ],
           ],
         ),
       ),
@@ -214,6 +252,23 @@ class _NotificationTile extends StatelessWidget {
   }
 
   IconData get _icon {
+    // Manual / campaign push
+    if (notification.isManualPush) {
+      return Icons.campaign_outlined;
+    }
+
+    // Complaint updates
+    if (notification.isComplaintStatusChange) {
+      final status = notification.data['new_status'] as String?;
+      return switch (status) {
+        'resolved' => Icons.check_circle_outline,
+        'in_progress' => Icons.search_rounded,
+        'closed' => Icons.archive_outlined,
+        _ => Icons.chat_bubble_outline_rounded,
+      };
+    }
+
+    // Order status updates
     if (notification.newStatus != null) {
       return switch (notification.newStatus!) {
         'confirmed' => Icons.check_circle_outline,
@@ -223,10 +278,25 @@ class _NotificationTile extends StatelessWidget {
         _ => Icons.notifications_outlined,
       };
     }
+
     return Icons.notifications_outlined;
   }
 
   Color get _iconColor {
+    if (notification.isManualPush) {
+      return AppColors.accent;
+    }
+
+    if (notification.isComplaintStatusChange) {
+      final status = notification.data['new_status'] as String?;
+      return switch (status) {
+        'resolved' => AppColors.statusDelivered,
+        'in_progress' => AppColors.info,
+        'closed' => AppColors.textHint,
+        _ => AppColors.warning,
+      };
+    }
+
     if (notification.newStatus != null) {
       return switch (notification.newStatus!) {
         'confirmed' => AppColors.statusConfirmed,
@@ -236,6 +306,7 @@ class _NotificationTile extends StatelessWidget {
         _ => AppColors.primary,
       };
     }
+
     return AppColors.primary;
   }
 

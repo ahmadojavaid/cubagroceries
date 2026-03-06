@@ -12,6 +12,7 @@ class ManualPush extends Notification
     public function __construct(
         protected string $title,
         protected string $message,
+        protected ?string $imageUrl = null,
     ) {}
 
     public function via(object $notifiable): array
@@ -21,10 +22,11 @@ class ManualPush extends Notification
 
     public function toArray(object $notifiable): array
     {
-        return [
+        return array_filter([
             'title' => $this->title,
             'message' => $this->message,
+            'image_url' => $this->imageUrl,
             'type' => 'manual_push',
-        ];
+        ]);
     }
 }

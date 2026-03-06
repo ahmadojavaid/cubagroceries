@@ -43,9 +43,27 @@ class NotificationModel {
   /// New status if this is an order status change notification.
   String? get newStatus => data['new_status'] as String?;
 
+  /// Image URL if this notification includes a promotional image.
+  String? get imageUrl => data['image_url'] as String?;
+
+  /// Complaint ID if this is a complaint status change notification.
+  int? get complaintId {
+    final val = data['complaint_id'];
+    if (val is int) return val;
+    if (val is String) return int.tryParse(val);
+    return null;
+  }
+
   /// Whether this is an order status change notification.
   bool get isOrderStatusChange =>
       type.contains('OrderStatusChanged') || data.containsKey('order_number');
+
+  /// Whether this is a complaint status change notification.
+  bool get isComplaintStatusChange =>
+      type.contains('ComplaintStatusChanged') || data.containsKey('complaint_id');
+
+  /// Whether this is a manual/campaign push notification.
+  bool get isManualPush => data['type'] == 'manual_push';
 
   /// Return a copy with readAt set to now (for optimistic UI updates).
   NotificationModel markAsRead() {
