@@ -10,7 +10,7 @@ import '../../profile/providers/address_provider.dart';
 import '../../profile/data/address_model.dart';
 import '../providers/home_provider.dart';
 import '../widgets/banner_slider.dart';
-import '../widgets/category_slider.dart';
+import '../widgets/category_grid.dart';
 import '../widgets/featured_section_widget.dart';
 import '../widgets/holiday_banner.dart';
 import '../widgets/survey_prompt_card.dart';
@@ -319,7 +319,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         if (homeState.banners.isNotEmpty)
           const SizedBox(height: AppDimens.lg),
 
-        // 2. Categories horizontal slider
+        // 2. Categories grid (4 per row)
         if (catState.categories.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.symmetric(
@@ -332,7 +332,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           const SizedBox(height: AppDimens.sm),
-          CategorySlider(
+          CategoryGrid(
             categories: catState.categories,
             onTap: (cat) {
               if (cat.hasChildren) {
