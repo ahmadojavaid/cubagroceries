@@ -28,23 +28,56 @@ class _RiderNavigationShellState extends ConsumerState<RiderNavigationShell> {
     setState(() => _currentIndex = index);
   }
 
+  DateTime? _lastBackPress;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          const OfflineBanner(),
-          Expanded(
-            child: IndexedStack(
-              index: _currentIndex,
-              children: _screens,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+
+        // If not on Orders tab, go back to Orders first
+        if (_currentIndex != 0) {
+          setState(() => _currentIndex = 0);
+          return;
+        }
+
+        // On Orders tab: double-back to exit
+        final now = DateTime.now();
+        if (_lastBackPress != null &&
+            now.difference(_lastBackPress!) < const Duration(seconds: 2)) {
+          Navigator.of(context).pop();
+          return;
+        }
+
+        _lastBackPress = now;
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Press back again to exit'),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: _RiderNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onTap,
+          );
+      },
+      child: Scaffold(
+        body: Column(
+          children: [
+            const OfflineBanner(),
+            Expanded(
+              child: IndexedStack(
+                index: _currentIndex,
+                children: _screens,
+              ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: _RiderNavBar(
+          currentIndex: _currentIndex,
+          onTap: _onTap,
+        ),
       ),
     );
   }
