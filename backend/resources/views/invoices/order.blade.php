@@ -403,12 +403,26 @@
                 <table class="totals-table">
                     @php
                         $subtotal = $order->products->sum(fn($i) => $i->price * $i->quantity);
+                        $shipping = (float) ($order->shipping_amount ?? 0);
+                        $couponDiscount = (float) ($order->coupon_discount ?? 0);
                         $walletUsed = (float) ($order->wallet_amount_used ?? 0);
                     @endphp
                     <tr>
                         <td>Subtotal</td>
                         <td>Rs {{ number_format($subtotal, 0) }}</td>
                     </tr>
+                    @if($shipping > 0)
+                        <tr>
+                            <td>Shipping{{ $order->shipping_title ? ' (' . $order->shipping_title . ')' : '' }}</td>
+                            <td>Rs {{ number_format($shipping, 0) }}</td>
+                        </tr>
+                    @endif
+                    @if($couponDiscount > 0)
+                        <tr>
+                            <td>Promo Code ({{ $order->coupon_code }})</td>
+                            <td style="color:#16a34a">- Rs {{ number_format($couponDiscount, 0) }}</td>
+                        </tr>
+                    @endif
                     @if($walletUsed > 0)
                         <tr>
                             <td>Wallet Credit</td>

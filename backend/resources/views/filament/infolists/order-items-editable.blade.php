@@ -58,8 +58,40 @@
                     </tr>
                 @endforeach
             </tbody>
-            <tfoot class="border-t-2 dark:border-gray-600">
-                <tr>
+            <tfoot>
+                @php
+                    $subtotal = $items->sum(fn($i) => $i->price * $i->quantity);
+                    $shipping = (float) ($record->shipping_amount ?? 0);
+                    $couponDiscount = (float) ($record->coupon_discount ?? 0);
+                    $walletUsed = (float) ($record->wallet_amount_used ?? 0);
+                @endphp
+                <tr class="border-t dark:border-gray-700">
+                    <td colspan="5" class="px-3 py-2 text-right text-gray-500 dark:text-gray-400">Subtotal</td>
+                    <td class="px-3 py-2 text-right font-medium text-gray-900 dark:text-white">Rs {{ number_format($subtotal, 0) }}</td>
+                </tr>
+                @if($shipping > 0)
+                    <tr>
+                        <td colspan="5" class="px-3 py-1.5 text-right text-gray-500 dark:text-gray-400">
+                            Shipping{{ $record->shipping_title ? ' (' . $record->shipping_title . ')' : '' }}
+                        </td>
+                        <td class="px-3 py-1.5 text-right font-medium text-gray-900 dark:text-white">Rs {{ number_format($shipping, 0) }}</td>
+                    </tr>
+                @endif
+                @if($couponDiscount > 0)
+                    <tr>
+                        <td colspan="5" class="px-3 py-1.5 text-right text-gray-500 dark:text-gray-400">
+                            Coupon{{ $record->coupon_code ? ' (' . $record->coupon_code . ')' : '' }}
+                        </td>
+                        <td class="px-3 py-1.5 text-right font-medium text-green-600 dark:text-green-400">- Rs {{ number_format($couponDiscount, 0) }}</td>
+                    </tr>
+                @endif
+                @if($walletUsed > 0)
+                    <tr>
+                        <td colspan="5" class="px-3 py-1.5 text-right text-gray-500 dark:text-gray-400">Wallet Credit</td>
+                        <td class="px-3 py-1.5 text-right font-medium text-red-600 dark:text-red-400">- Rs {{ number_format($walletUsed, 0) }}</td>
+                    </tr>
+                @endif
+                <tr class="border-t-2 dark:border-gray-600">
                     <td colspan="5" class="px-3 py-2.5 text-right font-bold text-gray-900 dark:text-white">
                         Order Total
                     </td>

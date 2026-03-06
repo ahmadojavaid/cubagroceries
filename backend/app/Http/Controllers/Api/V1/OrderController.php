@@ -53,6 +53,13 @@ class OrderController extends Controller
         $data['est_delivery_minutes'] = $order->est_delivery_minutes;
         $data['est_delivery_set_at'] = $order->est_delivery_set_at?->toIso8601String();
 
+        // Add payment breakdown
+        $data['shipping_title'] = $order->shipping_title;
+        $data['shipping_amount'] = $order->shipping_amount;
+        $data['coupon_code'] = $order->coupon_code;
+        $data['coupon_discount'] = $order->coupon_discount;
+        $data['wallet_amount_used'] = $order->wallet_amount_used;
+
         return $this->success($data);
     }
 
@@ -241,7 +248,13 @@ class OrderController extends Controller
         }
 
         // Create order in a transaction
-        $order = DB::transaction(function () use ($user, $address, $lineItems, $totalAmount, $couponCode, $couponDiscount, $walletUsed) {
+        $order = DB::transaction(function () use ($user, $address, $lineItems, $totalAmount, $couponCode, $couponDiscount, $walletUsed, $shippingAmount, $validated) {
+            // Resolve shipping title for snapshot
+            $shippingTitle = null;
+            if ($shippingAmount > 0 && !empty($validated['shipping_charge_id'])) {
+                $shippingTitle = \App\Models\ShippingCharge::find($validated['shipping_charge_id'])?->title;
+            }
+
             // Create order
             $order = Order::create([
                 'order_id' => OrderIdGenerator::generate(),
@@ -249,6 +262,10 @@ class OrderController extends Controller
                 'status' => 'pending',
                 'total_amount' => $totalAmount,
                 'wallet_amount_used' => $walletUsed,
+                'shipping_title' => $shippingTitle,
+                'shipping_amount' => $shippingAmount,
+                'coupon_code' => $couponCode,
+                'coupon_discount' => $couponDiscount,
             ]);
 
             // Record initial status
