@@ -64,6 +64,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     required String firstname,
     required String lastname,
     required String email,
+    String? identity,
     String? dateOfBirth,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
@@ -72,6 +73,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
         'firstname': firstname,
         'lastname': lastname,
         'email': email,
+        if (identity != null) 'identity': identity,
         if (dateOfBirth != null) 'date_of_birth': dateOfBirth,
       });
 

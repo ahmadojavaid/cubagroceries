@@ -25,6 +25,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   int? _selectedAddressId;
   int? _selectedShippingId;
   bool _useWallet = false;
+  final _phoneController = TextEditingController();
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -486,7 +493,103 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     }
   }
 
+  /// Check if user has a phone number, prompt if missing.
+  /// Returns true if phone is available (or was just provided), false if user cancelled.
+  Future<bool> _ensurePhoneNumber() async {
+    final profile = ref.read(profileProvider).user;
+    if (profile == null) return false;
+
+    final phone = profile.identity.trim();
+    if (phone.isNotEmpty) return true;
+
+    // Show dialog to collect phone number
+    _phoneController.clear();
+    final result = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.phone_outlined, color: AppColors.primary, size: 22),
+              SizedBox(width: 10),
+              Text('Phone Number Required'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Please provide your phone number so we can contact you about your delivery.',
+                style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                    height: 1.4),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                autofocus: true,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  hintText: '03001234567',
+                  prefixIcon: const Icon(Icons.phone_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, null),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final value = _phoneController.text.trim();
+                if (value.isEmpty) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter a phone number'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                  return;
+                }
+                Navigator.pop(ctx, value);
+              },
+              child: const Text('Save & Continue'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == null || !mounted) return false;
+
+    // Save phone to profile via API
+    final profile2 = ref.read(profileProvider).user!;
+    final success = await ref.read(profileProvider.notifier).updateProfile(
+          firstname: profile2.firstname,
+          lastname: profile2.lastname,
+          email: profile2.email,
+          identity: result,
+        );
+
+    return success;
+  }
+
   Future<void> _placeOrder() async {
+    // Ensure phone number exists before placing order
+    final hasPhone = await _ensurePhoneNumber();
+    if (!hasPhone) return;
+
     final cart = ref.read(cartProvider);
 
     final items = cart.items

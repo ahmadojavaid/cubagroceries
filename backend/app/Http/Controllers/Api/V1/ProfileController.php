@@ -30,6 +30,7 @@ class ProfileController extends Controller
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'email' => 'nullable|string|email|max:255|unique:users,email,' . $request->user()->id,
+            'identity' => 'nullable|string|max:50',
             'date_of_birth' => 'nullable|date',
         ]);
 
