@@ -121,25 +121,39 @@ class HolidayBanner extends StatelessWidget {
                   ),
                 ],
 
-                // Order for Later button
-                if (holiday.allowAdvanceOrders && onOrderForLater != null) ...[
-                  const SizedBox(height: 14),
-                  SizedBox(
+                // Advance orders info message
+                if (holiday.allowAdvanceOrders) ...[
+                  const SizedBox(height: 12),
+                  Container(
                     width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: onOrderForLater,
-                      icon: const Icon(Icons.shopping_cart_outlined, size: 18),
-                      label: const Text('Order for Later'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppDimens.radiusMd),
-                        ),
-                        elevation: 0,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.primarySurface.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.15),
+                        width: 0.5,
                       ),
+                    ),
+                    child: const Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.info_outline_rounded,
+                            size: 18, color: AppColors.primary),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'We are currently offline, but feel free to place '
+                            'orders for later. We will fulfill your orders as '
+                            'soon as possible.',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                              height: 1.45,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

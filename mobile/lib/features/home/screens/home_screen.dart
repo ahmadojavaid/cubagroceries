@@ -300,12 +300,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         if (homeState.isStoreOffline)
           Padding(
             padding: const EdgeInsets.only(bottom: AppDimens.md),
-            child: HolidayBanner(
-              holiday: homeState.holiday!,
-              onOrderForLater: homeState.holiday!.allowAdvanceOrders
-                  ? () {} // Continue browsing — banner is informational
-                  : null,
-            ),
+            child: HolidayBanner(holiday: homeState.holiday!),
           ),
 
         // 1. Banner slider
