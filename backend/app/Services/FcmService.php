@@ -18,7 +18,18 @@ class FcmService
         $projectId = config('services.firebase.project_id');
         $credentialsPath = config('services.firebase.credentials_path');
 
-        if (! $projectId || ! $fcmToken) {
+        if (! $projectId) {
+            Log::warning('FCM: FIREBASE_PROJECT_ID not configured in .env');
+            return false;
+        }
+
+        if (! $credentialsPath) {
+            Log::warning('FCM: FIREBASE_CREDENTIALS_PATH not configured in .env');
+            return false;
+        }
+
+        if (! $fcmToken) {
+            Log::warning('FCM: No FCM token provided');
             return false;
         }
 
@@ -129,6 +140,50 @@ class FcmService
             Log::warning('FCM: Token exchange failed', ['body' => $response->body()]);
             return null;
         });
+    }
+
+    /**
+     * Diagnostic check — returns an array of issues or empty if everything looks good.
+     */
+    public static function diagnose(): array
+    {
+        $issues = [];
+
+        $projectId = config('services.firebase.project_id');
+        $credentialsPath = config('services.firebase.credentials_path');
+
+        if (! $projectId) {
+            $issues[] = 'FIREBASE_PROJECT_ID is not set in .env';
+        }
+
+        if (! $credentialsPath) {
+            $issues[] = 'FIREBASE_CREDENTIALS_PATH is not set in .env';
+        } else {
+            $fullPath = base_path($credentialsPath);
+            if (! file_exists($fullPath)) {
+                $issues[] = "Service account file not found at: {$fullPath}";
+            } else {
+                $json = json_decode(file_get_contents($fullPath), true);
+                if (! $json || empty($json['private_key']) || empty($json['client_email'])) {
+                    $issues[] = 'Service account JSON is invalid or missing required fields (private_key, client_email)';
+                }
+            }
+        }
+
+        // Try to get an access token
+        if (empty($issues)) {
+            try {
+                Cache::forget('fcm_access_token');
+                $token = self::getAccessToken($credentialsPath);
+                if (! $token) {
+                    $issues[] = 'Failed to obtain OAuth2 access token from Google (check service account permissions)';
+                }
+            } catch (\Throwable $e) {
+                $issues[] = 'Access token error: ' . $e->getMessage();
+            }
+        }
+
+        return $issues;
     }
 
     private static function base64UrlEncode(string $data): string
