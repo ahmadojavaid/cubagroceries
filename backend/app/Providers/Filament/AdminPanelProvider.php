@@ -33,7 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Asif Groceries Admin')
             ->favicon(asset('favicon.ico'))
             ->colors([
-                'primary' => Color::Green,
+                'primary' => Color::Orange,
             ])
             ->maxContentWidth(\Filament\Support\Enums\MaxWidth::Full)
             ->navigationGroups([

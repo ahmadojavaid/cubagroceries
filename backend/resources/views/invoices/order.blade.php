@@ -68,7 +68,7 @@
         }
 
         .invoice-header {
-            background: linear-gradient(135deg, #0D4F1A 0%, #1B6B2A 100%);
+            background: linear-gradient(135deg, #F15722 0%, #FF7A4D 100%);
             color: #fff;
             padding: 32px 40px;
             display: flex;
