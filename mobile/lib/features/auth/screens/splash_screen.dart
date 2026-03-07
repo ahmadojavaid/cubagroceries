@@ -95,7 +95,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   padding: const EdgeInsets.symmetric(horizontal: 48),
                   child: Image.asset(
                     'assets/images/ag-logo.png',
-                    width: 220,
+                    width: 440,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => const Icon(
                       Icons.storefront_rounded,

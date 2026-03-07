@@ -4,10 +4,10 @@
 flutter_native_splash:
   color: "#F15722"
   image: "assets/splash/ag-splash.png"
-  image_dark: "assets/splash/ag-splash.png"
   android: true
   ios: false
+
+  # Android 12+ uses branded image (not icon) to avoid circular mask cropping
   android_12:
     color: "#F15722"
-    image: "assets/splash/ag-splash.png"
-    icon_background_color: "#F15722"
+    branding: "assets/splash/ag-splash.png"
