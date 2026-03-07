@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../providers/auth_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
@@ -110,41 +109,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                     children: [
                       ScaleTransition(
                         scale: _logoScale,
-                        child: Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
-                          padding: const EdgeInsets.all(16),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 60),
                           child: Image.asset(
                             'assets/images/ag-logo.png',
+                            width: 180,
                             fit: BoxFit.contain,
                             errorBuilder: (_, __, ___) => const Icon(
                               Icons.storefront_rounded,
-                              size: 48,
+                              size: 64,
                               color: Colors.white,
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Asif Groceries',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Fresh groceries delivered',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: Colors.white.withValues(alpha: 0.8),
                         ),
                       ),
                     ],

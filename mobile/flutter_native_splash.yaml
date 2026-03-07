@@ -4,8 +4,10 @@
 flutter_native_splash:
   color: "#F15722"
   image: "assets/splash/ag-splash.png"
+  image_dark: "assets/splash/ag-splash.png"
   android: true
   ios: false
   android_12:
     color: "#F15722"
     image: "assets/splash/ag-splash.png"
+    icon_background_color: "#F15722"
