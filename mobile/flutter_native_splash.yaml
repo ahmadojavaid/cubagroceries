@@ -3,11 +3,13 @@
 
 flutter_native_splash:
   color: "#F15722"
-  image: "assets/splash/ag-splash.png"
   android: true
   ios: false
 
-  # Android 12+ uses branded image (not icon) to avoid circular mask cropping
+  # Pre-Android 12: full image centered, no circular mask
+  image: "assets/splash/ag-splash.png"
+
+  # Android 12+: skip image entirely (avoids forced circular crop)
+  # Flutter splash screen takes over almost immediately anyway
   android_12:
     color: "#F15722"
-    branding: "assets/splash/ag-splash.png"
