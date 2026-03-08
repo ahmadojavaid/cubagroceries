@@ -103,6 +103,14 @@ class OrderResource extends Resource
                             ->options($record->status->allowedTransitionOptions())
                             ->required()
                             ->live(),
+                        Forms\Components\Placeholder::make('dispatch_warning')
+                            ->label('')
+                            ->content('⚠️ This will start the delivery countdown timer for the customer and notify them that their order is on the way.')
+                            ->visible(fn (Forms\Get $get) => $get('status') === 'dispatched'),
+                        Forms\Components\Placeholder::make('delivered_warning')
+                            ->label('')
+                            ->content('⚠️ This will mark the order as complete. The customer will be notified that their order has been delivered. This action cannot be undone.')
+                            ->visible(fn (Forms\Get $get) => $get('status') === 'delivered'),
                         Forms\Components\TextInput::make('cancellation_pin')
                             ->label('Cancellation PIN')
                             ->password()
@@ -119,6 +127,16 @@ class OrderResource extends Resource
                                 ->danger()
                                 ->title('Invalid Transition')
                                 ->body("Cannot change from {$record->status->label()} to {$newStatus->label()}.")
+                                ->send();
+                            return;
+                        }
+
+                        // Block dispatch without a rider assigned
+                        if ($newStatus === OrderStatus::Dispatched && ! $record->delivery_boy_id) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Rider Not Assigned')
+                                ->body('You must assign a delivery boy before dispatching this order.')
                                 ->send();
                             return;
                         }
@@ -170,7 +188,8 @@ class OrderResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->modalHeading(fn (Order $record) => "Change Status: {$record->order_id}"),
+                    ->modalHeading(fn (Order $record) => "Change Status: {$record->order_id}")
+                    ->modalDescription('Please review the status change and any warnings above before confirming.'),
 
                 Tables\Actions\Action::make('assignDeliveryBoy')
                     ->label('Assign Rider')
@@ -187,9 +206,10 @@ class OrderResource extends Resource
                             ->required(),
                         Forms\Components\TextInput::make('est_delivery_minutes')
                             ->label('Est. Delivery Time (minutes)')
-                            ->helperText('Leave empty or 0 to hide the timer from the customer.')
+                            ->helperText('Countdown timer shown to the customer once the order is dispatched.')
                             ->numeric()
-                            ->minValue(0)
+                            ->required()
+                            ->minValue(1)
                             ->maxValue(999)
                             ->suffix('min'),
                     ])

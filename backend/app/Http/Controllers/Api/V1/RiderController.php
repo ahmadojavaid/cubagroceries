@@ -146,7 +146,15 @@ class RiderController extends Controller
         }
 
         $oldStatus = $currentStatus;
-        $order->update(['status' => $newStatus]);
+
+        $updateData = ['status' => $newStatus];
+
+        // Start delivery countdown timer when dispatched
+        if ($newStatus === OrderStatus::Dispatched && $order->est_delivery_minutes) {
+            $updateData['est_delivery_set_at'] = now();
+        }
+
+        $order->update($updateData);
 
         // Record status history
         OrderStatusHistory::record(
