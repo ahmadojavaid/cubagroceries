@@ -22,6 +22,9 @@ class _RiderOrdersScreenState extends ConsumerState<RiderOrdersScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    Future.microtask(
+      () => ref.read(riderOrdersProvider.notifier).fetchOrders(),
+    );
   }
 
   @override

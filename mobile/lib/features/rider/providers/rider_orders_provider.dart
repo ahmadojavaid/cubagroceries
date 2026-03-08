@@ -187,9 +187,7 @@ class RiderOrdersState {
 class RiderOrdersNotifier extends StateNotifier<RiderOrdersState> {
   final ApiClient _api;
 
-  RiderOrdersNotifier(this._api) : super(const RiderOrdersState()) {
-    fetchOrders();
-  }
+  RiderOrdersNotifier(this._api) : super(const RiderOrdersState());
 
   Future<void> fetchOrders() async {
     state = state.copyWith(isLoading: true, error: null);
