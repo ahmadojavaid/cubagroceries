@@ -23,7 +23,7 @@ class OrderModel {
       status: json['status'] ?? 'pending',
       totalAmount: json['total_amount']?.toString() ?? '0.00',
       productsCount: json['products_count'] ?? 0,
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt: DateTime.parse(json['created_at']).toLocal(),
     );
   }
 
@@ -77,10 +77,10 @@ class OrderDetailModel {
                   OrderItemModel.fromJson(Map<String, dynamic>.from(p)))
               .toList()
           : [],
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt: DateTime.parse(json['created_at']).toLocal(),
       estDeliveryMinutes: json['est_delivery_minutes'] as int?,
       estDeliverySetAt: json['est_delivery_set_at'] != null
-          ? DateTime.parse(json['est_delivery_set_at'])
+          ? DateTime.parse(json['est_delivery_set_at']).toLocal()
           : null,
       rider: json['delivery_boy'] != null
           ? RiderModel.fromJson(
