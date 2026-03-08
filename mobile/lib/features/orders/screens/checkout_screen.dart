@@ -224,7 +224,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     // Auto-select free delivery when eligible
     if (qualifiesForFree) {
-      _selectedShippingId = freeOption!.id;
+      _selectedShippingId = freeOption.id;
       return const Column(
         children: [
           FreeDeliveryUnlocked(),
@@ -359,7 +359,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           Container(
             padding: const EdgeInsets.all(AppDimens.md),
             decoration: BoxDecoration(
-              color: AppColors.primarySurface.withOpacity(0.3),
+              color: AppColors.primarySurface.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(AppDimens.radiusMd),
               border: Border.all(
                 color: _useWallet ? AppColors.primary : AppColors.border,
@@ -398,7 +398,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 Switch(
                   value: _useWallet,
                   onChanged: (v) => setState(() => _useWallet = v),
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                 ),
               ],
             ),
@@ -660,8 +660,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         .toList();
 
     final coupon = ref.read(couponProvider);
+    final addressId = _selectedAddressId!;
     final order = await ref.read(orderActionProvider.notifier).placeOrder(
-          addressId: _selectedAddressId!,
+          addressId: addressId,
           items: items,
           shippingChargeId: _selectedShippingId,
           couponCode: coupon.code,

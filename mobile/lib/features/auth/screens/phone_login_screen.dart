@@ -145,9 +145,9 @@ class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(AppDimens.md),
                   decoration: BoxDecoration(
-                    color: AppColors.error.withOpacity(0.06),
+                    color: AppColors.error.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-                    border: Border.all(color: AppColors.error.withOpacity(0.15)),
+                    border: Border.all(color: AppColors.error.withValues(alpha: 0.15)),
                   ),
                   child: Text(
                     auth.error!,

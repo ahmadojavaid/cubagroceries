@@ -67,10 +67,10 @@ class CategoryListingScreen extends ConsumerWidget {
                       horizontal: 14, vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.55),
+                      color: Colors.black.withValues(alpha: 0.55),
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                       ),
                     ),
                     child: Row(
@@ -133,10 +133,10 @@ class CategoryListingScreen extends ConsumerWidget {
                             end: Alignment.bottomCenter,
                             stops: const [0.0, 0.4, 0.75, 1.0],
                             colors: [
-                              Colors.black.withOpacity(0.25),
+                              Colors.black.withValues(alpha: 0.25),
                               Colors.transparent,
-                              Colors.black.withOpacity(0.15),
-                              Colors.black.withOpacity(0.65),
+                              Colors.black.withValues(alpha: 0.15),
+                              Colors.black.withValues(alpha: 0.65),
                             ],
                           ),
                         ),
@@ -167,13 +167,13 @@ class CategoryListingScreen extends ConsumerWidget {
                   gradient: LinearGradient(
                     colors: [
                       AppColors.primary,
-                      AppColors.primary.withOpacity(0.85),
+                      AppColors.primary.withValues(alpha: 0.85),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(AppDimens.radiusLg),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.25),
+                      color: AppColors.primary.withValues(alpha: 0.25),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -184,7 +184,7 @@ class CategoryListingScreen extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -209,7 +209,7 @@ class CategoryListingScreen extends ConsumerWidget {
                           Text(
                             'View everything in ${parent?.title ?? 'this category'}',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                               fontSize: 12,
                             ),
                           ),
@@ -322,7 +322,7 @@ class _SubCategoryCard extends StatelessWidget {
           height: 80,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-            border: Border.all(color: AppColors.border.withOpacity(0.5)),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
           ),
           child: Row(
             children: [

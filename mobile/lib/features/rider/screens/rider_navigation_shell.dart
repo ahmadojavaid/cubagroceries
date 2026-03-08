@@ -167,7 +167,7 @@ class _NavBarItem extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: isSelected
-                  ? AppColors.primary.withOpacity(0.12)
+                  ? AppColors.primary.withValues(alpha: 0.12)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(24),
             ),

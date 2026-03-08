@@ -23,7 +23,7 @@ class HolidayBanner extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
         border: Border.all(
-          color: AppColors.error.withOpacity(0.3),
+          color: AppColors.error.withValues(alpha: 0.3),
           width: 1.5,
         ),
       ),
@@ -37,21 +37,21 @@ class HolidayBanner extends StatelessWidget {
               imageUrl: holiday.image!,
               height: 160,
               fit: BoxFit.cover,
-              placeholder: (_, __) => Container(
+              placeholder: (_, _) => Container(
                 height: 160,
-                color: AppColors.warning.withOpacity(0.1),
+                color: AppColors.warning.withValues(alpha: 0.1),
                 child: const Center(
                   child: Icon(Icons.image_outlined,
                       size: 40, color: AppColors.textHint),
                 ),
               ),
-              errorWidget: (_, __, ___) => const SizedBox.shrink(),
+              errorWidget: (_, _, _) => const SizedBox.shrink(),
             ),
 
           // Content
           Container(
             padding: const EdgeInsets.all(AppDimens.md),
-            color: AppColors.error.withOpacity(0.06),
+            color: AppColors.error.withValues(alpha: 0.06),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -61,7 +61,7 @@ class HolidayBanner extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppColors.error.withOpacity(0.12),
+                        color: AppColors.error.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.storefront_outlined,
@@ -87,7 +87,7 @@ class HolidayBanner extends StatelessWidget {
                   holiday.message,
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textPrimary.withOpacity(0.75),
+                    color: AppColors.textPrimary.withValues(alpha: 0.75),
                     height: 1.5,
                   ),
                 ),
@@ -99,7 +99,7 @@ class HolidayBanner extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.08),
+                      color: AppColors.primary.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -128,10 +128,10 @@ class HolidayBanner extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: AppColors.primarySurface.withOpacity(0.6),
+                      color: AppColors.primarySurface.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(AppDimens.radiusMd),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.15),
+                        color: AppColors.primary.withValues(alpha: 0.15),
                         width: 0.5,
                       ),
                     ),

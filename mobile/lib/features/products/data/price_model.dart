@@ -27,7 +27,7 @@ class PriceModel {
   String get cleanPrice => formatRs(priceValue);
 
   /// Formatted display: "Rs 120 / kg"
-  String get displayPrice => 'Rs ${cleanPrice} / ${unit.label}';
+  String get displayPrice => 'Rs $cleanPrice / ${unit.label}';
 
   /// Format a numeric price: drop .00 for whole numbers
   static String formatRs(double value) {

@@ -94,7 +94,7 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen>
                     padding: const EdgeInsets.all(AppDimens.pagePadding),
                     itemCount:
                         state.orders.length + (state.hasMore ? 1 : 0),
-                    separatorBuilder: (_, __) =>
+                    separatorBuilder: (_, _) =>
                         const SizedBox(height: AppDimens.sm),
                     itemBuilder: (context, index) {
                       if (index >= state.orders.length) {

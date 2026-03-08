@@ -73,8 +73,8 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
         'firstname': firstname,
         'lastname': lastname,
         'email': email,
-        if (identity != null) 'identity': identity,
-        if (dateOfBirth != null) 'date_of_birth': dateOfBirth,
+        'identity': ?identity,
+        'date_of_birth': ?dateOfBirth,
       });
 
       final data = response.data;

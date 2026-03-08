@@ -232,7 +232,7 @@ class _ProductReviewsScreenState extends ConsumerState<ProductReviewsScreen> {
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-        border: Border.all(color: AppColors.border.withOpacity(0.5)),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
@@ -275,7 +275,7 @@ class _ProductReviewsScreenState extends ConsumerState<ProductReviewsScreen> {
                     }
                     return Icon(Icons.star_border_rounded,
                         size: 24,
-                        color: AppColors.ratingStar.withOpacity(0.3));
+                        color: AppColors.ratingStar.withValues(alpha: 0.3));
                   }),
                 ),
                 const SizedBox(height: 6),
@@ -316,7 +316,7 @@ class _ReviewTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: AppColors.border.withOpacity(0.5)),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +358,7 @@ class _ReviewTile extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withOpacity(0.08),
+                  color: AppColors.success.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(AppDimens.radiusFull),
                 ),
                 child: const Row(

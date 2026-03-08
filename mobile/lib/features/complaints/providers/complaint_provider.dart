@@ -185,7 +185,7 @@ class SubmitComplaintNotifier extends StateNotifier<SubmitComplaintState> {
       final response = await _api.post('/complaints', data: {
         'subject': subject,
         'message': message,
-        if (orderId != null) 'order_id': orderId,
+        'order_id': ?orderId,
       });
       final data = response.data;
 

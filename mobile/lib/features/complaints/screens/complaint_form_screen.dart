@@ -260,7 +260,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen> {
           width: 42,
           height: 42,
           decoration: BoxDecoration(
-            color: AppColors.primarySurface.withOpacity(0.5),
+            color: AppColors.primarySurface.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(10),
           ),
           child: const Icon(Icons.receipt_long_rounded,
@@ -286,7 +286,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
+                      color: statusColor.withValues(alpha: 0.1),
                       borderRadius:
                           BorderRadius.circular(AppDimens.radiusFull),
                     ),
@@ -322,7 +322,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen> {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: AppColors.error.withOpacity(0.08),
+              color: AppColors.error.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.close_rounded,
@@ -396,7 +396,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen> {
           shrinkWrap: true,
           padding: const EdgeInsets.symmetric(vertical: 4),
           itemCount: state.orders.length,
-          separatorBuilder: (_, __) => Padding(
+          separatorBuilder: (_, _) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppDimens.md),
             child: Container(height: 0.5, color: AppColors.divider),
           ),
@@ -421,11 +421,11 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen> {
 
   (Color, Color) _orderStatusColor(String status) {
     return switch (status) {
-      'pending' => (AppColors.statusPending, AppColors.statusPending.withOpacity(0.1)),
-      'confirmed' => (AppColors.statusConfirmed, AppColors.statusConfirmed.withOpacity(0.1)),
-      'dispatched' => (AppColors.statusDispatched, AppColors.statusDispatched.withOpacity(0.1)),
-      'delivered' => (AppColors.statusDelivered, AppColors.statusDelivered.withOpacity(0.1)),
-      'cancelled' => (AppColors.statusCancelled, AppColors.statusCancelled.withOpacity(0.1)),
+      'pending' => (AppColors.statusPending, AppColors.statusPending.withValues(alpha: 0.1)),
+      'confirmed' => (AppColors.statusConfirmed, AppColors.statusConfirmed.withValues(alpha: 0.1)),
+      'dispatched' => (AppColors.statusDispatched, AppColors.statusDispatched.withValues(alpha: 0.1)),
+      'delivered' => (AppColors.statusDelivered, AppColors.statusDelivered.withValues(alpha: 0.1)),
+      'cancelled' => (AppColors.statusCancelled, AppColors.statusCancelled.withValues(alpha: 0.1)),
       _ => (AppColors.textSecondary, AppColors.surfaceBg),
     };
   }
@@ -450,7 +450,7 @@ class _OrderPickerItem extends StatelessWidget {
 
     return Material(
       color: isSelected
-          ? AppColors.primarySurface.withOpacity(0.3)
+          ? AppColors.primarySurface.withValues(alpha: 0.3)
           : Colors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -484,7 +484,7 @@ class _OrderPickerItem extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: statusColor.withOpacity(0.1),
+                            color: statusColor.withValues(alpha: 0.1),
                             borderRadius:
                                 BorderRadius.circular(AppDimens.radiusFull),
                           ),
@@ -523,11 +523,11 @@ class _OrderPickerItem extends StatelessWidget {
 
   (Color, Color) _statusColor(String status) {
     return switch (status) {
-      'pending' => (AppColors.statusPending, AppColors.statusPending.withOpacity(0.1)),
-      'confirmed' => (AppColors.statusConfirmed, AppColors.statusConfirmed.withOpacity(0.1)),
-      'dispatched' => (AppColors.statusDispatched, AppColors.statusDispatched.withOpacity(0.1)),
-      'delivered' => (AppColors.statusDelivered, AppColors.statusDelivered.withOpacity(0.1)),
-      'cancelled' => (AppColors.statusCancelled, AppColors.statusCancelled.withOpacity(0.1)),
+      'pending' => (AppColors.statusPending, AppColors.statusPending.withValues(alpha: 0.1)),
+      'confirmed' => (AppColors.statusConfirmed, AppColors.statusConfirmed.withValues(alpha: 0.1)),
+      'dispatched' => (AppColors.statusDispatched, AppColors.statusDispatched.withValues(alpha: 0.1)),
+      'delivered' => (AppColors.statusDelivered, AppColors.statusDelivered.withValues(alpha: 0.1)),
+      'cancelled' => (AppColors.statusCancelled, AppColors.statusCancelled.withValues(alpha: 0.1)),
       _ => (AppColors.textSecondary, AppColors.surfaceBg),
     };
   }

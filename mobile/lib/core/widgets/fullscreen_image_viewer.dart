@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../theme/app_colors.dart';
 import 'app_network_image.dart';
 
 /// Full-screen image viewer with pinch-to-zoom and swipe-to-dismiss.
@@ -94,7 +93,7 @@ class _FullscreenImageViewerState extends State<FullscreenImageViewer> {
         : 1.0;
 
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(opacity),
+      backgroundColor: Colors.black.withValues(alpha: opacity),
       body: GestureDetector(
         onVerticalDragUpdate: _onVerticalDragUpdate,
         onVerticalDragEnd: _onVerticalDragEnd,

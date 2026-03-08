@@ -80,12 +80,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       color: AppColors.error.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(AppDimens.radiusMd),
                       border: Border.all(
-                          color: AppColors.error.withOpacity(0.15)),
+                          color: AppColors.error.withValues(alpha: 0.15)),
                     ),
                     child: Row(
                       children: [
                         Icon(Icons.info_outline,
-                            size: 18, color: AppColors.error.withOpacity(0.7)),
+                            size: 18, color: AppColors.error.withValues(alpha: 0.7)),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -111,8 +111,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     hintText: '03001234567',
                   ),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty)
+                    if (v == null || v.trim().isEmpty) {
                       return 'Phone number is required';
+                    }
                     return null;
                   },
                 ),
@@ -162,8 +163,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
                   ),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty)
+                    if (v == null || v.trim().isEmpty) {
                       return 'Email is required';
+                    }
                     if (!v.contains('@')) return 'Enter a valid email';
                     return null;
                   },
@@ -220,8 +222,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Please confirm password';
-                    if (v != _passwordController.text)
+                    if (v != _passwordController.text) {
                       return 'Passwords do not match';
+                    }
                     return null;
                   },
                   onFieldSubmitted: (_) => _onRegister(),

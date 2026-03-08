@@ -64,7 +64,7 @@ class _AddressListScreenState extends ConsumerState<AddressListScreen> {
                   child: ListView.separated(
                     padding: const EdgeInsets.all(AppDimens.pagePadding),
                     itemCount: state.addresses.length,
-                    separatorBuilder: (_, __) =>
+                    separatorBuilder: (_, _) =>
                         const SizedBox(height: AppDimens.sm),
                     itemBuilder: (context, index) {
                       return _AddressCard(

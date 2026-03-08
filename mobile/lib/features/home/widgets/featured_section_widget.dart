@@ -78,7 +78,7 @@ class FeaturedSectionWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: AppDimens.pagePadding),
             itemCount: section.products.length,
-            separatorBuilder: (_, __) => const SizedBox(width: AppDimens.sm + 2),
+            separatorBuilder: (_, _) => const SizedBox(width: AppDimens.sm + 2),
             itemBuilder: (context, index) {
               final product = section.products[index];
               return SizedBox(

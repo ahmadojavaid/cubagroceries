@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_dimens.dart';
 import '../../../core/widgets/app_network_image.dart';
 import '../data/product_model.dart';
 import '../../cart/data/cart_item_model.dart';
@@ -40,7 +39,7 @@ class ProductCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -73,7 +72,7 @@ class ProductCard extends ConsumerWidget {
                           top: Radius.circular(16),
                         ),
                         child: Container(
-                          color: Colors.black.withOpacity(0.4),
+                          color: Colors.black.withValues(alpha: 0.4),
                           alignment: Alignment.center,
                           child: Container(
                             padding: const EdgeInsets.symmetric(

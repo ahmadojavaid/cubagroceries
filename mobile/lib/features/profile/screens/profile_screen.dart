@@ -195,7 +195,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           colors: [
             AppColors.primaryDark,
             AppColors.primary,
-            AppColors.primary.withOpacity(0.9),
+            AppColors.primary.withValues(alpha: 0.9),
           ],
         ),
       ),
@@ -213,7 +213,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
               ),
               Material(
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppDimens.radiusFull),
                 child: InkWell(
                   onTap: _toggleEdit,
@@ -241,10 +241,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.35),
+                    color: Colors.white.withValues(alpha: 0.35),
                     width: 2,
                   ),
                 ),
@@ -279,7 +279,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       user.email,
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -304,10 +304,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.14),
+                    color: Colors.white.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(AppDimens.radiusMd),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                     ),
                   ),
                   child: Row(
@@ -316,7 +316,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(
@@ -335,7 +335,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.white.withOpacity(0.6),
+                                color: Colors.white.withValues(alpha: 0.6),
                                 letterSpacing: 0.3,
                               ),
                             ),
@@ -354,7 +354,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                       Icon(
                         Icons.chevron_right_rounded,
-                        color: Colors.white.withOpacity(0.5),
+                        color: Colors.white.withValues(alpha: 0.5),
                         size: 22,
                       ),
                     ],
@@ -386,7 +386,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           decoration: BoxDecoration(
             color: AppColors.cardBg,
             borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-            border: Border.all(color: AppColors.border.withOpacity(0.5)),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
@@ -436,7 +436,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: AppColors.primarySurface.withOpacity(0.5),
+              color: AppColors.primarySurface.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, size: 18, color: AppColors.primary),
@@ -530,7 +530,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           decoration: BoxDecoration(
             color: AppColors.cardBg,
             borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-            border: Border.all(color: AppColors.border.withOpacity(0.5)),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
@@ -573,7 +573,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: AppColors.accentLight.withOpacity(0.6),
+                  color: AppColors.accentLight.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, size: 18, color: AppColors.accentDark),
@@ -640,7 +640,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           decoration: BoxDecoration(
             color: AppColors.cardBg,
             borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-            border: Border.all(color: AppColors.border.withOpacity(0.5)),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,

@@ -44,7 +44,7 @@ class _OrderReviewPopupState extends State<OrderReviewPopup> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.warning.withOpacity(0.1),
+              color: AppColors.warning.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.star_rounded,
@@ -161,7 +161,7 @@ class _OrderReviewPopupState extends State<OrderReviewPopup> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  disabledBackgroundColor: AppColors.primary.withOpacity(0.3),
+                  disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.3),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),

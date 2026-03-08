@@ -22,9 +22,9 @@ class FreeDeliveryMilestone extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppDimens.md),
       decoration: BoxDecoration(
-        color: AppColors.primarySurface.withOpacity(0.5),
+        color: AppColors.primarySurface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: AppColors.primary.withOpacity(0.15)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,9 +94,9 @@ class FreeDeliveryUnlocked extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppDimens.md, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.success.withOpacity(0.08),
+        color: AppColors.success.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: AppColors.success.withOpacity(0.2)),
+        border: Border.all(color: AppColors.success.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [

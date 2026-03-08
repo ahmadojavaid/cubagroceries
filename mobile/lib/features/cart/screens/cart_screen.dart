@@ -5,7 +5,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../data/cart_item_model.dart';
 import '../../home/providers/home_provider.dart';
-import '../../products/data/product_model.dart';
 import '../../products/widgets/product_card.dart';
 import '../providers/cart_provider.dart';
 import '../providers/cart_suggestions_provider.dart';
@@ -104,7 +103,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
     return suggestionsAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
       data: (products) {
         if (products.isEmpty) return const SizedBox.shrink();
 
@@ -125,7 +124,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: products.length,
-                separatorBuilder: (_, __) =>
+                separatorBuilder: (_, _) =>
                     const SizedBox(width: AppDimens.sm),
                 itemBuilder: (context, index) {
                   final product = products[index];
@@ -209,9 +208,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.warning.withOpacity(0.08),
+              color: AppColors.warning.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-              border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+              border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [

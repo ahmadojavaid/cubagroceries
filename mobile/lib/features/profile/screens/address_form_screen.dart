@@ -240,7 +240,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
           // Show coordinates + mini map preview
           Container(
             decoration: BoxDecoration(
-              color: AppColors.primarySurface.withOpacity(0.3),
+              color: AppColors.primarySurface.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(AppDimens.radiusMd),
               border: Border.all(color: AppColors.primary, width: 1),
             ),

@@ -24,7 +24,7 @@ class CategoryGridShimmer extends StatelessWidget {
           childAspectRatio: 1.05,
         ),
         itemCount: itemCount,
-        itemBuilder: (_, __) => Container(
+        itemBuilder: (_, _) => Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppDimens.radiusMd),
@@ -55,7 +55,7 @@ class ProductGridShimmer extends StatelessWidget {
           childAspectRatio: 0.68,
         ),
         itemCount: itemCount,
-        itemBuilder: (_, __) => Container(
+        itemBuilder: (_, _) => Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppDimens.radiusMd),
@@ -113,7 +113,7 @@ class ImageFallback extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.primarySurface.withOpacity(0.6),
+        color: AppColors.primarySurface.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(AppDimens.radiusSm),
       ),
       child: Icon(icon, size: size * 0.45, color: AppColors.primaryLight),
@@ -198,11 +198,11 @@ class ErrorStateWidget extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.error.withOpacity(0.08),
+                color: AppColors.error.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.cloud_off_outlined,
-                  size: 36, color: AppColors.error.withOpacity(0.6)),
+                  size: 36, color: AppColors.error.withValues(alpha: 0.6)),
             ),
             const SizedBox(height: AppDimens.lg),
             Text(

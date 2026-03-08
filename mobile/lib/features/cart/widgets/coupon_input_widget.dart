@@ -118,9 +118,9 @@ class _CouponInputWidgetState extends ConsumerState<CouponInputWidget> {
       return Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.success.withOpacity(0.08),
+          color: AppColors.success.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-          border: Border.all(color: AppColors.success.withOpacity(0.3)),
+          border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -144,7 +144,7 @@ class _CouponInputWidgetState extends ConsumerState<CouponInputWidget> {
                         : 'You save Rs ${coupon.discount.toStringAsFixed(0)}',
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.success.withOpacity(0.8),
+                      color: AppColors.success.withValues(alpha: 0.8),
                     ),
                   ),
                 ],

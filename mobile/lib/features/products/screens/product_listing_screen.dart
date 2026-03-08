@@ -169,7 +169,7 @@ class _ProductListingScreenState extends ConsumerState<ProductListingScreen> {
           vertical: 6,
         ),
         itemCount: children.length + 1, // +1 for "All"
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           if (index == 0) {
             return _FilterChip(

@@ -2,13 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_exception.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/providers/api_provider.dart';
-import '../../../core/services/fcm_service.dart';
-import '../../../core/services/fcm_notification_handler.dart';
 import '../../../core/providers/fcm_provider.dart';
+import '../../../core/services/fcm_service.dart';
 
 /// Represents the current auth state
 class AuthState {
@@ -50,9 +50,11 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final ApiClient _api;
   final FcmService _fcm;
-  final FcmNotificationHandler _fcmHandler;
+  final Ref _ref;
+  static const _storage = FlutterSecureStorage();
+  static const _roleKey = 'user_role';
 
-  AuthNotifier(this._api, this._fcm, this._fcmHandler) : super(const AuthState());
+  AuthNotifier(this._api, this._fcm, this._ref) : super(const AuthState());
 
   /// Check if user has a stored token on app start
   Future<void> checkAuth() async {
@@ -63,14 +65,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
         final data = response.data;
         if (data['success'] == true) {
           final userData = Map<String, dynamic>.from(data['data']);
+          final role = userData['role'] as String? ?? 'customer';
+          await _storage.write(key: _roleKey, value: role);
           state = AuthState(
             isAuthenticated: true,
             user: userData,
-            role: userData['role'] as String? ?? 'customer',
+            role: role,
           );
           // Send FCM token after auth verification
           _fcm.initialize();
-          _fcmHandler.initialize();
+          _ref.read(fcmNotificationHandlerProvider).initialize();
           return;
         }
       } catch (_) {
@@ -99,20 +103,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
         'lastname': lastname,
         'password': password,
         'password_confirmation': passwordConfirmation,
-        if (dateOfBirth != null) 'date_of_birth': dateOfBirth,
+        'date_of_birth': ?dateOfBirth,
       });
 
       final data = response.data;
       if (data['success'] == true) {
         await _api.saveToken(data['data']['token']);
         final userData = Map<String, dynamic>.from(data['data']['user']);
+        final role = userData['role'] as String? ?? 'customer';
+        await _storage.write(key: _roleKey, value: role);
         state = AuthState(
           isAuthenticated: true,
           user: userData,
-          role: userData['role'] as String? ?? 'customer',
+          role: role,
         );
         _fcm.initialize();
-        _fcmHandler.initialize();
+        _ref.read(fcmNotificationHandlerProvider).initialize();
         return true;
       }
 
@@ -141,13 +147,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (data['success'] == true) {
         await _api.saveToken(data['data']['token']);
         final userData = Map<String, dynamic>.from(data['data']['user']);
+        final role = userData['role'] as String? ?? 'customer';
+        await _storage.write(key: _roleKey, value: role);
         state = AuthState(
           isAuthenticated: true,
           user: userData,
-          role: userData['role'] as String? ?? 'customer',
+          role: role,
         );
         _fcm.initialize();
-        _fcmHandler.initialize();
+        _ref.read(fcmNotificationHandlerProvider).initialize();
         return true;
       }
 
@@ -192,13 +200,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (data['success'] == true) {
         await _api.saveToken(data['data']['token']);
         final userData = Map<String, dynamic>.from(data['data']['user']);
+        final role = userData['role'] as String? ?? 'customer';
+        await _storage.write(key: _roleKey, value: role);
         state = AuthState(
           isAuthenticated: true,
           user: userData,
-          role: userData['role'] as String? ?? 'customer',
+          role: role,
         );
         _fcm.initialize();
-        _fcmHandler.initialize();
+        _ref.read(fcmNotificationHandlerProvider).initialize();
         return true;
       }
 
@@ -286,13 +296,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (data['success'] == true) {
         await _api.saveToken(data['data']['token']);
         final userData = Map<String, dynamic>.from(data['data']['user']);
+        final role = userData['role'] as String? ?? 'customer';
+        await _storage.write(key: _roleKey, value: role);
         state = AuthState(
           isAuthenticated: true,
           user: userData,
-          role: userData['role'] as String? ?? 'customer',
+          role: role,
         );
         _fcm.initialize();
-        _fcmHandler.initialize();
+        _ref.read(fcmNotificationHandlerProvider).initialize();
 
         // Sign out of Firebase (we use our own Sanctum tokens)
         await fb.FirebaseAuth.instance.signOut();
@@ -316,6 +328,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // Ignore errors — still clear local state
     }
     await _api.clearToken();
+    await _storage.delete(key: _roleKey);
     FcmService.clearToken();
     state = const AuthState(isAuthenticated: false);
   }
@@ -340,8 +353,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final api = ref.watch(apiClientProvider);
   final fcm = ref.watch(fcmServiceProvider);
-  final fcmHandler = ref.watch(fcmNotificationHandlerProvider);
-  return AuthNotifier(api, fcm, fcmHandler);
+  return AuthNotifier(api, fcm, ref);
 });
 
 /// Derived provider: current user role

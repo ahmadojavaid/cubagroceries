@@ -201,16 +201,16 @@ class _ComplaintCard extends StatelessWidget {
     final (color, bgColor) = switch (status) {
       'pending' => (
           AppColors.statusPending,
-          AppColors.statusPending.withOpacity(0.12)
+          AppColors.statusPending.withValues(alpha: 0.12)
         ),
-      'in_progress' => (AppColors.info, AppColors.info.withOpacity(0.12)),
+      'in_progress' => (AppColors.info, AppColors.info.withValues(alpha: 0.12)),
       'resolved' => (
           AppColors.statusDelivered,
-          AppColors.statusDelivered.withOpacity(0.12)
+          AppColors.statusDelivered.withValues(alpha: 0.12)
         ),
       'closed' => (
           AppColors.textSecondary,
-          AppColors.textSecondary.withOpacity(0.12)
+          AppColors.textSecondary.withValues(alpha: 0.12)
         ),
       _ => (AppColors.textSecondary, AppColors.surfaceBg),
     };

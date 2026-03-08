@@ -89,7 +89,7 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withOpacity(0.1),
+                  color: AppColors.success.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -144,7 +144,7 @@ class _SurveyScreenState extends ConsumerState<SurveyScreen> {
       appBar: AppBar(title: const Text('Survey')),
       body: surveyAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => ErrorStateWidget(
+        error: (_, _) => ErrorStateWidget(
           message: 'Could not load survey',
           onRetry: () => ref.invalidate(surveyDetailProvider(widget.surveyId)),
         ),
@@ -314,8 +314,8 @@ class _QuestionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: _isAnswered
-              ? AppColors.primary.withOpacity(0.3)
-              : AppColors.border.withOpacity(0.5),
+              ? AppColors.primary.withValues(alpha: 0.3)
+              : AppColors.border.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -330,7 +330,7 @@ class _QuestionCard extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: _isAnswered
-                      ? AppColors.primary.withOpacity(0.1)
+                      ? AppColors.primary.withValues(alpha: 0.1)
                       : AppColors.surfaceBg,
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -403,13 +403,13 @@ class _QuestionCard extends StatelessWidget {
                   const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: selected
-                    ? AppColors.primary.withOpacity(0.08)
+                    ? AppColors.primary.withValues(alpha: 0.08)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: selected
                       ? AppColors.primary
-                      : AppColors.border.withOpacity(0.6),
+                      : AppColors.border.withValues(alpha: 0.6),
                   width: selected ? 1.5 : 1,
                 ),
               ),
@@ -472,13 +472,13 @@ class _QuestionCard extends StatelessWidget {
                   const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: selected
-                    ? AppColors.primary.withOpacity(0.08)
+                    ? AppColors.primary.withValues(alpha: 0.08)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: selected
                       ? AppColors.primary
-                      : AppColors.border.withOpacity(0.6),
+                      : AppColors.border.withValues(alpha: 0.6),
                   width: selected ? 1.5 : 1,
                 ),
               ),
@@ -538,11 +538,11 @@ class _QuestionCard extends StatelessWidget {
         fillColor: AppColors.surfaceBg,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.border.withOpacity(0.5)),
+          borderSide: BorderSide(color: AppColors.border.withValues(alpha: 0.5)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.border.withOpacity(0.5)),
+          borderSide: BorderSide(color: AppColors.border.withValues(alpha: 0.5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

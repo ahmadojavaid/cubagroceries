@@ -60,7 +60,7 @@ class ComplaintDetailScreen extends StatelessWidget {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primarySurface.withOpacity(0.3),
+                  color: AppColors.primarySurface.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(AppDimens.radiusMd),
                 ),
                 child: Row(
@@ -69,7 +69,7 @@ class ComplaintDetailScreen extends StatelessWidget {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
@@ -132,7 +132,7 @@ class ComplaintDetailScreen extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, size: 20, color: color),
@@ -155,7 +155,7 @@ class ComplaintDetailScreen extends StatelessWidget {
                   dateStr,
                   style: TextStyle(
                     fontSize: 12,
-                    color: color.withOpacity(0.6),
+                    color: color.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -174,7 +174,7 @@ class ComplaintDetailScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-        border: Border.all(color: AppColors.border.withOpacity(0.5)),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
@@ -206,22 +206,22 @@ class ComplaintDetailScreen extends StatelessWidget {
     return switch (status) {
       'pending' => (
           AppColors.statusPending,
-          AppColors.statusPending.withOpacity(0.08),
+          AppColors.statusPending.withValues(alpha: 0.08),
           Icons.schedule_rounded,
         ),
       'in_progress' => (
           AppColors.info,
-          AppColors.info.withOpacity(0.08),
+          AppColors.info.withValues(alpha: 0.08),
           Icons.autorenew_rounded,
         ),
       'resolved' => (
           AppColors.statusDelivered,
-          AppColors.statusDelivered.withOpacity(0.08),
+          AppColors.statusDelivered.withValues(alpha: 0.08),
           Icons.check_circle_outline_rounded,
         ),
       'closed' => (
           AppColors.textSecondary,
-          AppColors.textSecondary.withOpacity(0.08),
+          AppColors.textSecondary.withValues(alpha: 0.08),
           Icons.archive_outlined,
         ),
       _ => (

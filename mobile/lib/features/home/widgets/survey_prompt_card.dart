@@ -16,7 +16,7 @@ class SurveyPromptCard extends ConsumerWidget {
 
     return surveysAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
       data: (surveys) {
         if (surveys.isEmpty) return const SizedBox.shrink();
 
@@ -27,14 +27,14 @@ class SurveyPromptCard extends ConsumerWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppColors.primary.withOpacity(0.08),
-                AppColors.primary.withOpacity(0.03),
+                AppColors.primary.withValues(alpha: 0.08),
+                AppColors.primary.withValues(alpha: 0.03),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.primary.withOpacity(0.15)),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
           ),
           child: Material(
             color: Colors.transparent,
@@ -49,7 +49,7 @@ class SurveyPromptCard extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(

@@ -127,7 +127,7 @@ class _RiderOrdersScreenState extends ConsumerState<RiderOrdersScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.filter_list_off_rounded,
-                        size: 48, color: AppColors.textHint.withOpacity(0.4)),
+                        size: 48, color: AppColors.textHint.withValues(alpha: 0.4)),
                     const SizedBox(height: 12),
                     const Text(
                       'No orders with this status',
@@ -209,7 +209,7 @@ class _RiderOrdersScreenState extends ConsumerState<RiderOrdersScreen>
         padding: const EdgeInsets.symmetric(
             horizontal: AppDimens.pagePadding),
         itemCount: statuses.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final status = statuses[index];
           final isActive = _activeFilter == status;
@@ -247,7 +247,7 @@ class _RiderOrdersScreenState extends ConsumerState<RiderOrdersScreen>
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                     decoration: BoxDecoration(
                       color: isActive
-                          ? Colors.white.withOpacity(0.25)
+                          ? Colors.white.withValues(alpha: 0.25)
                           : AppColors.surfaceBg,
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -396,7 +396,7 @@ class _StatCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: color.withOpacity(0.8),
+              color: color.withValues(alpha: 0.8),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -424,10 +424,10 @@ class _RiderOrderCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.cardBg,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border.withOpacity(0.5)),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -665,10 +665,10 @@ class _StoreOfflineBanner extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.error.withOpacity(0.06),
+              color: AppColors.error.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: AppColors.error.withOpacity(0.15),
+                color: AppColors.error.withValues(alpha: 0.15),
               ),
             ),
             child: Row(
@@ -676,7 +676,7 @@ class _StoreOfflineBanner extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.error.withOpacity(0.1),
+                    color: AppColors.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
@@ -703,7 +703,7 @@ class _StoreOfflineBanner extends ConsumerWidget {
                         holiday.message,
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.error.withOpacity(0.75),
+                          color: AppColors.error.withValues(alpha: 0.75),
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -717,7 +717,7 @@ class _StoreOfflineBanner extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }

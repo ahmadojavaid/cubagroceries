@@ -200,7 +200,7 @@ class _WalletTransactionsScreenState
             'Available Balance',
             style: TextStyle(
               fontSize: 13,
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -267,9 +267,9 @@ class _SummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.06),
+        color: color.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: color.withOpacity(0.15)),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: [
@@ -277,7 +277,7 @@ class _SummaryCard extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, size: 18, color: color),
@@ -290,7 +290,7 @@ class _SummaryCard extends StatelessWidget {
                 Text(label,
                     style: TextStyle(
                         fontSize: 11,
-                        color: color.withOpacity(0.7),
+                        color: color.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w500)),
                 const SizedBox(height: 2),
                 Text(amount,
@@ -341,7 +341,7 @@ class _TransactionTile extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.08),
+              color: color.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(

@@ -143,7 +143,7 @@ class _NotificationTile extends StatelessWidget {
       child: Container(
         color: notification.isRead
             ? Colors.transparent
-            : AppColors.primarySurface.withOpacity(0.3),
+            : AppColors.primarySurface.withValues(alpha: 0.3),
         padding: const EdgeInsets.symmetric(
           horizontal: AppDimens.pagePadding,
           vertical: AppDimens.md,
@@ -229,7 +229,7 @@ class _NotificationTile extends StatelessWidget {
                     height: 140,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    placeholder: (_, __) => Container(
+                    placeholder: (_, _) => Container(
                       height: 140,
                       color: AppColors.surfaceBg,
                       child: const Center(
@@ -240,7 +240,7 @@ class _NotificationTile extends StatelessWidget {
                         ),
                       ),
                     ),
-                    errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                    errorWidget: (_, _, _) => const SizedBox.shrink(),
                   ),
                 ),
               ),
@@ -310,7 +310,7 @@ class _NotificationTile extends StatelessWidget {
     return AppColors.primary;
   }
 
-  Color get _iconBgColor => _iconColor.withOpacity(0.12);
+  Color get _iconBgColor => _iconColor.withValues(alpha: 0.12);
 
   String _formatTimeAgo(DateTime dateTime) {
     final now = DateTime.now();

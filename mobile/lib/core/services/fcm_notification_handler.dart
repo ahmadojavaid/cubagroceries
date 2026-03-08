@@ -1,5 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -111,7 +111,7 @@ class FcmNotificationHandler {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.success.withOpacity(0.1),
+                color: AppColors.success.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.check_circle_rounded,
@@ -136,7 +136,7 @@ class FcmNotificationHandler {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.warning.withOpacity(0.08),
+                color: AppColors.warning.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Row(
@@ -211,24 +211,25 @@ class FcmNotificationHandler {
       } catch (_) {}
     }
 
-    final context = navigatorKey.currentContext;
-    if (context == null) return;
+    // Re-fetch context after async gap
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null) return;
 
     final title = message.notification?.title ?? 'New Delivery Job!';
     final body = message.notification?.body ?? '';
     final orderNumber = message.data['order_number'] as String?;
 
     showDialog(
-      context: context,
+      context: ctx,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
+      builder: (dlgCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.delivery_dining,
@@ -277,14 +278,14 @@ class FcmNotificationHandler {
           TextButton(
             onPressed: () {
               _stopAlert();
-              Navigator.pop(ctx);
+              Navigator.pop(dlgCtx);
             },
             child: const Text('Dismiss'),
           ),
           ElevatedButton(
             onPressed: () {
               _stopAlert();
-              Navigator.pop(ctx);
+              Navigator.pop(dlgCtx);
               if (orderNumber != null) onNotificationTap(orderNumber);
             },
             style: ElevatedButton.styleFrom(

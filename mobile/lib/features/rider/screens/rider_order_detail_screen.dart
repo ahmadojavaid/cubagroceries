@@ -178,7 +178,7 @@ class _StatusBanner extends StatelessWidget {
             children: [
               Text('Order Status',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500,
-                      color: fg.withOpacity(0.7), letterSpacing: 0.3)),
+                      color: fg.withValues(alpha: 0.7), letterSpacing: 0.3)),
               const SizedBox(height: 2),
               Text(label,
                   style: GoogleFonts.dmSans(fontSize: 18, fontWeight: FontWeight.w800, color: fg)),
@@ -221,7 +221,7 @@ class _StatusTimeline extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border.withOpacity(0.5)),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: List.generate(_steps.length * 2 - 1, (i) {
@@ -233,7 +233,7 @@ class _StatusTimeline extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: stepIdx < activeIdx
                       ? AppColors.primary
-                      : AppColors.border.withOpacity(0.4),
+                      : AppColors.border.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -253,11 +253,11 @@ class _StatusTimeline extends StatelessWidget {
                   color: isCurrent
                       ? AppColors.primary
                       : isActive
-                          ? AppColors.primary.withOpacity(0.15)
+                          ? AppColors.primary.withValues(alpha: 0.15)
                           : AppColors.surfaceBg,
                   shape: BoxShape.circle,
                   border: isCurrent ? null : Border.all(
-                    color: isActive ? AppColors.primary : AppColors.border.withOpacity(0.5),
+                    color: isActive ? AppColors.primary : AppColors.border.withValues(alpha: 0.5),
                     width: 1.5,
                   ),
                 ),
@@ -374,25 +374,6 @@ class _CustomerSection extends StatelessWidget {
   }
 }
 
-class _CircleAction extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-  const _CircleAction({required this.icon, required this.color, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 38, height: 38,
-        decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
-        child: Icon(icon, size: 18, color: color),
-      ),
-    );
-  }
-}
-
 // ── Items ───────────────────────────────────────────────────
 
 class _OrderItemsSection extends StatelessWidget {
@@ -470,7 +451,7 @@ class _BottomActions extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         border: const Border(top: BorderSide(color: AppColors.border, width: 0.5)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, -2))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, -2))],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -499,19 +480,19 @@ class _BottomActions extends StatelessWidget {
                 Expanded(child: _SecondaryBtn(icon: Icons.map_rounded, label: 'Maps',
                     onTap: () => LauncherUtils.openGoogleMaps(
                       latitude: order.address?.latitude, longitude: order.address?.longitude,
-                      addressFallback: order.address != null ? '${order.address!.address}, ${order.address!.city ?? ''}' : null,
+                      addressFallback: order.address != null ? '${order.address!.address}, ${order.address?.city ?? ''}' : null,
                       context: context))),
               if (hasMapButton && hasContactButtons)
                 const SizedBox(width: 10),
               if (hasContactButtons)
                 Expanded(child: _SecondaryBtn(icon: Icons.chat_rounded, label: 'WhatsApp', color: const Color(0xFF25D366),
-                    onTap: () => LauncherUtils.openWhatsApp(phone: phone!,
+                    onTap: () => LauncherUtils.openWhatsApp(phone: phone,
                         message: 'Hi! I am your delivery rider from Asif Groceries. Your order #${order.orderId} is on the way.',
                         context: context))),
               if (hasContactButtons) ...[
                 const SizedBox(width: 10),
                 Expanded(child: _SecondaryBtn(icon: Icons.phone_rounded, label: 'Call', color: AppColors.primary,
-                    onTap: () => LauncherUtils.call(phone: phone!, context: context))),
+                    onTap: () => LauncherUtils.call(phone: phone, context: context))),
               ],
             ]),
         ],
@@ -535,8 +516,8 @@ class _SecondaryBtn extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: c.withOpacity(0.08), borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: c.withOpacity(0.15)),
+          color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: c.withValues(alpha: 0.15)),
         ),
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(icon, size: 18, color: c),
@@ -560,7 +541,7 @@ class _Card extends StatelessWidget {
       width: double.infinity, padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.cardBg, borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border.withOpacity(0.5)),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
       ),
       child: child,
     );

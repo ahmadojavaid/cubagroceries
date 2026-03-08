@@ -115,7 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             'assets/images/ag-logo.png',
                             width: 180,
                             fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => const Icon(
+                            errorBuilder: (_, _, _) => const Icon(
                               Icons.storefront_rounded,
                               size: 64,
                               color: Colors.white,
@@ -157,13 +157,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           borderRadius:
                               BorderRadius.circular(AppDimens.radiusMd),
                           border: Border.all(
-                              color: AppColors.error.withOpacity(0.15)),
+                              color: AppColors.error.withValues(alpha: 0.15)),
                         ),
                         child: Row(
                           children: [
                             Icon(Icons.info_outline,
                                 size: 18,
-                                color: AppColors.error.withOpacity(0.7)),
+                                color: AppColors.error.withValues(alpha: 0.7)),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
@@ -189,8 +189,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             Icon(Icons.mail_outline_rounded, size: 20),
                       ),
                       validator: (v) {
-                        if (v == null || v.trim().isEmpty)
+                        if (v == null || v.trim().isEmpty) {
                           return 'Email is required';
+                        }
                         if (!v.contains('@')) return 'Enter a valid email';
                         return null;
                       },
@@ -218,8 +219,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         ),
                       ),
                       validator: (v) {
-                        if (v == null || v.isEmpty)
+                        if (v == null || v.isEmpty) {
                           return 'Password is required';
+                        }
                         return null;
                       },
                       onFieldSubmitted: (_) => _onLogin(),

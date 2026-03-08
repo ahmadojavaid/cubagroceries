@@ -58,8 +58,8 @@ class ProductsNotifier extends StateNotifier<ProductsState> {
       final params = <String, dynamic>{
         'page': 1,
         'per_page': perPage,
-        if (categoryId != null) 'category_id': categoryId,
-        if (subCategoryId != null) 'sub_category_id': subCategoryId,
+        'category_id': ?categoryId,
+        'sub_category_id': ?subCategoryId,
       };
 
       final response = await _api.get('/products', queryParameters: params);
@@ -96,8 +96,8 @@ class ProductsNotifier extends StateNotifier<ProductsState> {
       final params = <String, dynamic>{
         'page': state.nextPage,
         'per_page': perPage,
-        if (categoryId != null) 'category_id': categoryId,
-        if (subCategoryId != null) 'sub_category_id': subCategoryId,
+        'category_id': ?categoryId,
+        'sub_category_id': ?subCategoryId,
       };
 
       final response = await _api.get('/products', queryParameters: params);

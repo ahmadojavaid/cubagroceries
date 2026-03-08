@@ -180,7 +180,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  AppColors.scaffoldBg.withOpacity(0.9),
+                  AppColors.scaffoldBg.withValues(alpha: 0.9),
                 ],
               ),
             ),
@@ -265,7 +265,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
   Widget _circleButton({required IconData icon, required VoidCallback onTap}) {
     return Material(
-      color: Colors.white.withOpacity(0.9),
+      color: Colors.white.withValues(alpha: 0.9),
       shape: const CircleBorder(),
       elevation: 2,
       child: InkWell(
@@ -358,7 +358,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-        border: Border.all(color: AppColors.border.withOpacity(0.6)),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
       ),
       child: Row(
         children: [
@@ -403,7 +403,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     final enabled = onTap != null;
     return Material(
       color: enabled
-          ? AppColors.primary.withOpacity(0.1)
+          ? AppColors.primary.withValues(alpha: 0.1)
           : AppColors.surfaceBg,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
@@ -430,7 +430,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-        border: Border.all(color: AppColors.border.withOpacity(0.6)),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -631,7 +631,7 @@ class _PriceChip extends StatelessWidget {
       color: isSelected ? AppColors.primary : AppColors.cardBg,
       borderRadius: BorderRadius.circular(AppDimens.radiusMd),
       elevation: isSelected ? 2 : 0,
-      shadowColor: AppColors.primary.withOpacity(0.3),
+      shadowColor: AppColors.primary.withValues(alpha: 0.3),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
@@ -662,7 +662,7 @@ class _PriceChip extends StatelessWidget {
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: isSelected
-                      ? Colors.white.withOpacity(0.85)
+                      ? Colors.white.withValues(alpha: 0.85)
                       : AppColors.textHint,
                 ),
               ),
@@ -687,7 +687,7 @@ class _RelatedProductsSection extends ConsumerWidget {
 
     return relatedAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
       data: (products) {
         if (products.isEmpty) return const SizedBox.shrink();
 
@@ -708,7 +708,7 @@ class _RelatedProductsSection extends ConsumerWidget {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: products.length,
-                separatorBuilder: (_, __) =>
+                separatorBuilder: (_, _) =>
                     const SizedBox(width: AppDimens.sm + 2),
                 itemBuilder: (context, index) {
                   final product = products[index];

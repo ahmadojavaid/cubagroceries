@@ -163,7 +163,7 @@ class _CategoryExpandedCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.cardBg,
             borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-            border: Border.all(color: AppColors.border.withOpacity(0.5)),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow,
@@ -180,7 +180,7 @@ class _CategoryExpandedCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppDimens.md),
                 decoration: BoxDecoration(
-                  color: tintColor.withOpacity(0.45),
+                  color: tintColor.withValues(alpha: 0.45),
                 ),
                 child: Row(
                   children: [
@@ -194,7 +194,7 @@ class _CategoryExpandedCard extends StatelessWidget {
                             BorderRadius.circular(AppDimens.radiusMd),
                         boxShadow: [
                           BoxShadow(
-                            color: accentColor.withOpacity(0.12),
+                            color: accentColor.withValues(alpha: 0.12),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -236,7 +236,7 @@ class _CategoryExpandedCard extends StatelessWidget {
                                     .textTheme
                                     .bodySmall
                                     ?.copyWith(
-                                      color: accentColor.withOpacity(0.75),
+                                      color: accentColor.withValues(alpha: 0.75),
                                       fontWeight: FontWeight.w500,
                                     ),
                               ),
@@ -249,12 +249,12 @@ class _CategoryExpandedCard extends StatelessWidget {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.arrow_forward_rounded,
-                        color: accentColor.withOpacity(0.7),
+                        color: accentColor.withValues(alpha: 0.7),
                         size: 18,
                       ),
                     ),
@@ -316,10 +316,10 @@ class _SubCategoryChip extends StatelessWidget {
             vertical: 8,
           ),
           decoration: BoxDecoration(
-            color: accentColor.withOpacity(0.08),
+            color: accentColor.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(AppDimens.radiusFull),
             border: Border.all(
-              color: accentColor.withOpacity(0.18),
+              color: accentColor.withValues(alpha: 0.18),
             ),
           ),
           child: Text(
@@ -327,7 +327,7 @@ class _SubCategoryChip extends StatelessWidget {
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.w600,
-              color: accentColor.withOpacity(0.85),
+              color: accentColor.withValues(alpha: 0.85),
               letterSpacing: 0.1,
             ),
           ),
@@ -346,11 +346,11 @@ class _ImageFallbackColored extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: color.withOpacity(0.08),
+      color: color.withValues(alpha: 0.08),
       child: Icon(
         Icons.eco_outlined,
         size: 30,
-        color: color.withOpacity(0.4),
+        color: color.withValues(alpha: 0.4),
       ),
     );
   }

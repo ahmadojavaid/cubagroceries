@@ -175,8 +175,8 @@ class OrderActionNotifier extends StateNotifier<PlaceOrderState> {
       final response = await _api.post('/orders', data: {
         'address_id': addressId,
         'items': items,
-        if (shippingChargeId != null) 'shipping_charge_id': shippingChargeId,
-        if (couponCode != null) 'coupon_code': couponCode,
+        'shipping_charge_id': ?shippingChargeId,
+        'coupon_code': ?couponCode,
         'use_wallet': useWallet,
       });
       final data = response.data;

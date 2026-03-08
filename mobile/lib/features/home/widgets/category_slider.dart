@@ -24,7 +24,7 @@ class CategorySlider extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppDimens.pagePadding),
         itemCount: categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppDimens.md),
+        separatorBuilder: (_, _) => const SizedBox(width: AppDimens.md),
         itemBuilder: (context, index) {
           final cat = categories[index];
           return _CategoryChip(category: cat, onTap: () => onTap(cat));
@@ -52,7 +52,7 @@ class _CategoryChip extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppColors.primarySurface.withOpacity(0.6),
+                color: AppColors.primarySurface.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(AppDimens.radiusMd),
                 border: Border.all(color: AppColors.border, width: 0.5),
               ),
@@ -85,7 +85,7 @@ class _CategoryChip extends StatelessWidget {
 
   Widget _fallbackIcon() {
     return Container(
-      color: AppColors.primarySurface.withOpacity(0.4),
+      color: AppColors.primarySurface.withValues(alpha: 0.4),
       child: const Icon(Icons.eco_outlined, size: 28, color: AppColors.primaryLight),
     );
   }

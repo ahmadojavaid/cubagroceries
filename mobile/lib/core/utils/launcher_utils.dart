@@ -1,3 +1,4 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -44,7 +45,9 @@ class LauncherUtils {
       return true;
     }
 
-    _showSnackbar(context, 'Could not open Google Maps.');
+    if (context != null && context.mounted) {
+      _showSnackbar(context, 'Could not open Google Maps.');
+    }
     return false;
   }
 
@@ -75,7 +78,9 @@ class LauncherUtils {
       return true;
     }
 
-    _showSnackbar(context, 'Could not open WhatsApp.');
+    if (context != null && context.mounted) {
+      _showSnackbar(context, 'Could not open WhatsApp.');
+    }
     return false;
   }
 
@@ -90,7 +95,9 @@ class LauncherUtils {
       await launchUrl(uri);
       return true;
     }
-    _showSnackbar(context, 'Could not open phone dialer.');
+    if (context != null && context.mounted) {
+      _showSnackbar(context, 'Could not open phone dialer.');
+    }
     return false;
   }
 

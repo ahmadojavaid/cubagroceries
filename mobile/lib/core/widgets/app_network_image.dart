@@ -114,7 +114,7 @@ class _AppNetworkImageState extends State<AppNetworkImage> {
       width: widget.width,
       height: widget.height,
       fit: widget.fit,
-      errorBuilder: (_, __, ___) => widget.errorWidget ?? _defaultError(),
+      errorBuilder: (_, _, _) => widget.errorWidget ?? _defaultError(),
     );
   }
 

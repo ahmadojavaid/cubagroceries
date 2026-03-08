@@ -222,7 +222,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return historyAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => _buildEmptySearchState(),
+      error: (_, _) => _buildEmptySearchState(),
       data: (history) {
         // Filter history by typed text if the user has typed something
         final filtered = typedText.isEmpty

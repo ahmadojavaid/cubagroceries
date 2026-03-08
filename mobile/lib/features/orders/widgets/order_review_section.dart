@@ -161,7 +161,7 @@ class _ProductReviewsCard extends ConsumerWidget {
       ),
       child: reviewableAsync.when(
         loading: () => const _SectionShimmer(),
-        error: (_, __) => const Text('Could not load products',
+        error: (_, _) => const Text('Could not load products',
             style: TextStyle(color: AppColors.textHint, fontSize: 13)),
         data: (data) {
           final products =
@@ -248,7 +248,7 @@ class _ProductReviewRow extends ConsumerWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: AppColors.success.withOpacity(0.08),
+                color: AppColors.success.withValues(alpha: 0.08),
                 borderRadius:
                     BorderRadius.circular(AppDimens.radiusFull),
               ),
@@ -330,7 +330,7 @@ class _ReviewPrompt extends StatelessWidget {
           width: 42,
           height: 42,
           decoration: BoxDecoration(
-            color: AppColors.warning.withOpacity(0.1),
+            color: AppColors.warning.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, size: 22, color: AppColors.warning),
@@ -353,7 +353,7 @@ class _ReviewPrompt extends StatelessWidget {
           onPressed: onTap,
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            backgroundColor: AppColors.primary.withOpacity(0.08),
+            backgroundColor: AppColors.primary.withValues(alpha: 0.08),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppDimens.radiusMd),
             ),

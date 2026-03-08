@@ -1,6 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/auth/providers/auth_provider.dart';
 import '../../features/notifications/providers/notification_provider.dart';
 import '../../features/orders/providers/order_provider.dart';
 import '../../features/rider/providers/rider_orders_provider.dart';
@@ -19,15 +20,18 @@ final fcmServiceProvider = Provider<FcmService>((ref) {
 final fcmNotificationHandlerProvider = Provider<FcmNotificationHandler>((ref) {
   final handler = FcmNotificationHandler(
     navigatorKey: navigatorKey,
-    onNotificationTap: (orderNumber) {
+    onNotificationTap: (orderNumber) async {
       if (orderNumber == null) return;
-      final context = navigatorKey.currentContext;
-      if (context == null) return;
-      final isRider = ref.read(isRiderProvider);
-      final route = isRider
+      // Check role from secure storage to avoid circular provider dependency
+      final storage = const FlutterSecureStorage();
+      final role = await storage.read(key: 'user_role');
+      final route = role == 'rider'
           ? '/rider/orders/$orderNumber'
           : '/orders/$orderNumber';
-      GoRouter.of(context).push(route);
+      // Re-check context after async gap
+      final ctx = navigatorKey.currentContext;
+      if (ctx == null) return;
+      GoRouter.of(ctx).push(route);
     },
     onDataChanged: () {
       // Refresh order lists and notification count when a status change arrives

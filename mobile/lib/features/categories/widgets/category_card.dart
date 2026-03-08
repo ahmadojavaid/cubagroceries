@@ -32,7 +32,7 @@ class CategoryCard extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppColors.primarySurface.withOpacity(0.5),
+                color: AppColors.primarySurface.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
               ),
               clipBehavior: Clip.antiAlias,
@@ -65,26 +65,11 @@ class CategoryCard extends StatelessWidget {
     );
   }
 
-  Widget _imagePlaceholder() {
-    return Container(
-      width: 72,
-      height: 72,
-      color: AppColors.primarySurface.withOpacity(0.3),
-      child: const Center(
-        child: SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(strokeWidth: 1.5),
-        ),
-      ),
-    );
-  }
-
   Widget _imageFallback() {
     return Container(
       width: 72,
       height: 72,
-      color: AppColors.primarySurface.withOpacity(0.4),
+      color: AppColors.primarySurface.withValues(alpha: 0.4),
       child: Icon(
         Icons.eco_outlined,
         size: 30,

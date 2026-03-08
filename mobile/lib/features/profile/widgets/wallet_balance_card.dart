@@ -22,7 +22,7 @@ class WalletBalanceCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.15),
+              color: AppColors.primary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppDimens.radiusSm),
             ),
             child: const Icon(
@@ -38,7 +38,7 @@ class WalletBalanceCard extends StatelessWidget {
                 'Wallet Balance',
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.primary.withOpacity(0.7),
+                  color: AppColors.primary.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(height: 2),

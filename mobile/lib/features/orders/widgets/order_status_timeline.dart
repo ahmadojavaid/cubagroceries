@@ -125,9 +125,9 @@ class _OrderStatusTimelineState extends State<OrderStatusTimeline>
         vertical: AppDimens.lg,
       ),
       decoration: BoxDecoration(
-        color: AppColors.error.withOpacity(0.05),
+        color: AppColors.error.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: AppColors.error.withOpacity(0.2)),
+        border: Border.all(color: AppColors.error.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -200,7 +200,7 @@ class _OrderStatusTimelineState extends State<OrderStatusTimeline>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: color.withOpacity(_glowAnimation.value),
+                    color: color.withValues(alpha: _glowAnimation.value),
                     blurRadius: 12,
                     spreadRadius: 2,
                   ),
@@ -225,7 +225,7 @@ class _OrderStatusTimelineState extends State<OrderStatusTimeline>
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
+              color: color.withValues(alpha: 0.3),
               blurRadius: 8,
               spreadRadius: 1,
             ),

@@ -57,7 +57,7 @@ class ProductRatingIndicator extends ConsumerWidget {
 
     return summaryAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
       data: (summary) {
         if (summary == null) {
           // No reviews — show subtle hint
@@ -80,7 +80,7 @@ class ProductRatingIndicator extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-                border: Border.all(color: AppColors.border.withOpacity(0.6)),
+                border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
               ),
               child: Row(
                 children: [
@@ -95,7 +95,7 @@ class ProductRatingIndicator extends ConsumerWidget {
                     }
                     return Icon(Icons.star_border_rounded,
                         size: 20,
-                        color: AppColors.ratingStar.withOpacity(0.35));
+                        color: AppColors.ratingStar.withValues(alpha: 0.35));
                   }),
                   const SizedBox(width: 10),
                   // Average
@@ -137,7 +137,7 @@ class _NoReviewsHint extends StatelessWidget {
       child: Row(
         children: [
           Icon(Icons.star_border_rounded,
-              size: 18, color: AppColors.textHint.withOpacity(0.5)),
+              size: 18, color: AppColors.textHint.withValues(alpha: 0.5)),
           const SizedBox(width: 6),
           const Text(
             'No reviews yet',
