@@ -315,7 +315,8 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen>
           // Delivery estimate countdown (only visible when dispatched)
           DeliveryEstimateCard(order: order),
 
-          if (order.hasDeliveryEstimate && order.status == 'dispatched')
+          if (order.hasDeliveryEstimate &&
+              (order.status == 'dispatched' || order.status == 'confirmed'))
             const SizedBox(height: AppDimens.md),
 
           // Rider details card

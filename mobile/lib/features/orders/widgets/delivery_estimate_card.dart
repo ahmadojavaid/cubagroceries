@@ -46,9 +46,11 @@ class _DeliveryEstimateCardState extends State<DeliveryEstimateCard>
   Widget build(BuildContext context) {
     final order = widget.order;
 
-    // Only show for dispatched orders with a delivery estimate
+    // Only show for active orders with a delivery estimate
     if (!order.hasDeliveryEstimate) return const SizedBox.shrink();
-    if (order.status != 'dispatched') return const SizedBox.shrink();
+    if (order.status != 'dispatched' && order.status != 'confirmed') {
+      return const SizedBox.shrink();
+    }
 
     final target = order.estDeliveryTime!;
     final now = DateTime.now();
@@ -106,13 +108,19 @@ class _DeliveryEstimateCardState extends State<DeliveryEstimateCard>
               Icon(
                 isOverdue
                     ? Icons.timer_off_outlined
-                    : Icons.delivery_dining_rounded,
+                    : order.status == 'dispatched'
+                        ? Icons.delivery_dining_rounded
+                        : Icons.schedule_rounded,
                 size: 18,
                 color: primaryColor,
               ),
               const SizedBox(width: 8),
               Text(
-                isOverdue ? 'Delivery Delayed' : 'Rider On The Way',
+                isOverdue
+                    ? 'Delivery Delayed'
+                    : order.status == 'dispatched'
+                        ? 'Rider On The Way'
+                        : 'Estimated Delivery Time',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
