@@ -47,6 +47,7 @@ class OrderDetailModel {
   final int? estDeliveryMinutes;
   final DateTime? estDeliverySetAt;
   final RiderModel? rider;
+  final OrderReviewData? orderReview;
 
   const OrderDetailModel({
     required this.id,
@@ -59,6 +60,7 @@ class OrderDetailModel {
     this.estDeliveryMinutes,
     this.estDeliverySetAt,
     this.rider,
+    this.orderReview,
   });
 
   factory OrderDetailModel.fromJson(Map<String, dynamic> json) {
@@ -86,8 +88,15 @@ class OrderDetailModel {
           ? RiderModel.fromJson(
               Map<String, dynamic>.from(json['delivery_boy']))
           : null,
+      orderReview: json['order_review'] != null
+          ? OrderReviewData.fromJson(
+              Map<String, dynamic>.from(json['order_review']))
+          : null,
     );
   }
+
+  /// Whether this order already has a review submitted
+  bool get isReviewed => orderReview != null;
 
   /// Whether this order has an active delivery estimate to show
   bool get hasDeliveryEstimate =>
@@ -192,6 +201,27 @@ class RiderModel {
       id: json['id'],
       name: json['name'] ?? '',
       phone: json['phone'] as String?,
+    );
+  }
+}
+
+/// Embedded order review data from the order detail response
+class OrderReviewData {
+  final int id;
+  final int rating;
+  final String? comment;
+
+  const OrderReviewData({
+    required this.id,
+    required this.rating,
+    this.comment,
+  });
+
+  factory OrderReviewData.fromJson(Map<String, dynamic> json) {
+    return OrderReviewData(
+      id: json['id'],
+      rating: json['rating'] ?? 0,
+      comment: json['comment'] as String?,
     );
   }
 }

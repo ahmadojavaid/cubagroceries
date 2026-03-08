@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/api_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../providers/order_provider.dart';
 
 // ─── Providers ──────────────────────────────────────────────
 
@@ -38,11 +39,17 @@ final reviewableProductsProvider =
 class OrderReviewSection extends ConsumerWidget {
   final int orderId;
   final String orderStatus;
+  final bool isReviewed;
+  final int? reviewRating;
+  final String? reviewComment;
 
   const OrderReviewSection({
     super.key,
     required this.orderId,
     required this.orderStatus,
+    this.isReviewed = false,
+    this.reviewRating,
+    this.reviewComment,
   });
 
   @override
@@ -54,7 +61,12 @@ class OrderReviewSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: AppDimens.md),
-        _OrderReviewCard(orderId: orderId),
+        _OrderReviewCard(
+          orderId: orderId,
+          isReviewed: isReviewed,
+          existingRating: reviewRating,
+          existingComment: reviewComment,
+        ),
         const SizedBox(height: AppDimens.sm),
         _ProductReviewsCard(orderId: orderId),
       ],
@@ -66,12 +78,19 @@ class OrderReviewSection extends ConsumerWidget {
 
 class _OrderReviewCard extends ConsumerWidget {
   final int orderId;
-  const _OrderReviewCard({required this.orderId});
+  final bool isReviewed;
+  final int? existingRating;
+  final String? existingComment;
+
+  const _OrderReviewCard({
+    required this.orderId,
+    this.isReviewed = false,
+    this.existingRating,
+    this.existingComment,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final reviewAsync = ref.watch(orderReviewProvider(orderId));
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppDimens.md),
@@ -80,31 +99,26 @@ class _OrderReviewCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
         border: Border.all(color: AppColors.border, width: 0.5),
       ),
-      child: reviewAsync.when(
-        loading: () => const _SectionShimmer(),
-        error: (_, __) => const Text('Could not load review',
-            style: TextStyle(color: AppColors.textHint, fontSize: 13)),
-        data: (review) {
-          if (review != null) {
-            return _ExistingReview(
+      child: isReviewed
+          ? _ExistingReview(
               title: 'Your Order Rating',
-              rating: review['rating'] as int,
-              comment: review['comment'] as String?,
-            );
-          }
-          return _ReviewPrompt(
-            icon: Icons.star_border_rounded,
-            title: 'Rate your experience',
-            subtitle: 'How was your overall order?',
-            buttonLabel: 'Rate Order',
-            onTap: () => _showOrderReviewDialog(context, ref),
-          );
-        },
-      ),
+              rating: existingRating ?? 5,
+              comment: existingComment,
+            )
+          : _ReviewPrompt(
+              icon: Icons.star_border_rounded,
+              title: 'Rate your experience',
+              subtitle: 'How was your overall order?',
+              buttonLabel: 'Rate Order',
+              onTap: () => _showOrderReviewDialog(context, ref),
+            ),
     );
   }
 
   void _showOrderReviewDialog(BuildContext context, WidgetRef ref) {
+    // Read the order number before showing dialog
+    final orderNumber = ref.read(orderActionProvider).placedOrder?.orderId;
+
     showDialog(
       context: context,
       builder: (_) => _WriteReviewDialog(
@@ -117,7 +131,10 @@ class _OrderReviewCard extends ConsumerWidget {
             'rating': rating,
             'comment': comment,
           });
-          ref.invalidate(orderReviewProvider(orderId));
+          // Refetch order detail so isReviewed updates
+          if (orderNumber != null) {
+            ref.read(orderActionProvider.notifier).fetchOrderDetail(orderNumber);
+          }
         },
       ),
     );

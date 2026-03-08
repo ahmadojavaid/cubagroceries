@@ -40,7 +40,7 @@ class OrderController extends Controller
     {
         $order = Order::where('order_id', $orderNumber)
             ->where('user_id', $request->user()->id)
-            ->with(['address', 'products.product', 'products.unit', 'deliveryBoy:id,name,phone'])
+            ->with(['address', 'products.product', 'products.unit', 'deliveryBoy:id,name,phone', 'orderReview'])
             ->first();
 
         if (!$order) {

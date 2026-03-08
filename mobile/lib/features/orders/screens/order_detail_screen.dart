@@ -40,6 +40,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen>
 
       if (order != null &&
           order.status == 'delivered' &&
+          !order.isReviewed &&
           !_reviewPromptShown &&
           mounted) {
         _maybeShowReviewPopup(order);
@@ -453,6 +454,9 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen>
           OrderReviewSection(
             orderId: order.id,
             orderStatus: order.status,
+            isReviewed: order.isReviewed,
+            reviewRating: order.orderReview?.rating,
+            reviewComment: order.orderReview?.comment,
           ),
 
           const SizedBox(height: AppDimens.lg),
