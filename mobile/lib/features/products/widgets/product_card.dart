@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../../../core/widgets/app_network_image.dart';
@@ -186,7 +187,12 @@ class ProductCard extends ConsumerWidget {
                                               BorderRadius.circular(10),
                                         ),
                                         duration: const Duration(
-                                            milliseconds: 1500),
+                                            milliseconds: 2000),
+                                        action: SnackBarAction(
+                                          label: 'VIEW CART',
+                                          textColor: Colors.white,
+                                          onPressed: () => context.push('/cart'),
+                                        ),
                                       ),
                                     );
                                 },
