@@ -18,12 +18,23 @@ class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
   final _otpController = TextEditingController();
   String? _verificationId;
   bool _otpSent = false;
+  int _resendCountdown = 0;
 
   @override
   void dispose() {
     _phoneController.dispose();
     _otpController.dispose();
     super.dispose();
+  }
+
+  void _startResendTimer() {
+    setState(() => _resendCountdown = 60);
+    Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return false;
+      setState(() => _resendCountdown--);
+      return _resendCountdown > 0;
+    });
   }
 
   String get _fullPhoneNumber {
@@ -45,6 +56,7 @@ class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
             _verificationId = verificationId;
             _otpSent = true;
           });
+          _startResendTimer();
         }
       },
       onError: (error) {
@@ -240,8 +252,14 @@ class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
                     ),
                     const SizedBox(width: 8),
                     TextButton(
-                      onPressed: auth.isLoading ? null : _sendOtp,
-                      child: const Text('Resend OTP'),
+                      onPressed: (auth.isLoading || _resendCountdown > 0)
+                          ? null
+                          : _sendOtp,
+                      child: Text(
+                        _resendCountdown > 0
+                            ? 'Resend (${_resendCountdown}s)'
+                            : 'Resend OTP',
+                      ),
                     ),
                   ],
                 ),
