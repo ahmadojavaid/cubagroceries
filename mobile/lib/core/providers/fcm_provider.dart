@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/auth/providers/auth_provider.dart';
 import '../../features/notifications/providers/notification_provider.dart';
 import '../../features/orders/providers/order_provider.dart';
 import '../../features/rider/providers/rider_orders_provider.dart';
@@ -22,7 +23,11 @@ final fcmNotificationHandlerProvider = Provider<FcmNotificationHandler>((ref) {
       if (orderNumber == null) return;
       final context = navigatorKey.currentContext;
       if (context == null) return;
-      GoRouter.of(context).push('/orders/$orderNumber');
+      final isRider = ref.read(isRiderProvider);
+      final route = isRider
+          ? '/rider/orders/$orderNumber'
+          : '/orders/$orderNumber';
+      GoRouter.of(context).push(route);
     },
     onDataChanged: () {
       // Refresh order lists and notification count when a status change arrives
