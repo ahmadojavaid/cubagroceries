@@ -46,7 +46,6 @@ class StoreHolidayMode extends Page
             'holiday_start' => AppSetting::getValue('holiday_start', null),
             'holiday_end' => AppSetting::getValue('holiday_end', null),
             'allow_advance_orders' => AppSetting::getValue('allow_advance_orders', '1') === '1',
-            'enforce_daily_schedule' => AppSetting::getValue('enforce_daily_schedule', '0') === '1',
         ]);
     }
 
@@ -99,28 +98,6 @@ class StoreHolidayMode extends Page
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Daily Operating Hours')
-                    ->description('Automatically go offline outside store hours. Configure hours in Operations → Store Schedules.')
-                    ->schema([
-                        Forms\Components\Toggle::make('enforce_daily_schedule')
-                            ->label('Enforce daily store schedule')
-                            ->helperText('When enabled, the store automatically goes offline outside the operating hours set in Store Schedules. The holiday title and message below will be shown to customers.')
-                            ->live(),
-
-                        Forms\Components\Placeholder::make('today_schedule')
-                            ->label('Today\'s Schedule')
-                            ->content(function () {
-                                $schedule = StoreSchedule::getTodaySchedule();
-                                if (! $schedule) return 'No schedule set for today — store stays online.';
-                                if ($schedule['is_closed']) return '⛔ Today is marked as Closed.';
-                                $open = \Carbon\Carbon::parse($schedule['open_time'])->format('g:i A');
-                                $close = \Carbon\Carbon::parse($schedule['close_time'])->format('g:i A');
-                                $isInHours = ! StoreSchedule::isOutsideOperatingHours();
-                                $status = $isInHours ? '🟢 Currently within hours' : '🔴 Currently outside hours';
-                                return "{$open} — {$close} ({$status})";
-                            })
-                            ->visible(fn (Forms\Get $get) => $get('enforce_daily_schedule')),
-                    ]),
             ])
             ->statePath('data');
     }
@@ -152,7 +129,6 @@ class StoreHolidayMode extends Page
         AppSetting::setValue('holiday_start', $formData['holiday_start']);
         AppSetting::setValue('holiday_end', $formData['holiday_end']);
         AppSetting::setValue('allow_advance_orders', ($formData['allow_advance_orders'] ?? true) ? '1' : '0');
-        AppSetting::setValue('enforce_daily_schedule', ($formData['enforce_daily_schedule'] ?? false) ? '1' : '0');
 
         // Handle image upload
         $image = $formData['holiday_image'] ?? null;
