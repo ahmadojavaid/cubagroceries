@@ -25,14 +25,7 @@ class OrdersRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'confirmed' => 'info',
-                        'dispatched' => 'primary',
-                        'delivered' => 'success',
-                        'cancelled' => 'danger',
-                        default => 'gray',
-                    }),
+                    ->color(fn (\App\Enums\OrderStatus $state): string => $state->color()),
 
                 Tables\Columns\TextColumn::make('total_amount')
                     ->label('Total')
