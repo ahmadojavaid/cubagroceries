@@ -23,6 +23,16 @@ class PriceModel {
   /// Parsed numeric price
   double get priceValue => double.tryParse(price) ?? 0.0;
 
-  /// Formatted display: "Rs 120.00 / kg"
-  String get displayPrice => 'Rs $price / ${unit.label}';
+  /// Clean price string: strips .00 for whole numbers (250.00 → 250, 99.50 → 99.50)
+  String get cleanPrice => formatRs(priceValue);
+
+  /// Formatted display: "Rs 120 / kg"
+  String get displayPrice => 'Rs ${cleanPrice} / ${unit.label}';
+
+  /// Format a numeric price: drop .00 for whole numbers
+  static String formatRs(double value) {
+    return value == value.roundToDouble()
+        ? value.toStringAsFixed(0)
+        : value.toStringAsFixed(2);
+  }
 }

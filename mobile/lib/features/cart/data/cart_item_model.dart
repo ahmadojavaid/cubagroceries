@@ -22,11 +22,18 @@ class CartItemModel {
   /// Unique key for this cart item (product + unit combination)
   String get cartKey => '${productId}_$unitId';
 
+  /// Format a numeric price: drop .00 for whole numbers
+  static String _formatRs(double value) {
+    return value == value.roundToDouble()
+        ? value.toStringAsFixed(0)
+        : value.toStringAsFixed(2);
+  }
+
   /// Formatted price display
-  String get displayPrice => 'Rs ${price.toStringAsFixed(2)} / $unitName';
+  String get displayPrice => 'Rs ${_formatRs(price)} / $unitName';
 
   /// Formatted line total display
-  String get displayLineTotal => 'Rs ${lineTotal.toStringAsFixed(2)}';
+  String get displayLineTotal => 'Rs ${_formatRs(lineTotal)}';
 
   factory CartItemModel.fromJson(Map<String, dynamic> json) {
     return CartItemModel(

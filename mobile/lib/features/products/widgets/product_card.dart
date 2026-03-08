@@ -134,7 +134,7 @@ class ProductCard extends ConsumerWidget {
                       Expanded(
                         child: price != null
                             ? Text(
-                                'Rs ${price.price}',
+                                'Rs ${price.cleanPrice}',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w800,

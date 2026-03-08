@@ -643,7 +643,7 @@ class _PriceChip extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                'Rs ${price.price}',
+                'Rs ${price.cleanPrice}',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,

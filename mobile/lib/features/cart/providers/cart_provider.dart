@@ -21,7 +21,11 @@ class CartState {
       items.fold(0.0, (sum, item) => sum + item.lineTotal);
 
   /// Formatted subtotal
-  String get displaySubtotal => 'Rs ${subtotal.toStringAsFixed(2)}';
+  String get displaySubtotal {
+    return subtotal == subtotal.roundToDouble()
+        ? 'Rs ${subtotal.toStringAsFixed(0)}'
+        : 'Rs ${subtotal.toStringAsFixed(2)}';
+  }
 
   /// Whether cart is empty
   bool get isEmpty => items.isEmpty;
