@@ -49,21 +49,72 @@ class CategoryListingScreen extends ConsumerWidget {
 
     return CustomScrollView(
       slivers: [
-        // Collapsing header with category image
+        // Hero header with category image
         SliverAppBar(
-          expandedHeight: parent?.image != null ? 200 : 0,
+          expandedHeight: parent?.image != null ? 240 : 0,
           floating: false,
           pinned: true,
+          stretch: true,
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
           flexibleSpace: parent?.image != null
               ? FlexibleSpaceBar(
-                  title: Text(
-                    parent!.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18,
-                      shadows: [
-                        Shadow(color: Colors.black54, blurRadius: 12),
+                  titlePadding: const EdgeInsets.only(
+                    left: 20, right: 20, bottom: 16,
+                  ),
+                  title: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.55),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.15),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.storefront_rounded,
+                          color: Colors.white,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            parent!.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                              letterSpacing: 0.2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (children.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${children.length}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -74,15 +125,18 @@ class CategoryListingScreen extends ConsumerWidget {
                         imageUrl: parent.image,
                         fit: BoxFit.cover,
                       ),
-                      // Dark gradient overlay
-                      Container(
+                      // Multi-stop gradient for depth
+                      DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
+                            stops: const [0.0, 0.4, 0.75, 1.0],
                             colors: [
+                              Colors.black.withOpacity(0.25),
                               Colors.transparent,
-                              Colors.black.withOpacity(0.6),
+                              Colors.black.withOpacity(0.15),
+                              Colors.black.withOpacity(0.65),
                             ],
                           ),
                         ),

@@ -36,6 +36,14 @@ class ProfileController extends Controller
 
         $request->user()->update($validated);
 
+        // Sync name to linked delivery boy record (if rider)
+        if ($request->user()->deliveryBoy) {
+            $fullName = trim(($validated['firstname'] ?? '') . ' ' . ($validated['lastname'] ?? ''));
+            if ($fullName) {
+                $request->user()->deliveryBoy->update(['name' => $fullName]);
+            }
+        }
+
         return $this->success($request->user()->fresh(), 'Profile updated successfully');
     }
 
