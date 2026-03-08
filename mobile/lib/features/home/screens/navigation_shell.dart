@@ -55,8 +55,8 @@ class _NavigationShellState extends ConsumerState<NavigationShell> {
         final now = DateTime.now();
         if (_lastBackPress != null &&
             now.difference(_lastBackPress!) < const Duration(seconds: 2)) {
-          // Second press within 2s — exit
-          Navigator.of(context).pop();
+          // Second press within 2s — exit the app
+          SystemNavigator.pop();
           return;
         }
 
