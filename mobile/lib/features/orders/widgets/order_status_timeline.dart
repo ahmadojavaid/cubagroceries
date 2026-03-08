@@ -239,7 +239,8 @@ class _OrderStatusTimelineState extends State<OrderStatusTimeline>
       );
     }
 
-    return Expanded(
+    return SizedBox(
+      width: 64,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -253,6 +254,8 @@ class _OrderStatusTimelineState extends State<OrderStatusTimeline>
               color: isCompleted ? AppColors.textPrimary : AppColors.textHint,
             ),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
