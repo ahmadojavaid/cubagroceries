@@ -242,7 +242,7 @@
     <p>If you have any questions or concerns about this Privacy Policy, please contact us:</p>
     <div class="contact-card">
         <p><strong>Asif Groceries</strong><br>
-        Email: <a href="mailto:support@asifgroceries.pk">support@asifgroceries.pk</a><br>
+        Email: <a href="mailto:ahmadomer@zegobyte.com">ahmadomer@zegobyte.com</a><br>
         Pakistan</p>
     </div>
 
