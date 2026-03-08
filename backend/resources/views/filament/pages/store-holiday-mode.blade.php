@@ -28,7 +28,7 @@
                     </h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                         @if($this->is_store_offline)
-                            Customers see the holiday banner. {{ $this->allow_advance_orders ? '"Order for Later" is enabled.' : 'Ordering is disabled.' }}
+                            Customers see the holiday banner. {{ ($this->data['allow_advance_orders'] ?? true) ? '"Order for Later" is enabled.' : 'Ordering is disabled.' }}
                         @else
                             Store is accepting orders normally.
                         @endif

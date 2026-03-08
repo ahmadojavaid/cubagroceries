@@ -28,32 +28,23 @@ class StoreHolidayMode extends Page
 
     protected static string $view = 'filament.pages.store-holiday-mode';
 
-    // Form state
+    // Toggle state (not part of the form)
     public bool $is_store_offline = false;
-    public ?string $holiday_title = '';
-    public ?string $holiday_message = '';
-    public ?string $holiday_image = null;
-    public ?string $holiday_start = null;
-    public ?string $holiday_end = null;
-    public bool $allow_advance_orders = true;
+
+    // Form data array — Filament binds to this via statePath('data')
+    public ?array $data = [];
 
     public function mount(): void
     {
         $this->is_store_offline = AppSetting::getValue('is_store_offline', '0') === '1';
-        $this->holiday_title = AppSetting::getValue('holiday_title', '');
-        $this->holiday_message = AppSetting::getValue('holiday_message', '');
-        $this->holiday_image = AppSetting::getValue('holiday_image', null);
-        $this->holiday_start = AppSetting::getValue('holiday_start', null);
-        $this->holiday_end = AppSetting::getValue('holiday_end', null);
-        $this->allow_advance_orders = AppSetting::getValue('allow_advance_orders', '1') === '1';
 
         $this->form->fill([
-            'holiday_title' => $this->holiday_title,
-            'holiday_message' => $this->holiday_message,
-            'holiday_image' => $this->holiday_image,
-            'holiday_start' => $this->holiday_start,
-            'holiday_end' => $this->holiday_end,
-            'allow_advance_orders' => $this->allow_advance_orders,
+            'holiday_title' => AppSetting::getValue('holiday_title', ''),
+            'holiday_message' => AppSetting::getValue('holiday_message', ''),
+            'holiday_image' => AppSetting::getValue('holiday_image', null),
+            'holiday_start' => AppSetting::getValue('holiday_start', null),
+            'holiday_end' => AppSetting::getValue('holiday_end', null),
+            'allow_advance_orders' => AppSetting::getValue('allow_advance_orders', '1') === '1',
         ]);
     }
 
@@ -109,12 +100,6 @@ class StoreHolidayMode extends Page
             ->statePath('data');
     }
 
-    // Override to use properties directly
-    protected function getFormStatePath(): ?string
-    {
-        return null;
-    }
-
     /**
      * Instant toggle: take store offline/online immediately.
      */
@@ -135,25 +120,23 @@ class StoreHolidayMode extends Page
      */
     public function save(): void
     {
-        $this->validate([
-            'holiday_title' => 'nullable|string|max:200',
-            'holiday_message' => 'nullable|string|max:1000',
-            'holiday_start' => 'nullable|date',
-            'holiday_end' => 'nullable|date|after:holiday_start',
-        ]);
+        $formData = $this->form->getState();
 
-        AppSetting::setValue('holiday_title', $this->holiday_title ?: null);
-        AppSetting::setValue('holiday_message', $this->holiday_message ?: null);
-        AppSetting::setValue('holiday_start', $this->holiday_start);
-        AppSetting::setValue('holiday_end', $this->holiday_end);
-        AppSetting::setValue('allow_advance_orders', $this->allow_advance_orders ? '1' : '0');
+        AppSetting::setValue('holiday_title', $formData['holiday_title'] ?: null);
+        AppSetting::setValue('holiday_message', $formData['holiday_message'] ?: null);
+        AppSetting::setValue('holiday_start', $formData['holiday_start']);
+        AppSetting::setValue('holiday_end', $formData['holiday_end']);
+        AppSetting::setValue('allow_advance_orders', ($formData['allow_advance_orders'] ?? true) ? '1' : '0');
 
         // Handle image upload
-        if ($this->holiday_image && $this->holiday_image instanceof TemporaryUploadedFile) {
-            $path = $this->holiday_image->store('holidays', 'public');
+        $image = $formData['holiday_image'] ?? null;
+        if ($image && $image instanceof TemporaryUploadedFile) {
+            $path = $image->store('holidays', 'public');
             AppSetting::setValue('holiday_image', $path);
-            $this->holiday_image = $path;
-        } elseif ($this->holiday_image === null) {
+        } elseif (is_string($image)) {
+            // Existing path string — keep it
+            AppSetting::setValue('holiday_image', $image);
+        } else {
             AppSetting::setValue('holiday_image', null);
         }
 
