@@ -59,6 +59,7 @@ class CategoryListingScreen extends ConsumerWidget {
                   title: Text(
                     parent!.title,
                     style: const TextStyle(
+                      color: Colors.white,
                       fontWeight: FontWeight.w700,
                       fontSize: 18,
                       shadows: [
