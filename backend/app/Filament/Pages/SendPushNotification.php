@@ -193,13 +193,14 @@ class SendPushNotification extends Page implements HasForms
         $users = User::where('role', 'customer')->get();
         $sentCount = 0;
         $totalCount = $users->count();
+        $pushedTokens = []; // Track tokens already pushed to avoid duplicates
 
         foreach ($users as $user) {
             // Save in database for all
             $user->notify(new ManualPush($title, $message, $imageUrl));
 
-            // Send push to those with tokens
-            if ($user->fcm_token) {
+            // Send push to those with tokens (skip duplicate tokens)
+            if ($user->fcm_token && !in_array($user->fcm_token, $pushedTokens)) {
                 $success = FcmService::sendToDevice(
                     fcmToken: $user->fcm_token,
                     title: $title,
@@ -209,6 +210,7 @@ class SendPushNotification extends Page implements HasForms
                     imageUrl: $imageUrl,
                 );
                 if ($success) $sentCount++;
+                $pushedTokens[] = $user->fcm_token;
             }
         }
 
