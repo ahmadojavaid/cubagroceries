@@ -23,8 +23,8 @@ class HolidayBanner extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
         border: Border.all(
-          color: AppColors.warning.withOpacity(0.3),
-          width: 1,
+          color: AppColors.error.withOpacity(0.3),
+          width: 1.5,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -51,7 +51,7 @@ class HolidayBanner extends StatelessWidget {
           // Content
           Container(
             padding: const EdgeInsets.all(AppDimens.md),
-            color: AppColors.warning.withOpacity(0.06),
+            color: AppColors.error.withOpacity(0.06),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -59,22 +59,22 @@ class HolidayBanner extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppColors.warning.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(10),
+                        color: AppColors.error.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.event_busy_rounded,
-                          size: 22, color: AppColors.warning),
+                      child: const Icon(Icons.storefront_outlined,
+                          size: 24, color: AppColors.error),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         holiday.title,
                         style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.error,
                         ),
                       ),
                     ),
@@ -85,9 +85,9 @@ class HolidayBanner extends StatelessWidget {
                 // Message
                 Text(
                   holiday.message,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: AppColors.textPrimary.withOpacity(0.75),
                     height: 1.5,
                   ),
                 ),
