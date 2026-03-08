@@ -31,4 +31,16 @@ class AppSettingController extends Controller
             'data' => $settings,
         ]);
     }
+
+    /**
+     * GET /api/v1/store-status
+     * Lightweight endpoint returning just the holiday/offline status.
+     */
+    public function storeStatus()
+    {
+        return response()->json([
+            'success' => true,
+            'data' => \App\Filament\Pages\StoreHolidayMode::getHolidayData(),
+        ]);
+    }
 }

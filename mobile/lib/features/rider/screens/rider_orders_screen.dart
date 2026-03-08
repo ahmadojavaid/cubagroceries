@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
+import '../../../core/providers/store_status_provider.dart';
 import '../providers/rider_orders_provider.dart';
 
 class RiderOrdersScreen extends ConsumerStatefulWidget {
@@ -85,6 +86,11 @@ class _RiderOrdersScreenState extends ConsumerState<RiderOrdersScreen>
           // ── Header ──
           SliverToBoxAdapter(
             child: _buildHeader(context),
+          ),
+
+          // ── Store Offline Banner ──
+          SliverToBoxAdapter(
+            child: _StoreOfflineBanner(),
           ),
 
           // ── Status Dashboard Cards ──
@@ -636,6 +642,82 @@ class _EmptyState extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ─── Error State ────────────────────────────────────────────
+
+// ─── Store Offline Banner ────────────────────────────────
+
+class _StoreOfflineBanner extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final storeStatus = ref.watch(storeStatusProvider);
+
+    return storeStatus.when(
+      data: (holiday) {
+        if (holiday == null) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppDimens.pagePadding, 12, AppDimens.pagePadding, 0,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.error.withOpacity(0.06),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.error.withOpacity(0.15),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.storefront_outlined,
+                    size: 20,
+                    color: AppColors.error,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        holiday.title,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.error,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        holiday.message,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.error.withOpacity(0.75),
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

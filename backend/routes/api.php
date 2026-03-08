@@ -107,6 +107,7 @@ Route::prefix('v1')->group(function () {
 
         // App Settings (public config)
         Route::get('/settings', [AppSettingController::class, 'index']);
+        Route::get('/store-status', [AppSettingController::class, 'storeStatus']);
 
         // Coupons
         Route::post('/coupons/apply', [CouponController::class, 'apply']);
