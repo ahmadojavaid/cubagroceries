@@ -25,7 +25,7 @@
                 <p class="text-sm font-semibold text-gray-900 dark:text-white">New Activity</p>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5" x-text="toastMessage"></p>
             </div>
-            <button @click="showToast = false" class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+            <button @click="dismissToast()" class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -62,14 +62,37 @@
         muted: localStorage.getItem('admin_alert_muted') === 'true',
         audio: null,
         audioReady: false,
+        audioUnlocked: false,
         pollInterval: null,
 
         startPolling() {
-            // Try to pre-load WAV file
-            this.audio = new Audio('/sounds/admin_alert.wav');
-            this.audio.volume = 0.7;
+            // Pre-load MP3 file
+            this.audio = new Audio('/sounds/admin_alert.mp3');
+            this.audio.volume = 0.8;
+            this.audio.loop = true; // Loop until dismissed
             this.audio.addEventListener('canplaythrough', () => { this.audioReady = true; });
-            this.audio.addEventListener('error', () => { this.audioReady = false; });
+            this.audio.addEventListener('error', (e) => {
+                console.warn('Alert sound failed to load:', e);
+                this.audioReady = false;
+            });
+
+            // Unlock audio on any user interaction (browser autoplay policy)
+            const unlock = () => {
+                if (this.audioUnlocked) return;
+                // Play then immediately pause to unlock the audio context
+                if (this.audio) {
+                    const p = this.audio.play();
+                    if (p) p.then(() => {
+                        this.audio.pause();
+                        this.audio.currentTime = 0;
+                    }).catch(() => {});
+                }
+                this.audioUnlocked = true;
+                document.removeEventListener('click', unlock);
+                document.removeEventListener('keydown', unlock);
+            };
+            document.addEventListener('click', unlock, { once: false });
+            document.addEventListener('keydown', unlock, { once: false });
 
             // Poll every 15 seconds
             this.pollInterval = setInterval(() => this.poll(), 15000);
@@ -85,9 +108,6 @@
                     if (!this.muted) {
                         this.playSound();
                     }
-
-                    // Auto-hide toast after 8 seconds
-                    setTimeout(() => { this.showToast = false; }, 8000);
                 }
             } catch (e) {
                 // Silently ignore poll failures
@@ -95,59 +115,38 @@
         },
 
         playSound() {
-            // Try WAV file first, fallback to Web Audio API tone
-            if (this.audioReady) {
+            if (this.audioReady && this.audio) {
                 try {
                     this.audio.currentTime = 0;
-                    this.audio.play().catch(() => this.playFallbackTone());
-                    return;
-                } catch (e) {}
+                    this.audio.loop = true;
+                    this.audio.play().catch((e) => console.warn('Sound play blocked:', e));
+                } catch (e) {
+                    console.warn('Sound error:', e);
+                }
             }
-            this.playFallbackTone();
         },
 
-        playFallbackTone() {
-            // Generate a pleasant two-tone chime using Web Audio API
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const now = ctx.currentTime;
-
-                // Tone 1: A5 (880 Hz)
-                const osc1 = ctx.createOscillator();
-                const gain1 = ctx.createGain();
-                osc1.type = 'sine';
-                osc1.frequency.value = 880;
-                gain1.gain.setValueAtTime(0.4, now);
-                gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-                osc1.connect(gain1).connect(ctx.destination);
-                osc1.start(now);
-                osc1.stop(now + 0.25);
-
-                // Tone 2: C#6 (1108 Hz) — slightly delayed
-                const osc2 = ctx.createOscillator();
-                const gain2 = ctx.createGain();
-                osc2.type = 'sine';
-                osc2.frequency.value = 1108;
-                gain2.gain.setValueAtTime(0.35, now + 0.2);
-                gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
-                osc2.connect(gain2).connect(ctx.destination);
-                osc2.start(now + 0.2);
-                osc2.stop(now + 0.55);
-
-                // Clean up context after sounds finish
-                setTimeout(() => ctx.close(), 1000);
-            } catch (e) {
-                // Web Audio not available — silent
+        stopSound() {
+            if (this.audio) {
+                this.audio.pause();
+                this.audio.currentTime = 0;
             }
+        },
+
+        dismissToast() {
+            this.showToast = false;
+            this.stopSound();
         },
 
         toggleMute() {
             this.muted = !this.muted;
             localStorage.setItem('admin_alert_muted', this.muted);
+            if (this.muted) this.stopSound();
         },
 
         destroy() {
             if (this.pollInterval) clearInterval(this.pollInterval);
+            this.stopSound();
         }
     }));
 </script>
