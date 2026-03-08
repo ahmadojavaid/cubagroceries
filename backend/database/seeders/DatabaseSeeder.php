@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             ImageSeeder::class,
             SampleDataSeeder::class,
             SurveySeeder::class,
+            TestCredentialsSeeder::class,
         ]);
     }
 }

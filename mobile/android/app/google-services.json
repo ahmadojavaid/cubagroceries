@@ -12,7 +12,20 @@
           "package_name": "com.asifgroceries.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "970803843908-q2aq3h9ch08b1lfnqhmpirbv9vnrdbta.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.asifgroceries.app",
+            "certificate_hash": "f68be32f55dc8f0ef3aecb35e8d3447497621c84"
+          }
+        },
+        {
+          "client_id": "970803843908-1rvkl62d20kkrskg0qkfua9c8dts2kir.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBZ-ugQ5DOkYH7tIFtkbu1c0Y1slCAoMEY"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "970803843908-1rvkl62d20kkrskg0qkfua9c8dts2kir.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
