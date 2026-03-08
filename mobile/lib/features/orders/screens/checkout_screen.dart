@@ -493,76 +493,132 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     }
   }
 
-  /// Check if user has a phone number, prompt if missing.
-  /// Returns true if phone is available (or was just provided), false if user cancelled.
-  Future<bool> _ensurePhoneNumber() async {
+  /// Pre-flight check: ensure user has a real name and phone number before ordering.
+  /// Returns true if all info is available, false if user cancelled.
+  Future<bool> _ensureProfileComplete() async {
     final profile = ref.read(profileProvider).user;
     if (profile == null) return false;
 
     final phone = profile.identity.trim();
-    if (phone.isNotEmpty) return true;
+    final needsName = profile.firstname.trim().isEmpty ||
+        profile.firstname.trim().toLowerCase() == 'user';
+    final needsPhone = phone.isEmpty;
 
-    // Show dialog to collect phone number
-    _phoneController.clear();
-    final result = await showDialog<String>(
+    if (!needsName && !needsPhone) return true;
+
+    // Controllers for missing fields
+    final nameCtrl = TextEditingController(
+        text: needsName ? '' : profile.firstname);
+    final lastNameCtrl = TextEditingController(
+        text: needsName ? '' : profile.lastname);
+    _phoneController.text = needsPhone ? '' : phone;
+
+    final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16)),
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.phone_outlined, color: AppColors.primary, size: 22),
-              SizedBox(width: 10),
-              Text('Phone Number Required'),
+              Icon(
+                needsName ? Icons.person_outline : Icons.phone_outlined,
+                color: AppColors.primary,
+                size: 22,
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text('Complete Your Profile',
+                    style: TextStyle(fontSize: 18)),
+              ),
             ],
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Please provide your phone number so we can contact you about your delivery.',
-                style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                    height: 1.4),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                autofocus: true,
-                decoration: InputDecoration(
-                  labelText: 'Phone Number',
-                  hintText: '03001234567',
-                  prefixIcon: const Icon(Icons.phone_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'We need a few details before placing your order.',
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                      height: 1.4),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                if (needsName) ...[
+                  TextField(
+                    controller: nameCtrl,
+                    textCapitalization: TextCapitalization.words,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: 'First Name',
+                      hintText: 'Ali',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: lastNameCtrl,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: InputDecoration(
+                      labelText: 'Last Name',
+                      hintText: 'Khan',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                if (needsPhone)
+                  TextField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    autofocus: !needsName,
+                    decoration: InputDecoration(
+                      labelText: 'Phone Number',
+                      hintText: '03001234567',
+                      prefixIcon: const Icon(Icons.phone_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(ctx, null),
+              onPressed: () => Navigator.pop(ctx, false),
               child: const Text('Cancel'),
             ),
             FilledButton(
               onPressed: () {
-                final value = _phoneController.text.trim();
-                if (value.isEmpty) {
+                if (needsName && nameCtrl.text.trim().isEmpty) {
                   ScaffoldMessenger.of(ctx).showSnackBar(
                     const SnackBar(
-                      content: Text('Please enter a phone number'),
+                      content: Text('Please enter your first name'),
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
                   return;
                 }
-                Navigator.pop(ctx, value);
+                if (needsPhone && _phoneController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter your phone number'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                  return;
+                }
+                Navigator.pop(ctx, true);
               },
               child: const Text('Save & Continue'),
             ),
@@ -571,24 +627,27 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       },
     );
 
-    if (result == null || !mounted) return false;
+    if (result != true || !mounted) return false;
 
-    // Save phone to profile via API
-    final profile2 = ref.read(profileProvider).user!;
+    // Save to profile via API
+    final current = ref.read(profileProvider).user!;
     final success = await ref.read(profileProvider.notifier).updateProfile(
-          firstname: profile2.firstname,
-          lastname: profile2.lastname,
-          email: profile2.email,
-          identity: result,
+          firstname: needsName ? nameCtrl.text.trim() : current.firstname,
+          lastname: needsName ? lastNameCtrl.text.trim() : current.lastname,
+          email: current.email,
+          identity: needsPhone ? _phoneController.text.trim() : current.identity,
         );
+
+    nameCtrl.dispose();
+    lastNameCtrl.dispose();
 
     return success;
   }
 
   Future<void> _placeOrder() async {
-    // Ensure phone number exists before placing order
-    final hasPhone = await _ensurePhoneNumber();
-    if (!hasPhone) return;
+    // Ensure profile is complete (name + phone) before placing order
+    final profileOk = await _ensureProfileComplete();
+    if (!profileOk) return;
 
     final cart = ref.read(cartProvider);
 
