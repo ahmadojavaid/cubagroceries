@@ -4,7 +4,7 @@ class AppConfig {
   static const bool isProduction = true;
 
   // API Base URLs
-  static const String _prodBaseUrl = 'https://cubagroceries.zegobyte.com/api/v1';
+  static const String _prodBaseUrl = 'https://asifgroceries.pk/api/v1';
   static const String _devBaseUrl = 'https://10.0.2.2/api/v1';
 
   static String get baseUrl => isProduction ? _prodBaseUrl : _devBaseUrl;
