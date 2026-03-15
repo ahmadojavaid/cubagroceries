@@ -602,25 +602,25 @@
     <section class="testimonials">
         <div class="section-inner" style="text-align:center;">
             <span class="section-label">What Customers Say</span>
-            <h2 class="section-title">Loved by shoppers in Lahore.</h2>
+            <h2 class="section-title">Loved by shoppers around you.</h2>
             <div class="testimonials-grid reveal">
                 <div class="testimonial-card">
                     <div class="testimonial-stars">★★★★★</div>
                     <p class="testimonial-text">"The app is so easy to use. I order my weekly groceries in minutes and they always deliver on time."</p>
                     <div class="testimonial-author">Ayesha K.</div>
-                    <div class="testimonial-location">DHA, Lahore</div>
+                    <div class="testimonial-location">Model Town, Lahore</div>
                 </div>
                 <div class="testimonial-card">
                     <div class="testimonial-stars">★★★★★</div>
                     <p class="testimonial-text">"Fresh vegetables every time. The delivery rider is always polite and the packaging is excellent."</p>
                     <div class="testimonial-author">Usman M.</div>
-                    <div class="testimonial-location">Johar Town, Lahore</div>
+                    <div class="testimonial-location">Faisal Town, Lahore</div>
                 </div>
                 <div class="testimonial-card">
                     <div class="testimonial-stars">★★★★★</div>
                     <p class="testimonial-text">"Finally a grocery app that actually works well in Lahore. Great prices and the delivery is quick."</p>
                     <div class="testimonial-author">Fatima R.</div>
-                    <div class="testimonial-location">Gulberg, Lahore</div>
+                    <div class="testimonial-location">Garden Town, Lahore</div>
                 </div>
             </div>
         </div>
