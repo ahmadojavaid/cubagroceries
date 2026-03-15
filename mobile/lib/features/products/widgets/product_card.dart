@@ -186,11 +186,15 @@ class ProductCard extends ConsumerWidget {
                                               BorderRadius.circular(10),
                                         ),
                                         duration: const Duration(
-                                            milliseconds: 2000),
+                                            seconds: 2),
+                                        dismissDirection: DismissDirection.down,
                                         action: SnackBarAction(
                                           label: 'VIEW CART',
                                           textColor: Colors.white,
-                                          onPressed: () => context.push('/cart'),
+                                          onPressed: () {
+                                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                            context.push('/cart');
+                                          },
                                         ),
                                       ),
                                     );
