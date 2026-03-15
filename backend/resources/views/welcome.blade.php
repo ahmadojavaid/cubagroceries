@@ -569,7 +569,7 @@
                 <div class="cat-card"><div class="cat-emoji">🧀</div><div class="cat-name">Dairy</div></div>
                 <div class="cat-card"><div class="cat-emoji">🧹</div><div class="cat-name">Home Care</div></div>
                 <div class="cat-card"><div class="cat-emoji">🐾</div><div class="cat-name">Pet Care</div></div>
-                <div class="cat-card"><div class="cat-emoji">🍎</div><div class="cat-name">Phal Sabzi</div></div>
+                <div class="cat-card"><div class="cat-emoji">🍎</div><div class="cat-name">Fruits</div></div>
                 <div class="cat-card"><div class="cat-emoji">🥕</div><div class="cat-name">Vegetables</div></div>
             </div>
         </div>
