@@ -661,9 +661,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   icon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress),
               const SizedBox(height: AppDimens.md),
-              _textField(_dobController, 'Date of Birth (YYYY-MM-DD)',
-                  icon: Icons.cake_outlined,
-                  keyboardType: TextInputType.datetime),
+              _dateField(_dobController, 'Date of Birth',
+                  icon: Icons.cake_outlined),
               const SizedBox(height: AppDimens.lg),
               SizedBox(
                 width: double.infinity,
@@ -696,6 +695,52 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         prefixIcon: icon != null
             ? Icon(icon, size: 20, color: AppColors.textSecondary)
             : null,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+        ),
+      ),
+    );
+  }
+
+  Widget _dateField(TextEditingController controller, String label,
+      {IconData? icon}) {
+    return TextField(
+      controller: controller,
+      readOnly: true,
+      onTap: () async {
+        final now = DateTime.now();
+        DateTime initial;
+        try {
+          initial = DateTime.parse(controller.text);
+        } catch (_) {
+          initial = DateTime(2000, 1, 1);
+        }
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: initial,
+          firstDate: DateTime(1940),
+          lastDate: now,
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: AppColors.primary,
+                ),
+              ),
+              child: child!,
+            );
+          },
+        );
+        if (picked != null) {
+          controller.text = DateFormat('yyyy-MM-dd').format(picked);
+        }
+      },
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: icon != null
+            ? Icon(icon, size: 20, color: AppColors.textSecondary)
+            : null,
+        suffixIcon: const Icon(Icons.calendar_today_rounded, size: 18, color: AppColors.textHint),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppDimens.radiusMd),
         ),
