@@ -508,7 +508,7 @@
                 <div class="feature-card">
                     <div class="feature-icon">⚡</div>
                     <h3>Fast Delivery</h3>
-                    <p>Reliable and prompt delivery to your doorstep across Lahore. Track your order in real-time.</p>
+                    <p>Reliable and prompt delivery to your doorstep across Model Town, Faisal Town & Garden Town, Lahore. Track your order in real-time.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">💰</div>
