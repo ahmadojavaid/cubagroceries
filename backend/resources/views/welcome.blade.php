@@ -433,11 +433,11 @@
             <div>
                 <div class="hero-badge">
                     <span class="hero-badge-dot"></span>
-                    Now delivering across Lahore
+                    Now delivering across Model Town and nearby areas
                 </div>
                 <h1>Fresh groceries,<br><span>delivered fast.</span></h1>
                 <p class="hero-subtitle">
-                    Order daily essentials, fresh produce, and household items from Asif Groceries. We deliver straight to your doorstep in Lahore.
+                    Order daily essentials, fresh produce, and household items from Asif Groceries. We deliver straight to your doorstep across Model Town and nearby areas.
                 </p>
                 <div class="hero-actions">
                     <a href="#download" class="btn-primary">
