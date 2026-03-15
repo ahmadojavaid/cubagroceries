@@ -7,7 +7,7 @@ import '../theme/app_colors.dart';
 /// App-wide network image widget that handles:
 /// - Herd self-signed SSL certs (dev only)
 /// - Host header for emulator → Herd routing (dev only)
-/// - Production: standard HTTPS image loading
+/// - Production: standard HTTPS image loading via Image.network
 class AppNetworkImage extends StatefulWidget {
   final String? imageUrl;
   final double? width;
@@ -31,13 +31,13 @@ class AppNetworkImage extends StatefulWidget {
 }
 
 class _AppNetworkImageState extends State<AppNetworkImage> {
-  static final HttpClient _client = HttpClient()
-    ..badCertificateCallback = AppConfig.trustSelfSigned
-        ? (X509Certificate cert, String host, int port) => true
-        : null;
+  // Only used in dev mode for self-signed certs + Host header
+  static final HttpClient _devClient = HttpClient()
+    ..badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
 
-  /// Simple in-memory cache shared across all instances
-  static final Map<String, Uint8List> _cache = {};
+  /// Simple in-memory cache for dev mode
+  static final Map<String, Uint8List> _devCache = {};
 
   Uint8List? _imageBytes;
   bool _loading = true;
@@ -46,33 +46,35 @@ class _AppNetworkImageState extends State<AppNetworkImage> {
   @override
   void initState() {
     super.initState();
-    _loadImage();
+    if (!AppConfig.isProduction) {
+      _loadImageDev();
+    }
   }
 
   @override
   void didUpdateWidget(covariant AppNetworkImage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.imageUrl != widget.imageUrl) {
-      _loadImage();
+    if (oldWidget.imageUrl != widget.imageUrl && !AppConfig.isProduction) {
+      _loadImageDev();
     }
   }
 
-  Future<void> _loadImage() async {
+  /// Dev-only: uses custom HttpClient for self-signed certs
+  Future<void> _loadImageDev() async {
     final url = widget.imageUrl;
     if (url == null || url.isEmpty) {
       if (mounted) setState(() { _loading = false; _error = true; });
       return;
     }
 
-    // Check cache first
-    if (_cache.containsKey(url)) {
-      if (mounted) setState(() { _imageBytes = _cache[url]; _loading = false; });
+    if (_devCache.containsKey(url)) {
+      if (mounted) setState(() { _imageBytes = _devCache[url]; _loading = false; });
       return;
     }
 
     try {
       final uri = Uri.parse(url);
-      final request = await _client.getUrl(uri);
+      final request = await _devClient.getUrl(uri);
       if (AppConfig.hostHeader != null) {
         request.headers.set('Host', AppConfig.hostHeader!);
       }
@@ -80,13 +82,13 @@ class _AppNetworkImageState extends State<AppNetworkImage> {
 
       if (response.statusCode == 200) {
         final bytes = await _consolidate(response);
-        _cache[url] = bytes;
+        _devCache[url] = bytes;
         if (mounted) setState(() { _imageBytes = bytes; _loading = false; });
       } else {
         if (mounted) setState(() { _loading = false; _error = true; });
       }
     } catch (e) {
-      debugPrint('AppNetworkImage error: $e');
+      debugPrint('AppNetworkImage dev error: $e');
       if (mounted) setState(() { _loading = false; _error = true; });
     }
   }
@@ -101,6 +103,29 @@ class _AppNetworkImageState extends State<AppNetworkImage> {
 
   @override
   Widget build(BuildContext context) {
+    final url = widget.imageUrl;
+
+    // No URL — show error
+    if (url == null || url.isEmpty) {
+      return widget.errorWidget ?? _defaultError();
+    }
+
+    // Production: use standard Image.network (handles concurrency properly)
+    if (AppConfig.isProduction) {
+      return Image.network(
+        url,
+        width: widget.width,
+        height: widget.height,
+        fit: widget.fit,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return widget.placeholder ?? _defaultPlaceholder();
+        },
+        errorBuilder: (_, _, _) => widget.errorWidget ?? _defaultError(),
+      );
+    }
+
+    // Dev: use custom HttpClient loaded bytes
     if (_loading) {
       return widget.placeholder ?? _defaultPlaceholder();
     }
