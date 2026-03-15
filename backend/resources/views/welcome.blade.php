@@ -293,6 +293,15 @@
             color: var(--orange); font-size: 0.8rem; font-weight: 700; margin-top: 2px;
         }
 
+        /* ─── Store badges ─── */
+        .store-badges {
+            display: flex; align-items: center; gap: 1rem;
+            margin-top: 2rem;
+        }
+        .store-badges a { display: inline-block; transition: transform 0.3s; }
+        .store-badges a:hover { transform: translateY(-2px); }
+        .store-badges img { height: 52px; width: auto; }
+
         /* ─── Testimonials ─── */
         .testimonials { padding: 6rem 2rem; background: var(--warm-white); }
         .testimonials-grid {
@@ -590,10 +599,17 @@
                 <ul class="checklist">
                     <li><span class="check-icon">✓</span> Browse 500+ products across 6 categories</li>
                     <li><span class="check-icon">✓</span> Real-time order tracking and push notifications</li>
-                    <li><span class="check-icon">✓</span> Secure checkout with multiple sign-in options</li>
                     <li><span class="check-icon">✓</span> Save delivery addresses for quick reorder</li>
-                    <li><span class="check-icon">✓</span> In-app wallet for fast payments</li>
                 </ul>
+
+                <div class="store-badges">
+                    <a href="https://play.google.com/store/apps/details?id=com.asifgroceries.app" target="_blank" rel="noopener">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" height="52">
+                    </a>
+                    <a href="#" style="opacity:0.4;pointer-events:none;">
+                        <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="52">
+                    </a>
+                </div>
             </div>
         </div>
     </section>
