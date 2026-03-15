@@ -32,7 +32,7 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
-            'date_of_birth' => 'date',
+            'date_of_birth' => 'date:Y-m-d',
             'wallet_amount' => 'decimal:2',
         ];
     }
