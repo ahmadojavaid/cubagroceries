@@ -1,8 +1,8 @@
 name: cubagroceries
 description: "Asif Groceries — Customer & Rider mobile app"
 publish_to: 'none'
-version: 1.0.6+8
-# Play Store: versionName=1.0.6, versionCode=8
+version: 1.0.6+9
+# Play Store: versionName=1.0.6, versionCode=9
 # Bump versionCode for each upload to Play Store
 
 # Release: flutter build apk --release

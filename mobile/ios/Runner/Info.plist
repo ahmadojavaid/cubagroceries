@@ -66,6 +66,19 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>GIDClientID</key>
+	<string>970803843908-vgbg85n42vmv3r29lllolsa62u4e67l0.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.970803843908-vgbg85n42vmv3r29lllolsa62u4e67l0</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Asif Groceries needs your location to deliver orders to your address and show nearby delivery areas.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
