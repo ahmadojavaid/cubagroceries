@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Asif Groceries needs your location to deliver orders to your address and show nearby delivery areas.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Asif Groceries needs your location to deliver orders to your address.</string>
 </dict>
 </plist>
