@@ -19,3 +19,24 @@ stop.ps1
 # OS files
 .DS_Store
 Thumbs.db
+
+# Apple keys and certificates
+*.p8
+*.p12
+*.mobileprovision
+
+# iOS build artifacts
+iOS Build/
+
+# Screenshots and promo images (not source code)
+*.png
+*.jpg
+*.jpeg
+!mobile/assets/**
+!mobile/ios/Runner/Assets.xcassets/**
+!backend/public/**
+
+# Word docs and misc files at repo root
+*.docx
+*.ipa
+*.zip
