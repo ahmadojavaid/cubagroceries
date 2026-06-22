@@ -56,8 +56,8 @@ dependencies:
   firebase_auth: ^5.5.1
 
   # Error Tracking (GlitchTip via Sentry SDK)
-  sentry_flutter: ^8.15.0
-  sentry_dio: ^8.15.0
+  sentry_flutter: ^9.22.0
+  sentry_dio: ^9.22.0
 
   # Connectivity
   connectivity_plus: ^6.1.4
