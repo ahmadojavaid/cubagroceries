@@ -1,8 +1,8 @@
 name: cubagroceries
 description: "Asif Groceries — Customer & Rider mobile app"
 publish_to: 'none'
-version: 1.0.6+10
-# Play Store: versionName=1.0.6, versionCode=10
+version: 1.0.6+11
+# Play Store: versionName=1.0.6, versionCode=11
 # Bump versionCode for each upload to Play Store
 
 # Release: flutter build apk --release
@@ -56,8 +56,8 @@ dependencies:
   firebase_auth: ^5.5.1
 
   # Error Tracking (GlitchTip via Sentry SDK)
-  sentry_flutter: ^8.12.0
-  sentry_dio: ^8.12.0
+  sentry_flutter: ^8.15.0
+  sentry_dio: ^8.15.0
 
   # Connectivity
   connectivity_plus: ^6.1.4
