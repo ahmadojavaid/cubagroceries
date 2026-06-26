@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../../../core/widgets/shared_widgets.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../categories/providers/category_provider.dart';
 import '../../notifications/providers/notification_provider.dart';
 import '../../profile/providers/address_provider.dart';
@@ -29,8 +30,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Future.microtask(() {
       ref.read(homeProvider.notifier).fetchHome();
       ref.read(categoriesProvider.notifier).fetchCategories();
-      ref.read(notificationListProvider.notifier).fetchNotifications();
-      ref.read(addressProvider.notifier).fetchAddresses();
+      // Only fetch user-specific data if authenticated
+      if (ref.read(authProvider).isAuthenticated) {
+        ref.read(notificationListProvider.notifier).fetchNotifications();
+        ref.read(addressProvider.notifier).fetchAddresses();
+      }
     });
   }
 
@@ -55,7 +59,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: const Icon(Icons.search_rounded),
             onPressed: () => context.push('/search'),
           ),
-          _buildNotificationBell(context),
+          if (ref.watch(authProvider).isAuthenticated)
+            _buildNotificationBell(context),
         ],
       ),
       body: RefreshIndicator(
@@ -67,6 +72,45 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildLocationHeader() {
+    final isAuth = ref.watch(authProvider).isAuthenticated;
+
+    // Guest user: show simple branding
+    if (!isAuth) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.location_on_rounded,
+            size: 22,
+            color: AppColors.primary,
+          ),
+          const SizedBox(width: 6),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Asif Groceries',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              Text(
+                'Lahore, Pakistan',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+
     final addrState = ref.watch(addressProvider);
     final addresses = addrState.addresses;
     final selected = addresses.where((a) => a.isDefault).firstOrNull ?? addresses.firstOrNull;

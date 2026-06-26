@@ -45,7 +45,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _completeOnboarding() async {
     final box = await Hive.openBox('app_prefs');
     await box.put('hasSeenOnboarding', true);
-    if (mounted) context.go('/login');
+    if (mounted) context.go('/home');
   }
 
   void _onNext() {

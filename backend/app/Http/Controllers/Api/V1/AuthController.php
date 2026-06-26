@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Firebase\JWT\JWT;
+use Firebase\JWT\JWK;
+use Firebase\JWT\Key;
 
 class AuthController extends Controller
 {
@@ -108,6 +111,74 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token,
         ], 'Google sign-in successful');
+    }
+
+    /**
+     * Sign in with Apple: verify Apple identity token, find or create user, return Sanctum token.
+     */
+    public function apple(Request $request): JsonResponse
+    {
+        $request->validate([
+            'identity_token' => 'required|string',
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            // Decode the Apple identity token (JWT)
+            // Fetch Apple's public keys
+            $jwksResponse = Http::get('https://appleid.apple.com/auth/keys');
+
+            if ($jwksResponse->failed()) {
+                return $this->error('Could not verify Apple token.', 500);
+            }
+
+            $keys = JWK::parseKeySet($jwksResponse->json());
+            $decoded = JWT::decode($request->identity_token, $keys);
+
+            // Verify issuer and audience
+            if ($decoded->iss !== 'https://appleid.apple.com') {
+                return $this->error('Invalid Apple token issuer.', 401);
+            }
+
+            $bundleId = config('services.apple.client_id', 'com.asifgroceries.app');
+            if ($decoded->aud !== $bundleId) {
+                return $this->error('Invalid Apple token audience.', 401);
+            }
+
+            $email = $decoded->email ?? null;
+            $appleUserId = $decoded->sub;
+
+            // Find existing user by email or apple_user_id
+            $user = null;
+            if ($email) {
+                $user = User::where('email', $email)->first();
+            }
+
+            if (!$user) {
+                // Create new user
+                $firstName = $request->first_name ?? 'Apple';
+                $lastName = $request->last_name ?? 'User';
+
+                $user = User::create([
+                    'email' => $email,
+                    'firstname' => $firstName,
+                    'lastname' => $lastName,
+                    'identity' => '',
+                    'password' => Hash::make(Str::random(32)),
+                    'role' => 'customer',
+                ]);
+            }
+
+            $token = $user->createToken('mobile-app')->plainTextToken;
+
+            return $this->success([
+                'user' => $user,
+                'token' => $token,
+            ], 'Apple sign-in successful');
+        } catch (\Exception $e) {
+            return $this->error('Invalid Apple token: ' . $e->getMessage(), 401);
+        }
     }
 
     /**

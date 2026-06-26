@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/auth_gate.dart';
 import '../../../core/widgets/offline_banner.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../cart/screens/cart_screen.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../../categories/screens/categories_tab_screen.dart';
@@ -30,6 +32,12 @@ class _NavigationShellState extends ConsumerState<NavigationShell> {
 
   void _onTap(int index) {
     if (index == _currentIndex) return;
+
+    // Tabs 2 (Cart), 3 (Orders), 4 (Profile) require authentication
+    if (index >= 2 && !requireAuth(context, ref)) {
+      return;
+    }
+
     HapticFeedback.lightImpact();
     setState(() => _currentIndex = index);
   }

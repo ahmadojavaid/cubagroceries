@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_exception.dart';
 import '../../../core/config/app_config.dart';
@@ -215,6 +217,63 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(isLoading: false, error: data['message']);
       return false;
     } catch (e) {
+      final message = _extractError(e);
+      state = state.copyWith(isLoading: false, error: message);
+      return false;
+    }
+  }
+
+  /// Sign in with Apple
+  Future<bool> signInWithApple() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final identityToken = credential.identityToken;
+      if (identityToken == null) {
+        state = state.copyWith(isLoading: false, error: 'Could not get Apple token.');
+        return false;
+      }
+
+      // Apple only sends name on first sign-in, so capture it
+      final firstName = credential.givenName;
+      final lastName = credential.familyName;
+
+      final response = await _api.post('/auth/apple', data: {
+        'identity_token': identityToken,
+        'first_name': firstName,
+        'last_name': lastName,
+      });
+
+      final data = response.data;
+      if (data['success'] == true) {
+        await _api.saveToken(data['data']['token']);
+        final userData = Map<String, dynamic>.from(data['data']['user']);
+        final role = userData['role'] as String? ?? 'customer';
+        await _storage.write(key: _roleKey, value: role);
+        state = AuthState(
+          isAuthenticated: true,
+          user: userData,
+          role: role,
+        );
+        _fcm.initialize();
+        _ref.read(fcmNotificationHandlerProvider).initialize();
+        return true;
+      }
+
+      state = state.copyWith(isLoading: false, error: data['message']);
+      return false;
+    } catch (e) {
+      if (e is SignInWithAppleAuthorizationException &&
+          e.code == AuthorizationErrorCode.canceled) {
+        state = state.copyWith(isLoading: false);
+        return false;
+      }
       final message = _extractError(e);
       state = state.copyWith(isLoading: false, error: message);
       return false;

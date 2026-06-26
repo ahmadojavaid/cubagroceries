@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/auth_gate.dart';
 import '../../../core/widgets/app_network_image.dart';
 import '../data/product_model.dart';
 import '../../cart/data/cart_item_model.dart';
@@ -162,6 +163,7 @@ class ProductCard extends ConsumerWidget {
                               )
                             : _AddButton(
                                 onTap: () {
+                                  if (!requireAuth(context, ref)) return;
                                   HapticFeedback.mediumImpact();
                                   ref.read(cartProvider.notifier).addItem(
                                         CartItemModel(

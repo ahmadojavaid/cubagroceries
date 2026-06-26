@@ -29,6 +29,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/google', [AuthController::class, 'google']);
+        Route::post('/apple', [AuthController::class, 'apple']);
         Route::post('/phone-verify', [AuthController::class, 'phoneVerify']);
     });
 
@@ -38,26 +39,33 @@ Route::prefix('v1')->group(function () {
         Route::get('/user', [AuthController::class, 'user']);
     });
 
-    // Protected API routes
+    // Public API routes (no auth required — Apple Guideline 5.1.1(v) guest browsing)
+    Route::get('/home', [HomeController::class, 'home']);
+    Route::get('/banners', [HomeController::class, 'banners']);
+
+    Route::get('/categories', [CategoriesController::class, 'index']);
+    Route::get('/categories/{id}', [CategoriesController::class, 'show']);
+    Route::get('/categories/{id}/products', [CategoriesController::class, 'products']);
+
+    Route::get('/products', [ProductsController::class, 'index']);
+    Route::get('/products/search', [ProductsController::class, 'search']);
+    Route::get('/products/suggestions', [ProductsController::class, 'suggestions']);
+    Route::get('/products/{id}', [ProductsController::class, 'show']);
+    Route::get('/products/{id}/related', [ProductsController::class, 'related']);
+
+    // Product reviews (read-only, public)
+    Route::get('/products/{productId}/reviews', [ReviewController::class, 'forProduct']);
+
+    // FAQs, Store Schedules, App Settings, Store Status (public)
+    Route::get('/faqs', [FaqController::class, 'index']);
+    Route::get('/store-schedules', [StoreScheduleController::class, 'index']);
+    Route::get('/settings', [AppSettingController::class, 'index']);
+    Route::get('/store-status', [AppSettingController::class, 'storeStatus']);
+
+    // Protected API routes (auth required)
     Route::middleware('auth:sanctum')->group(function () {
 
-        // Home & Banners
-        Route::get('/home', [HomeController::class, 'home']);
-        Route::get('/banners', [HomeController::class, 'banners']);
-
-        // Categories
-        Route::get('/categories', [CategoriesController::class, 'index']);
-        Route::get('/categories/{id}', [CategoriesController::class, 'show']);
-        Route::get('/categories/{id}/products', [CategoriesController::class, 'products']);
-
-        // Products
-        Route::get('/products', [ProductsController::class, 'index']);
-        Route::get('/products/search', [ProductsController::class, 'search']);
-        Route::get('/products/suggestions', [ProductsController::class, 'suggestions']);
-        Route::get('/products/{id}', [ProductsController::class, 'show']);
-        Route::get('/products/{id}/related', [ProductsController::class, 'related']);
-
-        // Search history
+        // Search history (user-specific)
         Route::get('/search-history', [ProductsController::class, 'searchHistory']);
         Route::delete('/search-history', [ProductsController::class, 'clearSearchHistory']);
         Route::delete('/search-history/{id}', [ProductsController::class, 'deleteSearchHistoryItem']);
@@ -99,21 +107,10 @@ Route::prefix('v1')->group(function () {
         // Device Token (FCM)
         Route::post('/device-token', [DeviceTokenController::class, 'store']);
 
-        // FAQs
-        Route::get('/faqs', [FaqController::class, 'index']);
-
-        // Store Schedules
-        Route::get('/store-schedules', [StoreScheduleController::class, 'index']);
-
-        // App Settings (public config)
-        Route::get('/settings', [AppSettingController::class, 'index']);
-        Route::get('/store-status', [AppSettingController::class, 'storeStatus']);
-
         // Coupons
         Route::post('/coupons/apply', [CouponController::class, 'apply']);
 
-        // Reviews — Product
-        Route::get('/products/{productId}/reviews', [ReviewController::class, 'forProduct']);
+        // Reviews — Product (write)
         Route::post('/reviews', [ReviewController::class, 'store']);
         Route::get('/orders/{orderId}/reviewable-products', [ReviewController::class, 'reviewableProducts']);
 

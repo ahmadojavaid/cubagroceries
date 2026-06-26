@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -51,6 +52,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   Future<void> _onGoogleSignIn() async {
     final success = await ref.read(authProvider.notifier).signInWithGoogle();
+    if (success && mounted) {
+      final isRider = ref.read(authProvider).isRider;
+      context.go(isRider ? '/rider-home' : '/home');
+    }
+  }
+
+  Future<void> _onAppleSignIn() async {
+    final success = await ref.read(authProvider.notifier).signInWithApple();
     if (success && mounted) {
       final isRider = ref.read(authProvider).isRider;
       context.go(isRider ? '/rider-home' : '/home');
@@ -290,6 +299,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       ),
                     ),
                     const SizedBox(height: 12),
+
+                    // Sign in with Apple (iOS only)
+                    if (Platform.isIOS) ...[
+                      SizedBox(
+                        height: 52,
+                        child: OutlinedButton.icon(
+                          onPressed: auth.isLoading ? null : _onAppleSignIn,
+                          icon: const Icon(Icons.apple_rounded, size: 24),
+                          label: const Text('Sign in with Apple'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.textPrimary,
+                            side: const BorderSide(color: AppColors.border),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
 
                     // Phone OTP
                     SizedBox(

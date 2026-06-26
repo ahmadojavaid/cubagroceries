@@ -71,7 +71,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           box.get('hasSeenOnboarding', defaultValue: false);
       if (!mounted) return;
       if (hasSeenOnboarding) {
-        context.go('/login');
+        // Guest browsing — go straight to home (Apple Guideline 5.1.1(v))
+        context.go('/home');
       } else {
         context.go('/onboarding');
       }
