@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -268,15 +268,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       state = state.copyWith(isLoading: false, error: data['message']);
       return false;
-    } catch (e) {
-      if (e is SignInWithAppleAuthorizationException &&
-          e.code == AuthorizationErrorCode.canceled) {
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) {
         state = state.copyWith(isLoading: false);
-        return false;
+      } else {
+        debugPrint('Apple sign-in failed: ${e.code} ${e.message}');
+        state = state.copyWith(
+          isLoading: false,
+          error: 'Apple sign-in failed. Please try again.',
+        );
       }
-      final message = _extractError(e);
-      state = state.copyWith(isLoading: false, error: message);
       return false;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: _extractError(e));
+      return false;
+    } finally {
+      // Never leave the UI stuck in a loading state
+      if (state.isLoading) state = state.copyWith(isLoading: false);
     }
   }
 
@@ -397,12 +405,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(error: null);
   }
 
-  String _extractError(dynamic e) {
-    if (e is Exception) {
-      final dioError = e as dynamic;
-      if (dioError.error is ApiException) {
-        return (dioError.error as ApiException).firstError;
-      }
+  String _extractError(Object e) {
+    if (e is DioException && e.error is ApiException) {
+      return (e.error as ApiException).firstError;
     }
     return 'Something went wrong. Please try again.';
   }

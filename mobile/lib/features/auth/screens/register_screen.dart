@@ -34,6 +34,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  void _back() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/login');
+    }
+  }
+
   Future<void> _onRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -60,7 +68,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.go('/login'),
+          onPressed: _back,
         ),
         title: const Text('Create Account'),
       ),
@@ -263,7 +271,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     TextButton(
                       style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                      onPressed: () => context.go('/login'),
+                      onPressed: () => context.pushReplacement('/login'),
                       child: const Text('Sign In'),
                     ),
                   ],

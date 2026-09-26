@@ -50,6 +50,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     super.dispose();
   }
 
+  /// Leave auth flow and return to guest browsing (Apple 5.1.1(v))
+  void _continueAsGuest() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/home');
+    }
+  }
+
   Future<void> _onGoogleSignIn() async {
     final success = await ref.read(authProvider.notifier).signInWithGoogle();
     if (success && mounted) {
@@ -95,7 +104,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               // ── Animated orange header with logo ──
               FadeTransition(
                 opacity: _headerFade,
-                child: Container(
+                child: Stack(
+                  children: [
+                    Container(
                   width: double.infinity,
                   padding: EdgeInsets.only(
                     top: MediaQuery.of(context).padding.top + 32,
@@ -134,6 +145,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       ),
                     ],
                   ),
+                ),
+                    Positioned(
+                      top: MediaQuery.of(context).padding.top + 4,
+                      left: 4,
+                      child: IconButton(
+                        tooltip: 'Close',
+                        icon: const Icon(Icons.close_rounded,
+                            color: Colors.white),
+                        onPressed: _continueAsGuest,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -326,7 +349,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       child: OutlinedButton.icon(
                         onPressed: auth.isLoading
                             ? null
-                            : () => context.go('/phone-login'),
+                            : () => context.push('/phone-login'),
                         icon: const Icon(Icons.phone_android_rounded,
                             size: 20),
                         label: const Text('Sign in with Phone'),
@@ -358,10 +381,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               minimumSize: Size.zero,
                               tapTargetSize:
                                   MaterialTapTargetSize.shrinkWrap),
-                          onPressed: () => context.go('/register'),
+                          onPressed: () => context.push('/register'),
                           child: const Text('Sign Up'),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Guest browsing
+                    Center(
+                      child: TextButton(
+                        onPressed: auth.isLoading ? null : _continueAsGuest,
+                        child: const Text('Continue as Guest'),
+                      ),
                     ),
                   ],
                 ),

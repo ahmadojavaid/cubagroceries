@@ -93,7 +93,8 @@ class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.go('/login'),
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/login'),
         ),
         title: const Text('Phone Login'),
       ),
