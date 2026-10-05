@@ -20,6 +20,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isChangingPassword = false;
+  bool _isDeleting = false;
   bool _obscureCurrent = true;
   bool _obscureNew = true;
   bool _obscureConfirm = true;
@@ -99,8 +100,54 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _logout() async {
     await ref.read(authProvider.notifier).logout();
     if (mounted) {
-      context.go('/login');
+      context.go('/home');
     }
+  }
+
+  void _confirmDeleteAccount() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Account?'),
+        content: const Text(
+          'This permanently deletes your account, profile, saved addresses '
+          'and wallet balance. This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _deleteAccount();
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Delete Permanently'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteAccount() async {
+    setState(() => _isDeleting = true);
+    final error = await ref.read(authProvider.notifier).deleteAccount();
+    if (!mounted) return;
+    setState(() => _isDeleting = false);
+
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error), backgroundColor: AppColors.error),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Your account has been deleted.')),
+    );
+    context.go('/home');
   }
 
   @override
@@ -307,6 +354,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                 ),
               ),
+            ),
+          ),
+
+          const SizedBox(height: AppDimens.lg),
+
+          // Delete account (Apple Guideline 5.1.1(v))
+          Center(
+            child: TextButton.icon(
+              onPressed: _isDeleting ? null : _confirmDeleteAccount,
+              icon: _isDeleting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.delete_forever_outlined, size: 20),
+              label: const Text('Delete Account'),
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
             ),
           ),
 

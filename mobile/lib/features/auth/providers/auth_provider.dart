@@ -400,6 +400,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = const AuthState(isAuthenticated: false);
   }
 
+  /// Permanently delete the account, then clear local session
+  Future<String?> deleteAccount() async {
+    try {
+      await _api.delete('/auth/account');
+    } catch (e) {
+      return _extractError(e);
+    }
+    await _api.clearToken();
+    await _storage.delete(key: _roleKey);
+    FcmService.clearToken();
+    state = const AuthState(isAuthenticated: false);
+    return null;
+  }
+
   /// Clear error state
   void clearError() {
     state = state.copyWith(error: null);

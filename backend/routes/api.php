@@ -37,6 +37,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'user']);
+        Route::delete('/account', [AuthController::class, 'deleteAccount']);
     });
 
     // Public API routes (no auth required — Apple Guideline 5.1.1(v) guest browsing)

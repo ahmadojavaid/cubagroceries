@@ -48,6 +48,14 @@ class _NavigationShellState extends ConsumerState<NavigationShell> {
   Widget build(BuildContext context) {
     final cartItemCount = ref.watch(cartProvider).items.length;
 
+    // On logout / account deletion, return guests to the Home tab
+    ref.listen<bool>(authProvider.select((s) => s.isAuthenticated),
+        (prev, next) {
+      if (prev == true && !next && _currentIndex >= 2) {
+        setState(() => _currentIndex = 0);
+      }
+    });
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {

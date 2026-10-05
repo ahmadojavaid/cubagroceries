@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -244,6 +245,39 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return $this->success(message: 'Logged out successfully');
+    }
+
+    /**
+     * Permanently delete the authenticated customer's account (Apple Guideline 5.1.1(v)).
+     * Personal data is removed; order/complaint records are kept anonymised for accounting.
+     */
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user->isRider()) {
+            return $this->error('Rider accounts must be removed by the store admin.', 403);
+        }
+
+        DB::transaction(function () use ($user) {
+            $user->addresses()->delete();
+            $user->notifications()->delete();
+            $user->tokens()->delete();
+            DB::table('search_history')->where('user_id', $user->id)->delete();
+
+            $user->forceFill([
+                'email' => null,
+                'identity' => 'deleted-' . $user->id,
+                'firstname' => 'Deleted',
+                'lastname' => 'User',
+                'password' => Hash::make(Str::random(64)),
+                'date_of_birth' => null,
+                'wallet_amount' => 0,
+                'fcm_token' => null,
+            ])->save();
+        });
+
+        return $this->success(message: 'Your account has been deleted.');
     }
 
     public function user(Request $request): JsonResponse

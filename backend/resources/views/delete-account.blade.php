@@ -247,7 +247,13 @@
         <p><strong>This action is permanent.</strong> Once your account is deleted, your personal data and account history cannot be recovered. Please read the information below before submitting a request.</p>
     </div>
 
-    <h2>How to Request Account Deletion</h2>
+    <h2>Delete From the App (Instant)</h2>
+    <p>
+        Open the Asif Groceries app, go to <strong>Profile &rarr; Settings &rarr; Delete Account</strong>, and confirm.
+        Your account is deleted immediately.
+    </p>
+
+    <h2>How to Request Account Deletion by Email</h2>
     <p>
         You can request the deletion of your Asif Groceries account and associated data by emailing us directly.
         We will process your request within <strong>30 days</strong>.
